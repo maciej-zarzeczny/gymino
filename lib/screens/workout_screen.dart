@@ -23,7 +23,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   double _opacity = 1.0;
   Timer _timer;
   int _timerDuration;
-  int _restDuration = 90;
+  int _restDuration = 0;
   final weightInputController = TextEditingController(text: '0');
 
   @override
@@ -43,18 +43,19 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 
   void setDone() {
     FocusScope.of(context).requestFocus(new FocusNode());
+    weightInputController.text = '0';
     setState(() {
-      _rest = true;
-      _opacity = 0.0;
-      _restDuration = 90;      
-      startCountdown(_restDuration);
       if (_currentSet < _exercises[_currentExerciseIndex].sets.length) {
         _currentSet += 1;
         _currentReps = 0;
+        _restDuration = _exercises[_currentExerciseIndex].rest;
+        startRest(_restDuration);
       } else {
         _currentSet = 1;
         _currentReps = 0;
         if (_currentExerciseIndex < _exercises.length - 1) {
+          _restDuration = _exercises[_currentExerciseIndex].setRest;
+          startRest(_restDuration);
           _currentExerciseIndex += 1;
         } else {
           print('Workout finished');
@@ -62,6 +63,12 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
         }
       }
     });
+  }
+
+  void startRest(int time) {
+    _rest = true;
+    _opacity = 0.0;
+    startCountdown(time);
   }
 
   void finishRest() {
@@ -149,16 +156,11 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     SizeConfig().init(context);
     Exercise _currentExercise;
     int _setsNumber;
-    // bool _smallScreen = false;
 
     if (!_isLoading) {
       _currentExercise = _exercises[_currentExerciseIndex];
       _setsNumber = _currentExercise.sets.length;
       _repsNumber = _currentExercise.sets.elementAt(_currentSet - 1);
-
-      // if (MediaQuery.of(context).size.height <= 600) {
-      //   _smallScreen = true;
-      // }
     }
 
     return Scaffold(
@@ -169,7 +171,10 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
           : SingleChildScrollView(
               child: GestureDetector(
                 onTap: () {
-                  FocusScope.of(context).requestFocus(new FocusNode());
+                  if (weightInputController.text == '') {
+                    weightInputController.text = '0';
+                  }                  
+                  FocusScope.of(context).requestFocus(new FocusNode());                  
                 },
                 child: Container(
                   height: (MediaQuery.of(context).size.height -
@@ -391,8 +396,11 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
               children: <Widget>[
                 Expanded(
                   child: TextField(
+                    onTap: () => weightInputController.text = '',
                     controller: weightInputController,
-                    decoration: InputDecoration(border: InputBorder.none),
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                    ),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: SizeConfig.safeBlockHorizontal * 7.0,
@@ -457,39 +465,17 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   }
 
   Widget topHeader() {
-    return Padding(
+    return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          IconButton(
-            padding: const EdgeInsets.all(0.0),
-            icon: Icon(
-              Icons.highlight_off,
-              color: Colors.white,
-              size: 35,
-            ),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          Row(
-            children: <Widget>[
-              Icon(
-                Icons.access_time,
-                size: 30,
-                color: Colors.white,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                child: Text(
-                  '25:38',
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
-              )
-            ],
-          ),
-        ],
+      alignment: Alignment.topLeft,
+      child: IconButton(
+        padding: const EdgeInsets.all(0.0),
+        icon: Icon(
+          Icons.highlight_off,
+          color: Colors.white,
+          size: 35,
+        ),
+        onPressed: () => Navigator.of(context).pop(),
       ),
     );
   }

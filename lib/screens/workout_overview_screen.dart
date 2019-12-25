@@ -129,7 +129,7 @@ class _WorkoutOverviewScreenState extends State<WorkoutOverviewScreen> {
                       ],
                     );
                   } else {
-                    return ExerciseCard(exercises[i - 1].name, true);
+                    return ExerciseCard(exercises[i - 1]);
                   }
                 },
               ),

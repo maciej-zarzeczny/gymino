@@ -5,12 +5,16 @@ class Exercise {
   final String name;
   final String description;
   final List<dynamic> sets;
+  final int rest;
+  final int setRest;
 
   Exercise({
     this.id,
     this.name,
     this.description,
     this.sets,
+    this.rest,
+    this.setRest,
   });
 
   factory Exercise.fromSnapshot(DocumentSnapshot doc) {
@@ -21,6 +25,8 @@ class Exercise {
       name: data['name'] ?? '',
       description: data['description'] ?? '',
       sets: data['sets'],
+      rest: data['rest'],
+      setRest: data['setRest'],
     );
   }
 }
