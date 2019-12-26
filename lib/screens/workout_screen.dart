@@ -173,8 +173,8 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                 onTap: () {
                   if (weightInputController.text == '') {
                     weightInputController.text = '0';
-                  }                  
-                  FocusScope.of(context).requestFocus(new FocusNode());                  
+                  }
+                  FocusScope.of(context).requestFocus(new FocusNode());
                 },
                 child: Container(
                   height: (MediaQuery.of(context).size.height -
@@ -240,6 +240,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
               style: Theme.of(context).textTheme.title.copyWith(
                     fontSize: SizeConfig.safeBlockHorizontal * 7.0,
                   ),
+              textAlign: TextAlign.center,
             ),
           ),
           AnimatedOpacity(

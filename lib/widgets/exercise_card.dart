@@ -16,8 +16,7 @@ class ExerciseCard extends StatelessWidget {
     return GestureDetector(
       onTap: () =>
           Navigator.of(context).pushNamed(ExerciseOverviewScreen.routeName, arguments: _exercise),
-      child: Container(
-        width: double.infinity,
+      child: Container(        
         height: size * 0.15,
         padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
         child: Row(
@@ -32,11 +31,12 @@ class ExerciseCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10.0),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 15.0),
+            Container(
+              width: MediaQuery.of(context).size.width - (size * 0.15) - 25.0,
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
               child: Text(
                 _exercise.name,
-                style: Theme.of(context).textTheme.display2,
+                style: Theme.of(context).textTheme.display2,                
               ),
             )
           ],

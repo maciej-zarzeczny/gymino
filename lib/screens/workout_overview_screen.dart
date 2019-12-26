@@ -25,9 +25,11 @@ class _WorkoutOverviewScreenState extends State<WorkoutOverviewScreen> {
       Provider.of<WorkoutsProvider>(context)
           .fetchExercises(ModalRoute.of(context).settings.arguments as String)
           .then((_) {
-        setState(() {
-          _isLoading = false;
-          _workoutId = ModalRoute.of(context).settings.arguments as String;
+        Provider.of<WorkoutsProvider>(context).fetchExercisesData().then((_) {
+          setState(() {
+            _isLoading = false;
+            _workoutId = ModalRoute.of(context).settings.arguments as String;
+          });
         });
       });
     });
@@ -41,10 +43,10 @@ class _WorkoutOverviewScreenState extends State<WorkoutOverviewScreen> {
     final exercises = workoutsProvider.exercises;
     if (_workoutId != null) {
       workout = workoutsProvider.findById(_workoutId);
-    }
+    }    
 
     void startWorkout() {
-      Navigator.of(context).pushNamed(WorkoutScreen.routeName, arguments: {        
+      Navigator.of(context).pushNamed(WorkoutScreen.routeName, arguments: {
         'exercises': exercises,
       });
     }

@@ -73,7 +73,7 @@ class WorkoutHeader extends StatelessWidget {
             ),
           ),
           Positioned(
-            bottom: -1,
+            bottom: -2,
             left: 0,
             right: 0,
             child: Container(

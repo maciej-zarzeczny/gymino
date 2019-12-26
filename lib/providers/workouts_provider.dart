@@ -51,7 +51,16 @@ class WorkoutsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchExercises(String workoutId) async {
+  // Future<void> fetchExercises(String workoutId) async {
+  //   var futures = <Future>[];
+  //   futures.add(fetchExercisesSets(workoutId));
+  //   futures.add(fetchExercisesData());
+
+  //   await Future.wait(futures);
+  //   notifyListeners();
+  // }
+
+  Future<void> fetchExercises(String workoutId) async {    
     var result = await _db
         .collection('trainers')
         .document(_trainerId)
@@ -59,11 +68,24 @@ class WorkoutsProvider with ChangeNotifier {
         .document(workoutId)
         .collection('exercises')
         .getDocuments();
+    
     final List<Exercise> loadedExercises = result.documents
         .map((exercise) => Exercise.fromSnapshot(exercise))
-        .toList();
+        .toList();            
 
     _exercises = loadedExercises;
     notifyListeners();
+  }
+
+  Future<void> fetchExercisesData() async {
+    var futures = <Future>[];    
+    for(int i=0; i<_exercises.length; i++) {
+      futures.add(_db.document('exercises/${_exercises[i].id}').get().then((data) {
+        _exercises[i].setExerciseData(data['name'], data['description'], data['instructions'], data['imageUrl'], data['keywords'], data['bulletPoints']);        
+      }));
+    }    
+
+    await Future.wait(futures);
+    notifyListeners();    
   }
 }
