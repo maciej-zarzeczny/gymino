@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../models/trainer.dart';
 import '../widgets/keyword.dart';
+import '../models/question.dart';
+import '../providers/trainers_provider.dart';
+import '../widgets/question_card.dart';
 
 class TrainerInfoScreen extends StatefulWidget {
   static const routeName = '/trainerInfo';
@@ -11,23 +15,92 @@ class TrainerInfoScreen extends StatefulWidget {
 }
 
 class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
+  bool _infoChoosen = true;
+  bool _isLoading = true;
+  Trainer _trainer;
+  List<Question> _questions;
+
+  @override
+  void initState() {
+    Future.delayed(Duration.zero).then((_) {
+      _trainer = ModalRoute.of(context).settings.arguments as Trainer;
+      Provider.of<TrainersProvider>(context)
+          .fetchQuestions(_trainer.id)
+          .then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+      });
+    });
+    super.initState();
+  }
+
+  void infoChoosed() {
+    setState(() {
+      _infoChoosen = true;
+    });
+  }
+
+  void faqChoosed() {
+    setState(() {
+      _infoChoosen = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final Trainer _trainer =
-        ModalRoute.of(context).settings.arguments as Trainer;
+    final trainersProvider = Provider.of<TrainersProvider>(context);
+    _questions = trainersProvider.questions;
 
     return Scaffold(
-      body: Container(
-        margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-        child: Column(
-          children: <Widget>[
-            header(context, _trainer),
-            picker(context),
-            infoGrid(context, _trainer.age, _trainer.height),
-            infoGrid2(context, _trainer.weight, _trainer.trainingTime),
-          ],
-        ),
-      ),
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : Container(              
+              margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  header(context, _trainer),
+                  picker(context),
+                  _infoChoosen
+                      ? Column(
+                          children: <Widget>[
+                            infoGrid(context, _trainer.age, _trainer.height),
+                            infoGrid2(context, _trainer.weight,
+                                _trainer.trainingTime),
+                          ],
+                        )
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(left: 15.0, right: 15.0, bottom: 15.0),
+                              child: Text(
+                                'Ostatnio dodane',
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    color: Theme.of(context).primaryColor,
+                                    fontWeight: FontWeight.normal),
+                              ),
+                            ),
+                            Container(                              
+                              height: (MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top) * 0.6049 - 15,                              
+                              child: ListView.builder(
+                                padding: const EdgeInsets.all(0.0),
+                                itemCount: _questions.length,
+                                itemBuilder: (context, i) {
+                                  return QuestionCard(_questions[i].question, _questions[i].answer);
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                ],
+              ),
+            ),
     );
   }
 
@@ -262,43 +335,62 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Container(
-            child: Text(
-              'Info',
-              style: TextStyle(color: Colors.white),
-              textAlign: TextAlign.center,
-            ),
-            margin: const EdgeInsets.only(right: 5.0),
-            padding:
-                const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-            decoration: BoxDecoration(
-                border: Border.all(
-                  color: Theme.of(context).primaryColor,
-                  width: 1.0,
+          GestureDetector(
+            onTap: infoChoosed,
+            child: Container(
+              child: Text(
+                'Info',
+                style: TextStyle(
+                  color: _infoChoosen
+                      ? Colors.white
+                      : Theme.of(context).primaryColor,
                 ),
-                color: Theme.of(context).primaryColor,
-                borderRadius: BorderRadius.circular(15.0)),
-            constraints: BoxConstraints(
-              minWidth: MediaQuery.of(context).size.width * 0.35,
+                textAlign: TextAlign.center,
+              ),
+              margin: const EdgeInsets.only(right: 5.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+              decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Theme.of(context).primaryColor,
+                    width: 1.0,
+                  ),
+                  color: _infoChoosen
+                      ? Theme.of(context).primaryColor
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(15.0)),
+              constraints: BoxConstraints(
+                minWidth: MediaQuery.of(context).size.width * 0.35,
+              ),
             ),
           ),
-          Container(
-            child: Text(
-              'FAQ',
-              style: TextStyle(color: Theme.of(context).primaryColor),
-              textAlign: TextAlign.center,
-            ),
-            margin: const EdgeInsets.only(left: 5.0),
-            padding:
-                const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-            decoration: BoxDecoration(
-                border: Border.all(
-                  color: Theme.of(context).primaryColor,
-                  width: 1.0,
+          GestureDetector(
+            onTap: faqChoosed,
+            child: Container(
+              child: Text(
+                'FAQ',
+                style: TextStyle(
+                  color: !_infoChoosen
+                      ? Colors.white
+                      : Theme.of(context).primaryColor,
                 ),
-                borderRadius: BorderRadius.circular(15.0)),
-            constraints: BoxConstraints(
-              minWidth: MediaQuery.of(context).size.width * 0.35,
+                textAlign: TextAlign.center,
+              ),
+              margin: const EdgeInsets.only(left: 5.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+              decoration: BoxDecoration(
+                  color: !_infoChoosen
+                      ? Theme.of(context).primaryColor
+                      : Colors.transparent,
+                  border: Border.all(
+                    color: Theme.of(context).primaryColor,
+                    width: 1.0,
+                  ),
+                  borderRadius: BorderRadius.circular(15.0)),
+              constraints: BoxConstraints(
+                minWidth: MediaQuery.of(context).size.width * 0.35,
+              ),
             ),
           ),
         ],
