@@ -8,7 +8,7 @@ class TrainersProvider with ChangeNotifier {
 
   List<Trainer> _trainers = [];
 
-  List<Trainer> get trainers {      
+  List<Trainer> get trainers {
     return [..._trainers];
   }
 

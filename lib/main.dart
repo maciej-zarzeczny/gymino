@@ -10,6 +10,7 @@ import './screens/trainer_workouts_screen.dart';
 import './screens/workout_overview_screen.dart';
 import './screens/workout_screen.dart';
 import './screens/exercise_overview_screen.dart';
+import './screens/trainer_info_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -89,6 +90,7 @@ class MyApp extends StatelessWidget {
           WorkoutOverviewScreen.routeName: (context) => WorkoutOverviewScreen(),
           WorkoutScreen.routeName: (context) => WorkoutScreen(),
           ExerciseOverviewScreen.routeName: (context) => ExerciseOverviewScreen(),
+          TrainerInfoScreen.routeName: (context) => TrainerInfoScreen(),
         },
       ),
     );

@@ -28,7 +28,7 @@ class WorkoutHeader extends StatelessWidget {
             alignment: Alignment.topCenter,
           ),
           Container(
-            color: Colors.black12,
+            color: Colors.black26,
             width: double.infinity,
             height: double.infinity,
           ),
@@ -39,7 +39,7 @@ class WorkoutHeader extends StatelessWidget {
               iconSize: 30,
               onPressed: () => Navigator.of(context).pop(),
               icon: Icon(Icons.arrow_back),
-              color: Theme.of(context).primaryColor,
+              color: Colors.white,
             ),
           ),
           Positioned(
@@ -68,7 +68,7 @@ class WorkoutHeader extends StatelessWidget {
             left: 15,
             child: Row(
               children: workout.keywords.entries.map((keyword) {
-                return Keyword(keyword.value);
+                return Keyword(keyword.value, false);
               }).toList(),
             ),
           ),

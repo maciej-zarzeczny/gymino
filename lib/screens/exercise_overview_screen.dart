@@ -99,7 +99,7 @@ class ExerciseOverviewScreen extends StatelessWidget {
             padding: const EdgeInsets.only(top: 10.0),
             child: Row(
               children: exercise.keywords.map((keyword) {
-                return Keyword(keyword);
+                return Keyword(keyword, true);
               }).toList(),
             ),
           ),

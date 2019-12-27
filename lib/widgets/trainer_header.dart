@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/trainer.dart';
+import '../screens/trainer_info_screen.dart';
 
 class TrainerHeader extends StatelessWidget {
   final Trainer trainer;
@@ -15,7 +16,7 @@ class TrainerHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        print('tap');
+        Navigator.of(context).pushNamed(TrainerInfoScreen.routeName, arguments: trainer);
       },
       child: Container(
         width: double.infinity,
@@ -49,7 +50,7 @@ class TrainerHeader extends StatelessWidget {
               top: 0,
               right: 0,
               child: IconButton(
-                onPressed: () { print('tap'); },
+                onPressed: () { Navigator.of(context).pushNamed(TrainerInfoScreen.routeName, arguments: trainer); },
                 icon: Icon(Icons.info_outline),
                 color: Colors.white,
                 iconSize: 30,
