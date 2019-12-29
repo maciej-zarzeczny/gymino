@@ -339,7 +339,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
             onTap: infoChoosed,
             child: Container(
               child: Text(
-                'Info',
+                'Informacje',
                 style: TextStyle(
                   color: _infoChoosen
                       ? Colors.white
@@ -368,7 +368,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
             onTap: faqChoosed,
             child: Container(
               child: Text(
-                'FAQ',
+                'Pytania',
                 style: TextStyle(
                   color: !_infoChoosen
                       ? Colors.white
