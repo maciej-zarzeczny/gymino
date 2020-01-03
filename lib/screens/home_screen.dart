@@ -2,22 +2,17 @@ import 'package:flutter/material.dart';
 
 import '../widgets/navigation_bar.dart';
 import './trainers_screen.dart';
-import '../providers/auth_provider.dart';
+import '../screens/user_profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  static const String routeName = '/';
+  static const String routeName = '/home';
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final AuthProvider _authProvider = AuthProvider();
-  int _currentIndex = 0;
-
-  void signOut() async {
-    await _authProvider.signOut();
-  }
+  int _currentIndex = 0;  
 
   void _onItemTapped(int index) {
     setState(() {
@@ -33,12 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Text('Szukaj...'),
       ),
       TrainersScreen(),
-      Center(
-        child: RaisedButton(
-          onPressed: signOut,          
-          child: Text('Wyloguj się'),
-        ),
-      )
+      UserProfileScreen(),
     ];
 
     return Scaffold(

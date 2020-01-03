@@ -27,6 +27,11 @@ class MyApp extends StatelessWidget {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
+        statusBarColor: Colors.white, 
+        statusBarBrightness:
+            Brightness.dark 
+        ));
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(
@@ -44,7 +49,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: MaterialColor(0xFF1A1A1A, Global().primaryColor),
           accentColor: Color.fromRGBO(224, 22, 22, 1),
-          fontFamily: 'Roboto',          
+          fontFamily: 'Roboto',
           textTheme: TextTheme(
               // TOP TRAINER NAME
               title: TextStyle(
@@ -92,7 +97,7 @@ class MyApp extends StatelessWidget {
                 fontSize: 20.0,
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
-                letterSpacing: 0.7,                
+                letterSpacing: 0.7,
               )),
         ),
         initialRoute: AuthWrapper.routeName,

@@ -26,6 +26,8 @@ class AuthProvider {
     } 
   }
 
+  // TODO: Register new user
+
   // Sign out
   Future signOut() async {
     try {
