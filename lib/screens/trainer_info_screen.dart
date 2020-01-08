@@ -24,7 +24,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
   void initState() {
     Future.delayed(Duration.zero).then((_) {
       _trainer = ModalRoute.of(context).settings.arguments as Trainer;
-      Provider.of<TrainersProvider>(context)
+      Provider.of<TrainersProvider>(context, listen: false)
           .fetchQuestions(_trainer.id)
           .then((_) {
         setState(() {
@@ -64,7 +64,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
                 children: <Widget>[
                   header(context, _trainer),
                   picker(context),
-                  _infoChoosen
+                  _infoChoosen                  
                       ? Column(
                           children: <Widget>[
                             infoGrid(context, _trainer.age, _trainer.height),
@@ -87,7 +87,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
                               ),
                             ),
                             Container(                              
-                              height: (MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top) * 0.6049 - 15,                              
+                              height: (MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top) * 0.55,                                 
                               child: ListView.builder(
                                 padding: const EdgeInsets.all(0.0),
                                 itemCount: _questions.length,
@@ -173,7 +173,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
 
   Widget infoGrid(context, int data1, int data2) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
@@ -252,7 +252,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
 
   Widget infoGrid2(context, int data1, int data2) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[

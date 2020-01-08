@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/trainer.dart';
 import '../models/question.dart';
 
-class TrainersProvider with ChangeNotifier {
+class TrainersProvider with ChangeNotifier {    
   final Firestore _db = Firestore.instance;
 
   List<Trainer> _trainers = [];

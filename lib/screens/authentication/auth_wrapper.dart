@@ -7,14 +7,14 @@ import './login_screen.dart';
 import '../home_screen.dart';
 
 class AuthWrapper extends StatelessWidget {
-  static const String routeName = '/';
+  static const String routeName = '/';  
 
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
 
     if (user == null) {
-      return LoginScreen();
+      return LoginScreen();    
     } else {
       return StreamProvider<UserData>.value(
         value: UsersProvider(uid: user.uid).userData,

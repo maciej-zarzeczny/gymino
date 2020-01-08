@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:flutter/services.dart';
 
+import '../widgets/button.dart';
 import '../size_config.dart';
 import '../models/exercise.dart';
 
@@ -152,7 +154,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {    
     SizeConfig().init(context);
     Exercise _currentExercise;
     int _setsNumber;
@@ -177,11 +179,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                   FocusScope.of(context).requestFocus(new FocusNode());
                 },
                 child: Container(
-                  height: (MediaQuery.of(context).size.height -
-                          MediaQuery.of(context).padding.top) *
-                      1,
-                  margin:
-                      EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+                  height: MediaQuery.of(context).size.height,                  
                   child: Stack(
                     children: <Widget>[
                       Image(
@@ -439,25 +437,11 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                   fontSize: SizeConfig.safeBlockHorizontal * 3.0,
                 ),
           ),
-          InkWell(
-            onTap: _rest ? finishRest : setDone,
-            child: Container(
-              margin:
-                  const EdgeInsets.symmetric(horizontal: 10.0, vertical: 7.0),
-              padding: const EdgeInsets.all(10.0),
-              alignment: Alignment.center,
-              width: MediaQuery.of(context).size.width * 0.7,
-              decoration: BoxDecoration(
-                color: Theme.of(context).accentColor,
-                borderRadius: BorderRadius.circular(25.0),
-              ),
-              child: Text(
-                _rest ? 'POMIŃ' : 'GOTOWE',
-                style: Theme.of(context)
-                    .textTheme
-                    .title
-                    .copyWith(fontSize: SizeConfig.safeBlockHorizontal * 5.0),
-              ),
+          Container(
+            width: MediaQuery.of(context).size.width * 0.7,
+            child: Button(
+              text: _rest ? 'Pomiń' : 'Gotowe',
+              onTapFunction: _rest ? finishRest : setDone,
             ),
           ),
         ],
@@ -467,7 +451,8 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 
   Widget topHeader() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+      margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+      padding: const EdgeInsets.only(left: 5.0, right: 5.0, bottom: 10.0),
       alignment: Alignment.topLeft,
       child: IconButton(
         padding: const EdgeInsets.all(0.0),

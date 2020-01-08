@@ -8,14 +8,11 @@ class UsersProvider {
 
   final Firestore _db = Firestore.instance;
 
-  Future<void> updateUserData(String name, String surname, int age, int trainingGoal, int trainingType, int experienceLevel, bool isPremium) async {
+  Future<void> updateUserData(String name, int gender, int trainingGoal, bool isPremium) async {
     return await _db.collection('users').document(uid).setData({
-      'name': name,
-      'surname': surname,
-      'age': age,
-      'trainingType': trainingType,
-      'trainingGoal': trainingGoal,
-      'experienceLevel': experienceLevel,
+      'name': name,      
+      'gender': gender,
+      'trainingGoal': trainingGoal, 
       'isPremium': isPremium,
     });
   }

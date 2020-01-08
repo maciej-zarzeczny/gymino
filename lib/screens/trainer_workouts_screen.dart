@@ -22,7 +22,7 @@ class _TrainerWorkoutsScreenState extends State<TrainerWorkoutsScreen> {
   @override
   void initState() {
     Future.delayed(Duration.zero).then((_) {
-      Provider.of<WorkoutsProvider>(context)
+      Provider.of<WorkoutsProvider>(context, listen: false)
           .fetchWorkouts(ModalRoute.of(context).settings.arguments as String)
           .then((_) {
         setState(() {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'package:flutter/services.dart';
 import '../providers/workouts_provider.dart';
 
 import '../models/workout.dart';
@@ -22,10 +22,10 @@ class _WorkoutOverviewScreenState extends State<WorkoutOverviewScreen> {
   @override
   void initState() {
     Future.delayed(Duration.zero).then((_) {
-      Provider.of<WorkoutsProvider>(context)
+      Provider.of<WorkoutsProvider>(context, listen: false)
           .fetchExercises(ModalRoute.of(context).settings.arguments as String)
           .then((_) {
-        Provider.of<WorkoutsProvider>(context).fetchExercisesData().then((_) {
+        Provider.of<WorkoutsProvider>(context, listen: false).fetchExercisesData().then((_) {
           setState(() {
             _isLoading = false;
             _workoutId = ModalRoute.of(context).settings.arguments as String;
@@ -37,7 +37,7 @@ class _WorkoutOverviewScreenState extends State<WorkoutOverviewScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {    
     Workout workout;
     final workoutsProvider = Provider.of<WorkoutsProvider>(context);
     final exercises = workoutsProvider.exercises;

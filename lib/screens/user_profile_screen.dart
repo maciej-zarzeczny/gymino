@@ -7,13 +7,21 @@ import '../providers/auth_provider.dart';
 class UserProfileScreen extends StatelessWidget {
   final AuthProvider _authProvider = AuthProvider();
 
-  void signOut() async {
+  void signOut() async {    
     await _authProvider.signOut();
-  }
+  }  
 
   @override
   Widget build(BuildContext context) {
     UserData userData = Provider.of<UserData>(context);
+    String name = '';
+    String gender = '';
+    String trainingGoal = '';
+    if (userData != null) {
+      name = userData.name;
+      gender = userData.gender;
+      trainingGoal = userData.trainingGoal;
+    }
 
     return Container(
       width: double.infinity,
@@ -25,10 +33,8 @@ class UserProfileScreen extends StatelessWidget {
             onPressed: signOut,
             child: Text('Wyloguj się'),
           ),
-          Text('${userData.name} ${userData.surname} (${userData.age})'),
-          Text(userData.trainingGoal),
-          Text(userData.trainingType),
-          Text(userData.experienceLevel),
+          Text('$name ($gender)'),
+          Text(trainingGoal),          
         ],
       ),
     );

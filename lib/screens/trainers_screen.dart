@@ -17,12 +17,12 @@ class _TrainersScreenState extends State<TrainersScreen> {
 
   @override
   void initState() {
-    Future.delayed(Duration.zero).then((_) {
-      Provider.of<TrainersProvider>(context).fetchTrainers().then((_) {
+    Future.microtask(() => {
+      Provider.of<TrainersProvider>(context, listen: false).fetchTrainers().then((_) {
         setState(() {
           _isLoading = false;
         });
-      });
+      })      
     });
     super.initState();
   }

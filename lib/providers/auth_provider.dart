@@ -1,9 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import '../models/user.dart';
+import './users_provider.dart';
 
 class AuthProvider {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   User _userFromFirebaseUser(FirebaseUser user) {
     return user != null ? User(uid: user.uid) : null; 
@@ -26,12 +29,56 @@ class AuthProvider {
     } 
   }
 
-  // TODO: Register new user
+  // Sign in with google
+  Future signInWithGoogle() async {    
+    try {
+      final GoogleSignInAccount googleSignInAccount = await _googleSignIn.signIn();
+      final GoogleSignInAuthentication googleSignInAuthentication =
+          await googleSignInAccount.authentication;
+
+      final AuthCredential credential = GoogleAuthProvider.getCredential(
+        accessToken: googleSignInAuthentication.accessToken,
+        idToken: googleSignInAuthentication.idToken,
+      );
+
+      final AuthResult authResult = await _auth.signInWithCredential(credential);
+      final FirebaseUser user = authResult.user;
+
+      return user;
+    } catch (error) {
+      print(error.toString());
+      return null;
+    }
+  }
+
+  // Registering new user
+  Future registerWithEmailAndPassword(String email, String password, String name, int gender, int trainingGoal) async {
+    try {
+      AuthResult result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      FirebaseUser user = result.user;
+      // create a new document for the user with the uid
+      await UsersProvider(uid: user.uid).updateUserData(name, gender, trainingGoal, false);
+      return _userFromFirebaseUser(user);
+    } catch (error) {
+      print(error.toString());
+      return null;
+    } 
+  }
 
   // Sign out
   Future signOut() async {
     try {
-      return await _auth.signOut();
+      return await _auth.signOut();      
+    } catch (error) {
+      print(error.toString());
+      return null;
+    }
+  }
+
+  // Sign out google
+  Future<void> signOutGoogle() async {
+    try {
+      return await _googleSignIn.signOut();
     } catch (error) {
       print(error.toString());
       return null;

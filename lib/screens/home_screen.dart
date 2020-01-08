@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../widgets/navigation_bar.dart';
 import './trainers_screen.dart';
@@ -12,7 +13,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _currentIndex = 0;  
+  int _currentIndex = 0;
 
   void _onItemTapped(int index) {
     setState(() {
@@ -22,6 +23,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
+      statusBarColor: Colors.white,
+      statusBarBrightness: Brightness.light,
+    ));
     List<Widget> _views = [
       TrainersScreen(),
       Center(

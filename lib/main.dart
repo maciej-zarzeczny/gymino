@@ -14,6 +14,7 @@ import './screens/exercise_overview_screen.dart';
 import './screens/trainer_info_screen.dart';
 import './screens/authentication/login_screen.dart';
 import './screens/authentication/auth_wrapper.dart';
+import './screens/authentication/register_screen.dart';
 import './models/user.dart';
 
 void main() {
@@ -22,16 +23,11 @@ void main() {
 
 class MyApp extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {    
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
-    ]);
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
-        statusBarColor: Colors.white, 
-        statusBarBrightness:
-            Brightness.dark 
-        ));
+    ]);    
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(
@@ -104,6 +100,7 @@ class MyApp extends StatelessWidget {
         routes: {
           AuthWrapper.routeName: (context) => AuthWrapper(),
           LoginScreen.routeName: (context) => LoginScreen(),
+          RegisterScreen.routeName: (context) => RegisterScreen(),
           HomeScreen.routeName: (context) => HomeScreen(),
           TrainerWorkoutsScreen.routeName: (context) => TrainerWorkoutsScreen(),
           WorkoutOverviewScreen.routeName: (context) => WorkoutOverviewScreen(),

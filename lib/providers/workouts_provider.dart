@@ -49,16 +49,7 @@ class WorkoutsProvider with ChangeNotifier {
 
     _workouts = loadedWorkouts;
     notifyListeners();
-  }
-
-  // Future<void> fetchExercises(String workoutId) async {
-  //   var futures = <Future>[];
-  //   futures.add(fetchExercisesSets(workoutId));
-  //   futures.add(fetchExercisesData());
-
-  //   await Future.wait(futures);
-  //   notifyListeners();
-  // }
+  }  
 
   Future<void> fetchExercises(String workoutId) async {    
     var result = await _db
