@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../providers/auth_provider.dart';
 import './register_screen.dart';
 import '../../widgets/button.dart';
+import '../../widgets/custom_text_input.dart';
 
 class LoginScreen extends StatefulWidget {
   static const String routeName = '/login';
@@ -81,83 +82,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               width: MediaQuery.of(context).size.width * 0.8,
                               child: Column(
                                 children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.all(4.0),
-                                    child: TextField(
-                                      controller: _emailController,
-                                      style: TextStyle(color: Colors.white),
-                                      decoration: InputDecoration(
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(50.0),
-                                          borderSide: BorderSide(
-                                              width: 2.0, color: Colors.white),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(50.0),
-                                          borderSide: BorderSide(
-                                              width: 2.0, color: Colors.white),
-                                        ),
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                          horizontal: 15.0,
-                                          vertical: 15.0,
-                                        ),
-                                        prefixIcon: Icon(
-                                          Icons.person_outline,
-                                          color: Colors.white,
-                                          size: 22,
-                                        ),
-                                        hintText: 'Nazwa użytkownika',
-                                        hintStyle: TextStyle(
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      cursorColor: Colors.white,
-                                      textAlignVertical:
-                                          TextAlignVertical.center,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(4.0),
-                                    child: TextField(
-                                      controller: _passwordController,
-                                      style: TextStyle(color: Colors.white),
-                                      decoration: InputDecoration(
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(50.0),
-                                          borderSide: BorderSide(
-                                              width: 2.0, color: Colors.white),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(50.0),
-                                          borderSide: BorderSide(
-                                              width: 2.0, color: Colors.white),
-                                        ),
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                          horizontal: 15.0,
-                                          vertical: 15.0,
-                                        ),
-                                        prefixIcon: Icon(
-                                          Icons.lock_outline,
-                                          color: Colors.white,
-                                          size: 22,
-                                        ),
-                                        hintText: 'Hasło',
-                                        hintStyle: TextStyle(
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      cursorColor: Colors.white,
-                                      textAlignVertical:
-                                          TextAlignVertical.center,
-                                      obscureText: true,
-                                    ),
-                                  ),
+                                  CustomTextInput(hintText: 'Adres email', controller: _emailController, icon: Icons.person_outline, isPassword: false,),
+                                  CustomTextInput(hintText: 'Hasło', controller: _passwordController, icon: Icons.lock_outline, isPassword: true,),                                                                    
                                   Button(
                                     text: 'Zaloguj',
                                     onTapFunction: signIn,

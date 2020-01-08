@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import '../../widgets/button.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/custom_text_input.dart';
 
 class RegisterScreen extends StatefulWidget {
   static const routeName = '/register';
@@ -19,10 +20,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   bool _isLoading = false;
   int _choosedGender = 0;
-  // int _choosedExperience = 0;
-  // int _choosedTrainingType = 0;
   int _currentView = 0;
   List<int> _choosedGoals = [];
+
+  List<String> _questions = [
+    'Płeć',
+    'Jaki jest Twój cel treningowy ?',
+    'Wprowadź swoje dane',
+  ];
+  List<String> _trainingGoals = [
+    'Budowanie masy mięśniowej',
+    'Redukacja tkanki tłuszczowej',
+    'Zwiększenie siły',
+    'Nauka technik',
+  ];
 
   void signUp() async {
     setState(() => _isLoading = true);
@@ -43,8 +54,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() {
       if (_currentView < 2) {
         _currentView += 1;
-      } else {
-        signUp();
       }
     });
   }
@@ -83,357 +92,170 @@ class _RegisterScreenState extends State<RegisterScreen> {
       insertDataView(context),
     ];
 
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: GestureDetector(
+    return Container(
+      height: MediaQuery.of(context).size.height,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/images/login_image.jpg'),
+          fit: BoxFit.cover,
+          colorFilter: ColorFilter.mode(Colors.black45, BlendMode.darken),
+        ),
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: GestureDetector(
           onTap: () => FocusScope.of(context).requestFocus(new FocusNode()),
-          child: Container(
-            height: MediaQuery.of(context).size.height,
-            child: Stack(
-              children: <Widget>[
-                Image(
-                  image: AssetImage('assets/images/login_image.jpg'),
-                  width: double.infinity,
-                  height: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-                Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  color: Colors.black45,
-                ),
-                _isLoading
-                    ? Container()
-                    : Align(
-                        alignment: Alignment.topLeft,
-                        child: IconButton(
-                          padding: EdgeInsets.only(
-                              top: MediaQuery.of(context).padding.top + 10.0,
-                              left: 10.0,
-                              right: 5.0,
-                              bottom: 10.0),
-                          onPressed: () => goBack(context),
-                          icon: Icon(
-                            Icons.arrow_back,
-                            color: Colors.white,
-                            size: 35,
+          child: _isLoading
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(                        
+                        constraints: BoxConstraints(
+                            minWidth: constraints.maxWidth,
+                            minHeight: constraints.maxHeight),
+                        child: IntrinsicHeight(                          
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Align(
+                                alignment: Alignment.topLeft,
+                                child: IconButton(
+                                  padding: EdgeInsets.only(
+                                      top: MediaQuery.of(context).padding.top +
+                                          10.0,
+                                      left: 10.0,
+                                      right: 5.0,
+                                      bottom: 10.0),
+                                  onPressed: () => goBack(context),
+                                  icon: Icon(
+                                    Icons.arrow_back,
+                                    color: Colors.white,
+                                    size: 35,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(
+                                    top: MediaQuery.of(context).size.width *
+                                        0.1),
+                                width: MediaQuery.of(context).size.width * 0.7,
+                                child: Text(
+                                  _questions[_currentView],
+                                  style: Theme.of(context).textTheme.title,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              Expanded(                                
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 20.0),
+                                  child: _views[_currentView],
+                                ),
+                              ),
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  progressIndicator(
+                                    context,
+                                    [
+                                      _currentView >= 0,
+                                      _currentView >= 1,
+                                      _currentView >= 2,
+                                      _currentView >= 3
+                                    ],
+                                  ),
+                                  Container(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.8,
+                                    margin: EdgeInsets.only(
+                                      bottom: MediaQuery.of(context)
+                                              .padding
+                                              .bottom +
+                                          10,
+                                    ),
+                                    child: Button(
+                                      text: _currentView == _views.length - 1
+                                          ? 'Utwórz konto'
+                                          : 'Dalej',
+                                      onTapFunction:
+                                          _currentView == _views.length - 1
+                                              ? signUp
+                                              : nextQuestion,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                _isLoading
-                    ? Center(
-                        child: CircularProgressIndicator(),
-                      )
-                    : _views[_currentView],
-              ],
-            ),
-          ),
+                    );
+                  },
+                ),
         ),
       ),
     );
   }
 
   Widget insertDataView(context) {
-    return Container(
-      margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-      width: double.infinity,
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Container(
-              margin: EdgeInsets.only(
-                  top: MediaQuery.of(context).size.width * 0.15),
-              width: MediaQuery.of(context).size.width * 0.7,
-              child: Text(
-                'Podaj swoje dane',
-                style: Theme.of(context).textTheme.title,
-                textAlign: TextAlign.center,
-              ),
-            ),
-            Column(
-              children: <Widget>[
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  padding: const EdgeInsets.all(4.0),
-                  child: TextField(
-                    controller: _nameController,
-                    style: TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(50.0),
-                        borderSide: BorderSide(width: 2.0, color: Colors.white),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(50.0),
-                        borderSide: BorderSide(width: 2.0, color: Colors.white),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 15.0,
-                        vertical: 15.0,
-                      ),
-                      prefixIcon: Icon(
-                        Icons.person_outline,
-                        color: Colors.white,
-                        size: 22,
-                      ),
-                      hintText: 'Imię',
-                      hintStyle: TextStyle(
-                        color: Colors.white,
-                      ),
-                    ),
-                    cursorColor: Colors.white,
-                    textAlignVertical: TextAlignVertical.center,
-                  ),
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  padding: const EdgeInsets.all(4.0),
-                  child: TextField(
-                    controller: _emailController,
-                    style: TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(50.0),
-                        borderSide: BorderSide(width: 2.0, color: Colors.white),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(50.0),
-                        borderSide: BorderSide(width: 2.0, color: Colors.white),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 15.0,
-                        vertical: 15.0,
-                      ),
-                      prefixIcon: Icon(
-                        Icons.email,
-                        color: Colors.white,
-                        size: 22,
-                      ),
-                      hintText: 'Adres email',
-                      hintStyle: TextStyle(
-                        color: Colors.white,
-                      ),
-                    ),
-                    cursorColor: Colors.white,
-                    textAlignVertical: TextAlignVertical.center,
-                  ),
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  padding: const EdgeInsets.all(4.0),
-                  child: TextField(
-                    controller: _passwordController,
-                    style: TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(50.0),
-                        borderSide: BorderSide(width: 2.0, color: Colors.white),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(50.0),
-                        borderSide: BorderSide(width: 2.0, color: Colors.white),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 15.0,
-                        vertical: 15.0,
-                      ),
-                      prefixIcon: Icon(
-                        Icons.lock_outline,
-                        color: Colors.white,
-                        size: 22,
-                      ),
-                      hintText: 'Hasło',
-                      hintStyle: TextStyle(
-                        color: Colors.white,
-                      ),
-                    ),
-                    cursorColor: Colors.white,
-                    textAlignVertical: TextAlignVertical.center,
-                    obscureText: true,
-                  ),
-                ),
-              ],
-            ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 5.0),
-                  child: progressIndicator(
-                    context,
-                    [
-                      _currentView >= 0,
-                      _currentView >= 1,
-                      _currentView >= 2,
-                      _currentView >= 3
-                    ],
-                  ),
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  margin: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).padding.bottom),
-                  child: Button(
-                    text: _currentView == 2 ? 'Stwórz konto' : 'Dalej',
-                    onTapFunction: nextQuestion,
-                  ),
-                ),
-              ],
-            ),
-          ],
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        CustomTextInput(
+          hintText: 'Imię',
+          icon: Icons.person_outline,
+          controller: _nameController,
+          isPassword: false,
         ),
-      ),
+        CustomTextInput(
+          hintText: 'Adres email',
+          icon: Icons.email,
+          controller: _emailController,
+          isPassword: false,
+        ),
+        CustomTextInput(
+          hintText: 'Hasło',
+          icon: Icons.lock_outline,
+          controller: _passwordController,
+          isPassword: true,
+        ),
+      ],
     );
   }
 
   Widget chooseGenderView(context) {
-    return Container(
-      margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-      width: double.infinity,
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Container(
-              margin: EdgeInsets.only(
-                  top: MediaQuery.of(context).size.width * 0.15),
-              width: MediaQuery.of(context).size.width * 0.7,
-              child: Text(
-                'Płeć',
-                style: Theme.of(context).textTheme.title,
-                textAlign: TextAlign.center,
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                GestureDetector(
-                  onTap: () => setGender(0),
-                  child: genderItem(context, 'Mężczyzna', _choosedGender == 0),
-                ),
-                GestureDetector(
-                  onTap: () => setGender(1),
-                  child: genderItem(context, 'Kobieta', _choosedGender == 1),
-                ),
-              ],
-            ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 5.0),
-                  child: progressIndicator(
-                    context,
-                    [
-                      _currentView >= 0,
-                      _currentView >= 1,
-                      _currentView >= 2,
-                      _currentView >= 3
-                    ],
-                  ),
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  margin: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).padding.bottom),
-                  child: Button(
-                    text: _currentView == 2 ? 'Stwórz konto' : 'Dalej',
-                    onTapFunction: nextQuestion,
-                  ),
-                ),
-              ],
-            ),
-          ],
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        GestureDetector(
+          onTap: () => setGender(0),
+          child: genderItem(context, 'Mężczyzna', _choosedGender == 0),
         ),
-      ),
+        GestureDetector(
+          onTap: () => setGender(1),
+          child: genderItem(context, 'Kobieta', _choosedGender == 1),
+        ),
+      ],
     );
   }
 
   Widget chooseGoalView(context) {
-    return Container(
-      margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-      width: double.infinity,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Container(
-            margin:
-                EdgeInsets.only(top: MediaQuery.of(context).size.width * 0.15),
-            width: MediaQuery.of(context).size.width * 0.7,
-            child: Text(
-              'Jaki jest Twój cel treningowy ?',
-              style: Theme.of(context).textTheme.title,
-              textAlign: TextAlign.center,
-            ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: _trainingGoals.map((element) {
+        var index = _trainingGoals.indexOf(element);
+        return GestureDetector(
+          onTap: () => setGoal(index),
+          child: optionItem(
+            context,
+            element,
+            _choosedGoals.contains(index),
           ),
-          Container(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                GestureDetector(
-                  onTap: () => setGoal(0),
-                  child: optionItem(
-                    context,
-                    'Budowanie masy mięśniowej',
-                    _choosedGoals.contains(0),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () => setGoal(1),
-                  child: optionItem(
-                    context,
-                    'Redukcja tkanki tłuszczowej',
-                    _choosedGoals.contains(1),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () => setGoal(2),
-                  child: optionItem(
-                    context,
-                    'Zwiększenie siły',
-                    _choosedGoals.contains(2),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () => setGoal(3),
-                  child: optionItem(
-                    context,
-                    'Nauka technik',
-                    _choosedGoals.contains(3),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(bottom: 5.0),
-                child: progressIndicator(
-                  context,
-                  [
-                    _currentView >= 0,
-                    _currentView >= 1,
-                    _currentView >= 2,
-                    _currentView >= 3
-                  ],
-                ),
-              ),
-              Container(
-                width: MediaQuery.of(context).size.width * 0.8,
-                margin: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).padding.bottom),
-                child: Button(
-                  text: _currentView == 2 ? 'Stwórz konto' : 'Dalej',
-                  onTapFunction: nextQuestion,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+        );
+      }).toList(),
     );
   }
 
