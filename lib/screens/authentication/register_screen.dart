@@ -90,7 +90,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       chooseGenderView(context),
       chooseGoalView(context),
       insertDataView(context),
-    ];
+    ];    
 
     return Container(
       height: MediaQuery.of(context).size.height,
@@ -103,20 +103,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        body: GestureDetector(
-          onTap: () => FocusScope.of(context).requestFocus(new FocusNode()),
-          child: _isLoading
-              ? Center(
-                  child: CircularProgressIndicator(),
-                )
-              : LayoutBuilder(
-                  builder: (context, constraints) {
-                    return SingleChildScrollView(
-                      child: ConstrainedBox(                        
+        body: _isLoading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : LayoutBuilder(
+                builder: (context, constraints) {                  
+                  return GestureDetector(
+                    onTap: () =>
+                        FocusScope.of(context).requestFocus(new FocusNode()),
+                    child: SingleChildScrollView(
+                      child: ConstrainedBox(
                         constraints: BoxConstraints(
-                            minWidth: constraints.maxWidth,
-                            minHeight: constraints.maxHeight),
-                        child: IntrinsicHeight(                          
+                          minWidth: constraints.maxWidth,
+                          minHeight: constraints.maxHeight,
+                        ),
+                        child: IntrinsicHeight(
                           child: Column(
                             mainAxisSize: MainAxisSize.max,
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -138,64 +140,73 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   ),
                                 ),
                               ),
-                              Container(
-                                margin: EdgeInsets.only(
-                                    top: MediaQuery.of(context).size.width *
-                                        0.1),
-                                width: MediaQuery.of(context).size.width * 0.7,
-                                child: Text(
-                                  _questions[_currentView],
-                                  style: Theme.of(context).textTheme.title,
-                                  textAlign: TextAlign.center,
+                              Expanded(
+                                flex: 1,
+                                child: Container(
+                                  margin: EdgeInsets.only(
+                                      top: MediaQuery.of(context).size.width *
+                                          0.1),
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.7,
+                                  child: Text(
+                                    _questions[_currentView],
+                                    style: Theme.of(context).textTheme.title,
+                                    textAlign: TextAlign.center,
+                                  ),
                                 ),
                               ),
-                              Expanded(                                
+                              Expanded(
+                                flex: 3,
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 20.0),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 20.0),
                                   child: _views[_currentView],
                                 ),
                               ),
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  progressIndicator(
-                                    context,
-                                    [
-                                      _currentView >= 0,
-                                      _currentView >= 1,
-                                      _currentView >= 2,
-                                      _currentView >= 3
-                                    ],
-                                  ),
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.8,
-                                    margin: EdgeInsets.only(
-                                      bottom: MediaQuery.of(context)
-                                              .padding
-                                              .bottom +
-                                          10,
+                              Expanded(
+                                flex: 1,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    progressIndicator(
+                                      context,
+                                      [
+                                        _currentView >= 0,
+                                        _currentView >= 1,
+                                        _currentView >= 2,
+                                        _currentView >= 3
+                                      ],
                                     ),
-                                    child: Button(
-                                      text: _currentView == _views.length - 1
-                                          ? 'Utwórz konto'
-                                          : 'Dalej',
-                                      onTapFunction:
-                                          _currentView == _views.length - 1
-                                              ? signUp
-                                              : nextQuestion,
+                                    Container(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.8,
+                                      margin: EdgeInsets.only(
+                                        bottom: MediaQuery.of(context)
+                                                .padding
+                                                .bottom +
+                                            10,
+                                      ),
+                                      child: Button(
+                                        text: _currentView == _views.length - 1
+                                            ? 'Utwórz konto'
+                                            : 'Dalej',
+                                        onTapFunction:
+                                            _currentView == _views.length - 1
+                                                ? signUp
+                                                : nextQuestion,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ],
                           ),
                         ),
                       ),
-                    );
-                  },
-                ),
-        ),
+                    ),
+                  );
+                },
+              ),
       ),
     );
   }
