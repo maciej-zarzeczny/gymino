@@ -7,6 +7,7 @@ import '../providers/workouts_provider.dart';
 import '../widgets/trainer_header.dart';
 import '../widgets/recent_workouts.dart';
 import '../widgets/workout_card.dart';
+import '../widgets/more_loading_indicator.dart';
 
 class TrainerWorkoutsScreen extends StatefulWidget {
   static const routeName = '/trainer';
@@ -18,17 +19,59 @@ class TrainerWorkoutsScreen extends StatefulWidget {
 class _TrainerWorkoutsScreenState extends State<TrainerWorkoutsScreen> {
   String _trainerId;
   bool _isLoading = true;
+  bool _moreLoading = false;
+  ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
-    Future.delayed(Duration.zero).then((_) {
-      Provider.of<WorkoutsProvider>(context, listen: false)
-          .fetchWorkouts(ModalRoute.of(context).settings.arguments as String)
-          .then((_) {
+    Future.microtask(() {
+      _trainerId = ModalRoute.of(context).settings.arguments as String;
+      var workoutsProvider =
+          Provider.of<WorkoutsProvider>(context, listen: false);
+      if (workoutsProvider.workouts.isEmpty) {
+        workoutsProvider.fetchWorkouts(_trainerId).then((_) {
+          setState(() {
+            _isLoading = false;
+          });
+        });
+      } else {
         setState(() {
           _isLoading = false;
-          _trainerId = ModalRoute.of(context).settings.arguments as String;
         });
+      }
+
+      _scrollController.addListener(() {
+        if (_scrollController.position.pixels ==
+            _scrollController.position.maxScrollExtent) {
+          setState(() {
+            _moreLoading = true;
+          });
+
+          if (!workoutsProvider.allWorkoutsLoaded) {
+            workoutsProvider.fetchMoreWorkouts().then((_) {
+              setState(() {
+                _moreLoading = false;
+              });
+            });
+          } else {
+            double edge = 50.0;
+            double offsetFromBottom =
+                _scrollController.position.maxScrollExtent -
+                    _scrollController.position.pixels;
+            if (offsetFromBottom < edge) {
+              _scrollController
+                  .animateTo(
+                      _scrollController.offset - (edge - offsetFromBottom),
+                      duration: new Duration(milliseconds: 500),
+                      curve: Curves.easeOut)
+                  .then((_) {
+                setState(() {
+                  _moreLoading = false;
+                });
+              });
+            }
+          }
+        }
       });
     });
     super.initState();
@@ -55,8 +98,9 @@ class _TrainerWorkoutsScreenState extends State<TrainerWorkoutsScreen> {
                   1,
               margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
               child: ListView.builder(
+                controller: _scrollController,
                 padding: const EdgeInsets.all(0.0),
-                itemCount: workouts.length + 1,
+                itemCount: workouts.length + 2,                
                 itemBuilder: (context, i) {
                   if (i == 0) {
                     return Column(
@@ -89,6 +133,8 @@ class _TrainerWorkoutsScreenState extends State<TrainerWorkoutsScreen> {
                               ),
                       ],
                     );
+                  } else if (i == workouts.length + 1) {
+                    return MoreLoadingIndicator(_moreLoading);
                   } else {
                     return WorkoutCard(workouts[i - 1], true);
                   }

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/badge.dart';
@@ -23,11 +24,12 @@ class RecommendedTrainer extends StatelessWidget {
             children: <Widget>[
               ClipRRect(
                 borderRadius: BorderRadius.circular(10.0),
-                child: Image(
+                child: CachedNetworkImage(
                   width: double.infinity,
-                  image: NetworkImage(recommendedTrainer.imageUrl),
+                  imageUrl: recommendedTrainer.imageUrl,
                   fit: BoxFit.cover,
-                  alignment: Alignment.topCenter,
+                  alignment: Alignment.topCenter,                  
+                  errorWidget: (context, url, error) => Icon(Icons.error_outline, color: Colors.white,),
                 ),
               ),
               Container(

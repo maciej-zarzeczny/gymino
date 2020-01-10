@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../models/trainer.dart';
 import './badge.dart';
@@ -10,7 +11,7 @@ class TrainerPick extends StatelessWidget {
   TrainerPick(this.trainer);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) { 
     return GestureDetector(
       onTap: () {
         Navigator.of(context)
@@ -25,11 +26,12 @@ class TrainerPick extends StatelessWidget {
           children: <Widget>[
             ClipRRect(
               borderRadius: BorderRadius.circular(10.0),
-              child: Image(
+              child: CachedNetworkImage(
                 width: double.infinity,
-                image: NetworkImage(trainer.imageUrl),
+                imageUrl: trainer.imageUrl,
                 fit: BoxFit.cover,
                 alignment: Alignment.topCenter,
+                errorWidget: (context, url, error) => Icon(Icons.error_outline, color: Colors.white,),
               ),
             ),
             Container(

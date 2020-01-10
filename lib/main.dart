@@ -45,6 +45,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: MaterialColor(0xFF1A1A1A, Global().primaryColor),
           accentColor: Color.fromRGBO(224, 22, 22, 1),
+          // fontFamily: 'Proxima-Nova',
           fontFamily: 'Roboto',
           textTheme: TextTheme(
               // TOP TRAINER NAME
@@ -90,7 +91,7 @@ class MyApp extends StatelessWidget {
                 color: Color.fromRGBO(26, 26, 26, 1),
               ),
               button: TextStyle(
-                fontSize: 20.0,
+                fontSize: 18.0,
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 0.7,

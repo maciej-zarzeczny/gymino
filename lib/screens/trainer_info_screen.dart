@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -6,6 +7,7 @@ import '../widgets/keyword.dart';
 import '../models/question.dart';
 import '../providers/trainers_provider.dart';
 import '../widgets/question_card.dart';
+import '../widgets/more_loading_indicator.dart';
 
 class TrainerInfoScreen extends StatefulWidget {
   static const routeName = '/trainerInfo';
@@ -17,19 +19,61 @@ class TrainerInfoScreen extends StatefulWidget {
 class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
   bool _infoChoosen = true;
   bool _isLoading = true;
+  bool _moreLoading = false;
   Trainer _trainer;
   List<Question> _questions;
+  ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
-    Future.delayed(Duration.zero).then((_) {
+    Future.microtask(() {
       _trainer = ModalRoute.of(context).settings.arguments as Trainer;
-      Provider.of<TrainersProvider>(context, listen: false)
-          .fetchQuestions(_trainer.id)
-          .then((_) {
+      var trainersProvider =
+          Provider.of<TrainersProvider>(context, listen: false);
+      if (trainersProvider.questions.isEmpty) {        
+        trainersProvider.fetchQuestions(_trainer.id).then((_) {
+          setState(() {
+            _isLoading = false;
+          });
+        });
+      } else {
         setState(() {
           _isLoading = false;
         });
+      }
+
+      _scrollController.addListener(() {
+        if (_scrollController.position.pixels ==
+            _scrollController.position.maxScrollExtent) {
+          setState(() {
+            _moreLoading = true;
+          });
+
+          if (!trainersProvider.allQuestionsLoaded) {
+            trainersProvider.fetchMoreQuestions(_trainer.id).then((_) {
+              setState(() {
+                _moreLoading = false;
+              });
+            });
+          } else {
+            double edge = 50.0;
+            double offsetFromBottom =
+                _scrollController.position.maxScrollExtent -
+                    _scrollController.position.pixels;
+            if (offsetFromBottom < edge) {
+              _scrollController
+                  .animateTo(
+                      _scrollController.offset - (edge - offsetFromBottom),
+                      duration: new Duration(milliseconds: 500),
+                      curve: Curves.easeOut)
+                  .then((_) {
+                setState(() {
+                  _moreLoading = false;
+                });
+              });
+            }
+          }
+        }
       });
     });
     super.initState();
@@ -49,7 +93,8 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final trainersProvider = Provider.of<TrainersProvider>(context);
+    final trainersProvider =
+        Provider.of<TrainersProvider>(context, listen: false);
     _questions = trainersProvider.questions;
 
     return Scaffold(
@@ -57,14 +102,14 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
           ? Center(
               child: CircularProgressIndicator(),
             )
-          : Container(              
+          : Container(
               margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   header(context, _trainer),
                   picker(context),
-                  _infoChoosen                  
+                  _infoChoosen
                       ? Column(
                           children: <Widget>[
                             infoGrid(context, _trainer.age, _trainer.height),
@@ -76,8 +121,8 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 15.0, right: 15.0, bottom: 15.0),
+                              padding: const EdgeInsets.only(
+                                  left: 15.0, right: 15.0, bottom: 15.0),
                               child: Text(
                                 'Ostatnio dodane',
                                 style: TextStyle(
@@ -86,13 +131,21 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
                                     fontWeight: FontWeight.normal),
                               ),
                             ),
-                            Container(                              
-                              height: (MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top) * 0.55,                                 
+                            Container(
+                              height: (MediaQuery.of(context).size.height -
+                                      MediaQuery.of(context).padding.top) *
+                                  0.55,
                               child: ListView.builder(
+                                controller: _scrollController,
                                 padding: const EdgeInsets.all(0.0),
-                                itemCount: _questions.length,
+                                itemCount: _questions.length + 1,
                                 itemBuilder: (context, i) {
-                                  return QuestionCard(_questions[i].question, _questions[i].answer);
+                                  if (i == _questions.length) {
+                                    return MoreLoadingIndicator(_moreLoading);
+                                  } else {
+                                    return QuestionCard(_questions[i].question,
+                                        _questions[i].answer);
+                                  }
                                 },
                               ),
                             ),
@@ -112,14 +165,18 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
           0.3,
       child: Stack(
         children: <Widget>[
-          Image(
+          CachedNetworkImage(
             width: double.infinity,
-            image: NetworkImage(trainer.imageUrl),
+            imageUrl: trainer.imageUrl,
             fit: BoxFit.cover,
             alignment: Alignment.topCenter,
+            errorWidget: (context, url, error) => Icon(
+              Icons.error_outline,
+              color: Colors.white,
+            ),
           ),
           Container(
-            color: Colors.black26,
+            color: Colors.black12,
             width: double.infinity,
             height: double.infinity,
           ),
@@ -252,7 +309,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
 
   Widget infoGrid2(context, int data1, int data2) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 7.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[

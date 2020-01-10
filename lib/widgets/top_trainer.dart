@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../models/trainer.dart';
 import '../screens/trainer_workouts_screen.dart';
@@ -21,11 +22,12 @@ class TopTrainer extends StatelessWidget {
         },
         child: Stack(
           children: <Widget>[
-            Image(
+            CachedNetworkImage(
               width: double.infinity,
-              image: NetworkImage(topTrainer.imageUrl),
+              imageUrl: topTrainer.imageUrl,
               fit: BoxFit.cover,
               alignment: Alignment.topCenter,
+              errorWidget: (context, url, error) => Icon(Icons.error_outline, color: Colors.white,),
             ),
             Container(
               color: Colors.black12,

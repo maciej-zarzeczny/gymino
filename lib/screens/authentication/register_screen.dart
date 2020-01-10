@@ -90,7 +90,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       chooseGenderView(context),
       chooseGoalView(context),
       insertDataView(context),
-    ];    
+    ];
 
     return Container(
       height: MediaQuery.of(context).size.height,
@@ -107,45 +107,40 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ? Center(
                 child: CircularProgressIndicator(),
               )
-            : LayoutBuilder(
-                builder: (context, constraints) {                  
-                  return GestureDetector(
-                    onTap: () =>
-                        FocusScope.of(context).requestFocus(new FocusNode()),
-                    child: SingleChildScrollView(
+            : GestureDetector(
+                onTap: () =>
+                    FocusScope.of(context).requestFocus(new FocusNode()),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
                       child: ConstrainedBox(
                         constraints: BoxConstraints(
-                          minWidth: constraints.maxWidth,
                           minHeight: constraints.maxHeight,
                         ),
-                        child: IntrinsicHeight(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Align(
-                                alignment: Alignment.topLeft,
-                                child: IconButton(
-                                  padding: EdgeInsets.only(
-                                      top: MediaQuery.of(context).padding.top +
-                                          10.0,
-                                      left: 10.0,
-                                      right: 5.0,
-                                      bottom: 10.0),
-                                  onPressed: () => goBack(context),
-                                  icon: Icon(
-                                    Icons.arrow_back,
-                                    color: Colors.white,
-                                    size: 35,
-                                  ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Align(
+                              alignment: Alignment.topLeft,
+                              child: IconButton(
+                                padding: EdgeInsets.only(
+                                    top: MediaQuery.of(context).padding.top +
+                                        10.0,
+                                    left: 10.0,
+                                    right: 5.0,
+                                    bottom: 10.0),
+                                onPressed: () => goBack(context),
+                                icon: Icon(
+                                  Icons.arrow_back,
+                                  color: Colors.white,
+                                  size: 35,
                                 ),
                               ),
-                              Expanded(
-                                flex: 1,
-                                child: Container(
-                                  margin: EdgeInsets.only(
-                                      top: MediaQuery.of(context).size.width *
-                                          0.1),
+                            ),
+                            Column(
+                              children: <Widget>[
+                                Container(
                                   width:
                                       MediaQuery.of(context).size.width * 0.7,
                                   child: Text(
@@ -154,58 +149,54 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     textAlign: TextAlign.center,
                                   ),
                                 ),
-                              ),
-                              Expanded(
-                                flex: 3,
-                                child: Padding(
+                                SizedBox(
+                                    height: MediaQuery.of(context).size.height *
+                                        0.05),
+                                Padding(
                                   padding: const EdgeInsets.symmetric(
                                       vertical: 20.0),
                                   child: _views[_currentView],
                                 ),
-                              ),
-                              Expanded(
-                                flex: 1,
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: <Widget>[
-                                    progressIndicator(
-                                      context,
-                                      [
-                                        _currentView >= 0,
-                                        _currentView >= 1,
-                                        _currentView >= 2,
-                                        _currentView >= 3
-                                      ],
-                                    ),
-                                    Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.8,
-                                      margin: EdgeInsets.only(
-                                        bottom: MediaQuery.of(context)
-                                                .padding
-                                                .bottom +
-                                            10,
-                                      ),
-                                      child: Button(
-                                        text: _currentView == _views.length - 1
-                                            ? 'Utwórz konto'
-                                            : 'Dalej',
-                                        onTapFunction:
-                                            _currentView == _views.length - 1
-                                                ? signUp
-                                                : nextQuestion,
-                                      ),
-                                    ),
+                              ],
+                            ),
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                progressIndicator(
+                                  context,
+                                  [
+                                    _currentView >= 0,
+                                    _currentView >= 1,
+                                    _currentView >= 2,
+                                    _currentView >= 3
                                   ],
                                 ),
-                              ),
-                            ],
-                          ),
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.8,
+                                  margin: EdgeInsets.only(
+                                    bottom:
+                                        MediaQuery.of(context).padding.bottom +
+                                            10,
+                                  ),
+                                  child: Button(
+                                    text: _currentView == _views.length - 1
+                                        ? 'Utwórz konto'
+                                        : 'Dalej',
+                                    onTapFunction:
+                                        _currentView == _views.length - 1
+                                            ? signUp
+                                            : nextQuestion,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
       ),
     );

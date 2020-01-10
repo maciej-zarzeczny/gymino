@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../models/trainer.dart';
@@ -25,11 +26,12 @@ class TrainerHeader extends StatelessWidget {
             0.3,
         child: Stack(
           children: <Widget>[
-            Image(
+            CachedNetworkImage(
               width: double.infinity,
-              image: NetworkImage(trainer.imageUrl),
+              imageUrl: trainer.imageUrl,
               fit: BoxFit.cover,
               alignment: Alignment.topCenter,
+              errorWidget: (context, url, error) => Icon(Icons.error_outline, color: Colors.white,),
             ),
             Container(
               color: Colors.black12,

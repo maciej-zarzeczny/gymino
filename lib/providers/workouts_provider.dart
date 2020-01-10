@@ -6,7 +6,12 @@ import '../models/exercise.dart';
 
 class WorkoutsProvider with ChangeNotifier {
   final Firestore _db = Firestore.instance;
+  final int _workoutsLimit = 5;
 
+  DocumentSnapshot _lastDocument;
+  bool _allWorkoutsLoaded = false;
+
+  List<Workout> _loadedWorkouts = [];
   List<Workout> _workouts = [];
   List<Exercise> _exercises = [];
 
@@ -22,6 +27,10 @@ class WorkoutsProvider with ChangeNotifier {
 
   int get numberOfWorkouts {
     return _workouts.length;
+  }
+
+  bool get allWorkoutsLoaded {
+    return _allWorkoutsLoaded;
   }
 
   List<Workout> get recentWorkouts {
@@ -42,16 +51,50 @@ class WorkoutsProvider with ChangeNotifier {
         .collection('trainers')
         .document(trainerId)
         .collection('workouts')
+        .orderBy('name')
+        .limit(_workoutsLimit)
         .getDocuments();
-    final List<Workout> loadedWorkouts = result.documents
-        .map((workout) => Workout.fromSnapshot(workout))
-        .toList();
 
-    _workouts = loadedWorkouts;
+    if (result.documents.length > 0) {
+      _lastDocument = result.documents[result.documents.length - 1];
+      _loadedWorkouts = result.documents
+          .map((workout) => Workout.fromSnapshot(workout))
+          .toList();
+
+      _workouts = _loadedWorkouts;
+    }
+    if (result.documents.length < _workoutsLimit) {
+      _allWorkoutsLoaded = true;
+    }
+
     notifyListeners();
-  }  
+  }
 
-  Future<void> fetchExercises(String workoutId) async {    
+  Future<void> fetchMoreWorkouts() async {
+    var result = await _db
+        .collection('trainers')
+        .document(_trainerId)
+        .collection('workouts')
+        .orderBy('name')
+        .startAfterDocument(_lastDocument)
+        .limit(_workoutsLimit)
+        .getDocuments();
+
+    if (result.documents.length > 0) {
+      _lastDocument = result.documents[result.documents.length - 1];
+      _loadedWorkouts = result.documents
+          .map((workout) => Workout.fromSnapshot(workout))
+          .toList();
+
+      _workouts.addAll(_loadedWorkouts);
+    }
+    if (result.documents.length < _workoutsLimit) {
+      _allWorkoutsLoaded = true;
+    }
+    notifyListeners();
+  }
+
+  Future<void> fetchExercises(String workoutId) async {
     var result = await _db
         .collection('trainers')
         .document(_trainerId)
@@ -59,24 +102,31 @@ class WorkoutsProvider with ChangeNotifier {
         .document(workoutId)
         .collection('exercises')
         .getDocuments();
-    
+
     final List<Exercise> loadedExercises = result.documents
         .map((exercise) => Exercise.fromSnapshot(exercise))
-        .toList();            
+        .toList();
 
     _exercises = loadedExercises;
     notifyListeners();
   }
 
   Future<void> fetchExercisesData() async {
-    var futures = <Future>[];    
-    for(int i=0; i<_exercises.length; i++) {
-      futures.add(_db.document('exercises/${_exercises[i].id}').get().then((data) {
-        _exercises[i].setExerciseData(data['name'], data['description'], data['instructions'], data['imageUrl'], data['keywords'], data['bulletPoints']);        
+    var futures = <Future>[];
+    for (int i = 0; i < _exercises.length; i++) {
+      futures
+          .add(_db.document('exercises/${_exercises[i].id}').get().then((data) {
+        _exercises[i].setExerciseData(
+            data['name'],
+            data['description'],
+            data['instructions'],
+            data['imageUrl'],
+            data['keywords'],
+            data['bulletPoints']);
       }));
-    }    
+    }
 
     await Future.wait(futures);
-    notifyListeners();    
+    notifyListeners();
   }
 }
