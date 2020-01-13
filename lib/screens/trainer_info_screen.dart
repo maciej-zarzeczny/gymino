@@ -22,6 +22,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
   bool _moreLoading = false;
   Trainer _trainer;
   List<Question> _questions;
+  List<dynamic> _supplements = [];
   ScrollController _scrollController = ScrollController();
 
   @override
@@ -30,7 +31,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
       _trainer = ModalRoute.of(context).settings.arguments as Trainer;
       var trainersProvider =
           Provider.of<TrainersProvider>(context, listen: false);
-      if (trainersProvider.questions.isEmpty) {        
+      if (trainersProvider.questions.isEmpty) {
         trainersProvider.fetchQuestions(_trainer.id).then((_) {
           setState(() {
             _isLoading = false;
@@ -97,72 +98,125 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
         Provider.of<TrainersProvider>(context, listen: false);
     _questions = trainersProvider.questions;
 
+    if (_trainer != null) {
+      _supplements = trainersProvider.findById(_trainer.id).supplements;
+    }
+
     return Scaffold(
       body: _isLoading
           ? Center(
               child: CircularProgressIndicator(),
             )
-          : Container(
-              margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+          : Padding(
+              padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  header(context, _trainer),
+                  header(context, _trainer, trainersProvider.resetQuestions),
                   picker(context),
-                  _infoChoosen
-                      ? Column(
-                          children: <Widget>[
-                            infoGrid(context, _trainer.age, _trainer.height),
-                            infoGrid2(context, _trainer.weight,
-                                _trainer.trainingTime),
-                          ],
-                        )
-                      : Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 15.0, right: 15.0, bottom: 15.0),
-                              child: Text(
-                                'Ostatnio dodane',
-                                style: TextStyle(
-                                    fontSize: 15,
-                                    color: Theme.of(context).primaryColor,
-                                    fontWeight: FontWeight.normal),
-                              ),
-                            ),
-                            Container(
-                              height: (MediaQuery.of(context).size.height -
-                                      MediaQuery.of(context).padding.top) *
-                                  0.55,
-                              child: ListView.builder(
-                                controller: _scrollController,
-                                padding: const EdgeInsets.all(0.0),
-                                itemCount: _questions.length + 1,
-                                itemBuilder: (context, i) {
-                                  if (i == _questions.length) {
-                                    return MoreLoadingIndicator(_moreLoading);
-                                  } else {
-                                    return QuestionCard(_questions[i].question,
-                                        _questions[i].answer);
-                                  }
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
+                  _infoChoosen ? infoPage() : questionsPage(),
                 ],
               ),
             ),
     );
   }
 
-  Widget header(context, Trainer trainer) {
+  Widget infoPage() {
+    return Expanded(
+      child: ListView.builder(
+        padding: const EdgeInsets.all(0.0),
+        itemCount: _supplements.length + 2,
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return infoGrid([
+              _trainer.age.toString(),
+              '${_trainer.height} cm',
+              '${_trainer.weight} kg',
+              '${_trainer.trainingTime} lat',
+            ], [
+              'Wiek',
+              'Wzrost',
+              'Waga',
+              'Staż treningowy'
+            ]);
+          } else if (index == 1) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20.0,
+                vertical: 10.0,
+              ),
+              child: Text(
+                'Suplementacja',
+                style: TextStyle(
+                  fontSize: 15,
+                  color: Theme.of(context).primaryColor,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+            );
+          } else {
+            return supplementItem(
+              _supplements[index - 2]['name'],
+              _supplements[index - 2]['amount'],
+              _supplements[index - 2]['portionsPerDay'],
+              _supplements[index - 2]['comment'],
+            );
+          }
+        },
+      ),
+    );
+  }
+
+  Widget questionsPage() {
+    return Expanded(
+      child: ListView.builder(
+        controller: _scrollController,        
+        padding: const EdgeInsets.all(0.0),
+        itemCount: _questions.length + 2,
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return Padding(
+              padding: const EdgeInsets.only(
+                left: 20.0,
+                right: 20.0,
+                bottom: 10.0,
+              ),
+              child: Text(
+                'Ostatnio dodane',
+                style: TextStyle(
+                  fontSize: 15,
+                  color: Theme.of(context).primaryColor,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+            );
+          } else if (index == _questions.length + 1) {
+            return MoreLoadingIndicator(_moreLoading);
+          } else {
+            return QuestionCard(
+              _questions[index - 1].question,
+              _questions[index - 1].answer,
+            );
+          }
+        },
+      ),
+    );
+  }
+
+  Widget header(context, Trainer trainer, Function resetQuestions) {
     return Container(
       width: double.infinity,
       height: (MediaQuery.of(context).size.height -
               MediaQuery.of(context).padding.top) *
           0.3,
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black38,
+            offset: Offset(0.0, 5.0),
+            blurRadius: 5.0,
+          ),
+        ],
+      ),
       child: Stack(
         children: <Widget>[
           CachedNetworkImage(
@@ -185,7 +239,10 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
             left: 0,
             child: IconButton(
               iconSize: 30,
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () {
+                resetQuestions();
+                Navigator.of(context).pop();
+              } ,
               icon: Icon(Icons.arrow_back),
               color: Colors.white,
             ),
@@ -228,158 +285,81 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
     );
   }
 
-  Widget infoGrid(context, int data1, int data2) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          Container(
-            child: Stack(
-              children: <Widget>[
-                Center(
-                  child: Text(
-                    data1.toString(),
-                    style: Theme.of(context).textTheme.title.copyWith(
-                          color: Theme.of(context).primaryColor,
-                          fontSize: 30,
-                        ),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 7.0),
-                    child: Text(
-                      'Wiek',
-                      style: TextStyle(
-                        color: Color.fromRGBO(190, 190, 190, 1.0),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            margin: const EdgeInsets.only(right: 5.0),
-            decoration: BoxDecoration(
-                color: Color.fromRGBO(240, 240, 240, 1.0),
-                borderRadius: BorderRadius.circular(20.0)),
-            width: MediaQuery.of(context).size.width * 0.45,
-            height: MediaQuery.of(context).size.width * 0.35,
+  Widget supplementItem(
+      String name, int amount, int portionsPerDay, String comment) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.15,
+      margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 20.0),
+      padding: const EdgeInsets.all(10.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10.0),
+        image: DecorationImage(
+          image: AssetImage('assets/images/vitamins.jpg'),
+          fit: BoxFit.cover,
+          colorFilter: ColorFilter.mode(
+            Colors.black12,
+            BlendMode.darken,
           ),
-          Container(
-            child: Stack(
-              children: <Widget>[
-                Center(
-                  child: Text(
-                    '$data2 cm',
-                    style: Theme.of(context).textTheme.title.copyWith(
-                          color: Theme.of(context).primaryColor,
-                          fontSize: 30,
-                        ),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 7.0),
-                    child: Text(
-                      'Wzrost',
-                      style: TextStyle(
-                        color: Color.fromRGBO(190, 190, 190, 1.0),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            margin: const EdgeInsets.only(left: 5.0),
-            decoration: BoxDecoration(
-                color: Color.fromRGBO(240, 240, 240, 1.0),
-                borderRadius: BorderRadius.circular(20.0)),
-            width: MediaQuery.of(context).size.width * 0.45,
-            height: MediaQuery.of(context).size.width * 0.35,
-          ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget infoGrid2(context, int data1, int data2) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 7.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  Widget infoGrid(titles, data) {
+    return Column(
+      children: <Widget>[
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            infoGridTile(context, titles[0], data[0]),
+            infoGridTile(context, titles[1], data[1]),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            infoGridTile(context, titles[2], data[2]),
+            infoGridTile(context, titles[3], data[3]),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget infoGridTile(BuildContext context, String title, String subtitle) {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.4,
+      height: MediaQuery.of(context).size.width * 0.3,
+      margin: const EdgeInsets.all(5.0),
+      decoration: BoxDecoration(
+        color: Color.fromRGBO(240, 240, 240, 1.0),
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: Stack(
         children: <Widget>[
-          Container(
-            child: Stack(
-              children: <Widget>[
-                Center(
-                  child: Text(
-                    '$data1 kg',
-                    style: Theme.of(context).textTheme.title.copyWith(
-                          color: Theme.of(context).primaryColor,
-                          fontSize: 30,
-                        ),
+          Center(
+            child: Text(
+              title,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.title.copyWith(
+                    color: Theme.of(context).primaryColor,
+                    fontSize: 30,
                   ),
-                ),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 7.0),
-                    child: Text(
-                      'Waga',
-                      style: TextStyle(
-                        color: Color.fromRGBO(190, 190, 190, 1.0),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
             ),
-            margin: const EdgeInsets.only(right: 5.0),
-            decoration: BoxDecoration(
-                color: Color.fromRGBO(240, 240, 240, 1.0),
-                borderRadius: BorderRadius.circular(20.0)),
-            width: MediaQuery.of(context).size.width * 0.45,
-            height: MediaQuery.of(context).size.width * 0.35,
           ),
-          Container(
-            child: Stack(
-              children: <Widget>[
-                Center(
-                  child: Text(
-                    '$data2 lat',
-                    style: Theme.of(context).textTheme.title.copyWith(
-                          color: Theme.of(context).primaryColor,
-                          fontSize: 30,
-                        ),
-                  ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 5.0),
+              child: Text(
+                subtitle,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color.fromRGBO(190, 190, 190, 1.0),
+                  fontWeight: FontWeight.bold,
                 ),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 7.0),
-                    child: Text(
-                      'Staż treningowy',
-                      style: TextStyle(
-                        color: Color.fromRGBO(190, 190, 190, 1.0),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-            margin: const EdgeInsets.only(left: 5.0),
-            decoration: BoxDecoration(
-                color: Color.fromRGBO(240, 240, 240, 1.0),
-                borderRadius: BorderRadius.circular(20.0)),
-            width: MediaQuery.of(context).size.width * 0.45,
-            height: MediaQuery.of(context).size.width * 0.35,
           ),
         ],
       ),

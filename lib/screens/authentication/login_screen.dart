@@ -5,6 +5,7 @@ import '../../providers/auth_provider.dart';
 import './register_screen.dart';
 import '../../widgets/button.dart';
 import '../../widgets/custom_text_input.dart';
+import '../../globals.dart';
 
 class LoginScreen extends StatefulWidget {
   static const String routeName = '/login';
@@ -16,22 +17,67 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _globals = Global();
 
   final AuthProvider _authProvider = AuthProvider();
 
   bool _isLoading = false;
 
-  void signIn() async {
+  void signIn() async {    
     setState(() => _isLoading = true);
-    dynamic result = await _authProvider.signInWithEmailAndPassword(
-        _emailController.text, _passwordController.text);
-    if (result == null) {
-      setState(() => _isLoading = false);
+
+    FocusScopeNode currentFocus = FocusScope.of(context);
+    if (!currentFocus.hasPrimaryFocus) {
+      currentFocus.unfocus();
     }
+
+    dynamic result = await _authProvider.signInWithEmailAndPassword(
+        _emailController.text.trim(), _passwordController.text.trim());    
+
+    String _errTitle;
+    String _errSubtitle;
+
+    switch(result) {
+      case 'ERROR_WRONG_PASSWORD':
+        _errTitle = 'Błąd logowania';
+        _errSubtitle = 'Podany email lub hasło są nieprawidłowe.';
+        break;     
+
+      case 'ERROR_USER_NOT_FOUND':
+        _errTitle = 'Błąd logowania';
+        _errSubtitle = 'Podany email lub hasło są nieprawidłowe.';
+        break; 
+
+      case 'ERROR_INVALID_EMAIL':
+        _errTitle = 'Błąd logowania';
+        _errSubtitle = 'Podany email lub hasło są nieprawidłowe.';
+        break;
+
+      default :
+        _errTitle = 'Bład logowania';
+        _errSubtitle = 'Podczas logowania wystąpił błąd spróbuj jeszcze raz.';
+        break;
+    }
+
+    setState(() => _isLoading = false);
+
+    _globals.showAlertDialog(
+        context,
+        _errTitle,
+        _errSubtitle,
+        'Ok',
+        () => Navigator.of(context).pop(),
+      );
   }
 
-  void signInWithGoogle() async {
+  void signInWithGoogle() async {    
     setState(() => _isLoading = true);
+
+    FocusScopeNode currentFocus = FocusScope.of(context);
+    if (!currentFocus.hasPrimaryFocus) {
+      currentFocus.unfocus();
+    }
+
     dynamic result = await _authProvider.signInWithGoogle();
     if (result == null) {
       setState(() => _isLoading = false);

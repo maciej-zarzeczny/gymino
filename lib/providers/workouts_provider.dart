@@ -15,7 +15,11 @@ class WorkoutsProvider with ChangeNotifier {
   List<Workout> _workouts = [];
   List<Exercise> _exercises = [];
 
-  String _trainerId;
+  String _trainerId = '';
+
+  String get currentTrainerId {
+    return _trainerId;
+  }
 
   List<Workout> get workouts {
     return [..._workouts];
@@ -33,6 +37,7 @@ class WorkoutsProvider with ChangeNotifier {
     return _allWorkoutsLoaded;
   }
 
+  // TODO: Change to return last 4 workouts based on timestamps
   List<Workout> get recentWorkouts {
     if (_workouts.length >= 4) {
       return [_workouts[0], _workouts[1], _workouts[2]];
@@ -62,6 +67,8 @@ class WorkoutsProvider with ChangeNotifier {
           .toList();
 
       _workouts = _loadedWorkouts;
+    } else {
+      _workouts = [];
     }
     if (result.documents.length < _workoutsLimit) {
       _allWorkoutsLoaded = true;

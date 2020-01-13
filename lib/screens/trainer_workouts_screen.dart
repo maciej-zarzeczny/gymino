@@ -27,9 +27,10 @@ class _TrainerWorkoutsScreenState extends State<TrainerWorkoutsScreen> {
     Future.microtask(() {
       _trainerId = ModalRoute.of(context).settings.arguments as String;
       var workoutsProvider =
-          Provider.of<WorkoutsProvider>(context, listen: false);
-      if (workoutsProvider.workouts.isEmpty) {
-        workoutsProvider.fetchWorkouts(_trainerId).then((_) {
+          Provider.of<WorkoutsProvider>(context, listen: false);                
+
+      if (workoutsProvider.workouts.isEmpty || _trainerId != workoutsProvider.currentTrainerId) {
+        workoutsProvider.fetchWorkouts(_trainerId).then((_) {          
           setState(() {
             _isLoading = false;
           });

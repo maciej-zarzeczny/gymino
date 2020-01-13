@@ -11,9 +11,8 @@ class UserData {
   final String name;
   final String gender;
   final String trainingGoal;
-  // final String experienceLevel;
-  // final String trainingType;
-  // final int age;  
+  final String experienceLevel;
+  // final String trainingType;  
   final bool isPremium;
 
   UserData({
@@ -21,8 +20,8 @@ class UserData {
     this.name,    
     this.gender,
     this.trainingGoal,
-    // this.trainingType,
-    // this.experienceLevel,
+    this.experienceLevel,
+    // this.trainingType,    
     this.isPremium,
   });
 
@@ -42,12 +41,12 @@ class UserData {
       else return '';
     }
 
-    String trainingTypeToString(int number) {
-      if (number == 0) return 'Siłownia';
-      else if (number == 1) return 'Kalistenika';
-      else if (number == 2) return 'Trening hybrydowy';
-      else return '';
-    }
+    // String trainingTypeToString(int number) {
+    //   if (number == 0) return 'Siłownia';
+    //   else if (number == 1) return 'Kalistenika';
+    //   else if (number == 2) return 'Trening hybrydowy';
+    //   else return '';
+    // }
 
     String experienceLevelToString(int number) {
       if (number == 0) return 'Początkujący';
@@ -59,12 +58,10 @@ class UserData {
     return UserData(
       uid: snapshot.documentID,
       name: data['name'] ?? '',
-      gender: genderToString(data['gender'] ?? 0),
-      // surname: data['surname'] ?? '',
-      // age: data['age'] ?? 0,
+      gender: genderToString(data['gender'] ?? 0),            
       trainingGoal: trainingGoalToString(data['trainingGoal'] ?? 0),
-      // trainingType: trainingTypeToString(data['trainingType'] ?? 0),      
-      // experienceLevel: experienceLevelToString(data['experienceLevel'] ?? 0),
+      experienceLevel: experienceLevelToString(data['experienceLevel'] ?? 0),
+      // trainingType: trainingTypeToString(data['trainingType'] ?? 0),            
       isPremium: data['isPremium'] ?? 0,
     );
   }

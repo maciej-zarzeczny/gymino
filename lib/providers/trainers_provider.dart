@@ -35,6 +35,10 @@ class TrainersProvider with ChangeNotifier {
     return _allQuestionsLoaded;
   }
 
+  void resetQuestions() {
+    _questions = [];
+  }
+
   // TODO: Chnage algorythm
   List<Trainer> get popularTrainers {
     return _trainers.length < 4
@@ -110,6 +114,8 @@ class TrainersProvider with ChangeNotifier {
           .toList();
 
       _questions = _loadedQuestions;
+    } else {
+      _questions = [];
     }
     if (result.documents.length < _questionsLimit) {
       _allQuestionsLoaded = true;

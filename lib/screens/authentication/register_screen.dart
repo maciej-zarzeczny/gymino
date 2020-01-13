@@ -1,9 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui';
 
+import '../../models/user.dart';
 import '../../widgets/button.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/custom_text_input.dart';
+import '../../globals.dart';
 
 class RegisterScreen extends StatefulWidget {
   static const routeName = '/register';
@@ -17,15 +20,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _emailController = TextEditingController();
   final _nameController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _passwordCheckController = TextEditingController();
+  final _globals = Global();
 
   bool _isLoading = false;
-  int _choosedGender = 0;
   int _currentView = 0;
-  List<int> _choosedGoals = [];
+  List<int> _choosedOptions = [-1, -1, -1];
 
   List<String> _questions = [
     'Płeć',
     'Jaki jest Twój cel treningowy ?',
+    'Jak oceniasz swój poziom zaawansowania ?',
     'Wprowadź swoje dane',
   ];
   List<String> _trainingGoals = [
@@ -34,43 +39,137 @@ class _RegisterScreenState extends State<RegisterScreen> {
     'Zwiększenie siły',
     'Nauka technik',
   ];
+  List<String> _experienceLevels = [
+    'Początkujący',
+    'Średniozaawansowany',
+    'Zaawansowany',
+  ];
 
   void signUp() async {
     setState(() => _isLoading = true);
+
+    FocusScopeNode currentFocus = FocusScope.of(context);
+    if (!currentFocus.hasPrimaryFocus) {
+      currentFocus.unfocus();
+    }
+    
     dynamic result = await _authProvider.registerWithEmailAndPassword(
-        _emailController.text,
-        _passwordController.text,
-        _nameController.text,
-        _choosedGender,
-        _choosedGoals[0]);
-    if (result == null) {
-      setState(() => _isLoading = false);
-    } else {
+      _emailController.text.trim(),
+      _passwordController.text.trim(),
+      _nameController.text.trim(),
+      _choosedOptions[0],
+      _choosedOptions[1],
+      _choosedOptions[2],
+    );
+
+    setState(() => _isLoading = false);
+
+    if (result.runtimeType == User) {
       Navigator.of(context).pop();
+    } else {
+      String _errTitle;
+      String _errSubtitle;
+
+      switch (result) {
+        case 'ERROR_INVALID_EMAIL':
+          _errTitle = 'Nieprawidłowy adres email';
+          _errSubtitle =
+              'Wprowadzony adres email jest niepoprawny. Spróbuj jeszcze raz';
+          break;
+
+        case 'ERROR_WEAK_PASSWORD':
+          _errTitle = 'Za krótkie hasło';
+          _errSubtitle = 'Hasło musi mieć co najmniej 6 znaków';
+          break;
+
+        case 'ERROR_EMAIL_ALREADY_IN_USE':
+          _errTitle = 'Adres email już istnieje';
+          _errSubtitle = 'Konto z podanym adresem email już istnieje.';
+          break;
+
+        default:
+          _errTitle = 'Błąd';
+          _errSubtitle =
+              'Podczas rejestracji wystąpił błąd. Spróbuj jeszcze raz.';
+          break;
+      }
+
+      _globals.showAlertDialog(
+        context,
+        _errTitle,
+        _errSubtitle,
+        'Ok',
+        () => Navigator.of(context).pop(),
+      );
+    }
+  }
+
+  int verifyData() {
+    String _name = _nameController.text.trim();
+    String _email = _emailController.text.trim();
+    String _password = _passwordController.text.trim();
+    String _passwordCheck = _passwordCheckController.text.trim();
+
+    if (_name.isEmpty || _email.isEmpty || _password.isEmpty) {
+      return 1;
+    } else if (_password != _passwordCheck) {
+      return 2;
+    } else {
+      return 0;
     }
   }
 
   void nextQuestion() {
-    setState(() {
-      if (_currentView < 2) {
-        _currentView += 1;
+    if (_currentView < _questions.length - 1 &&
+        _choosedOptions[_currentView] == -1) {
+      _globals.showAlertDialog(
+        context,
+        'Brak wybranej opcji',
+        'Wybierz jedną z podanych opcji',
+        'Ok',
+        () => Navigator.of(context).pop(),
+      );
+    } else if (_currentView < _questions.length - 1) {
+      setState(() => _currentView += 1);
+    } else {
+      int result = verifyData();
+      if (result == 1) {
+        _globals.showAlertDialog(
+          context,
+          'Niektóre pola są puste',
+          'Wypełnij wszystkie wymagane pola',
+          'Ok',
+          () => Navigator.of(context).pop(),
+        );
+      } else if (result == 2) {
+        _globals.showAlertDialog(
+          context,
+          'Podane hasła różnią się',
+          '',
+          'Ok',
+          () => Navigator.of(context).pop(),
+        );
+      } else if (result == 0) {
+        signUp();
       }
-    });
+    }
   }
 
   void setGender(int choice) {
     setState(() {
-      _choosedGender = choice;
+      _choosedOptions[0] = choice;
     });
   }
 
   void setGoal(int choice) {
     setState(() {
-      if (_choosedGoals.contains(choice)) {
-        _choosedGoals.remove(choice);
-      } else {
-        _choosedGoals.add(choice);
-      }
+      _choosedOptions[1] = choice;
+    });
+  }
+
+  void setExperienceLevel(int choice) {
+    setState(() {
+      _choosedOptions[2] = choice;
     });
   }
 
@@ -89,6 +188,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     List<Widget> _views = [
       chooseGenderView(context),
       chooseGoalView(context),
+      experienceLevelView(context),
       insertDataView(context),
     ];
 
@@ -183,10 +283,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     text: _currentView == _views.length - 1
                                         ? 'Utwórz konto'
                                         : 'Dalej',
-                                    onTapFunction:
-                                        _currentView == _views.length - 1
-                                            ? signUp
-                                            : nextQuestion,
+                                    onTapFunction: nextQuestion,
                                   ),
                                 ),
                               ],
@@ -224,6 +321,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
           controller: _passwordController,
           isPassword: true,
         ),
+        CustomTextInput(
+          hintText: 'Powtórz hasło',
+          icon: Icons.lock_outline,
+          controller: _passwordCheckController,
+          isPassword: true,
+        ),
       ],
     );
   }
@@ -234,11 +337,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       children: <Widget>[
         GestureDetector(
           onTap: () => setGender(0),
-          child: genderItem(context, 'Mężczyzna', _choosedGender == 0),
+          child: genderItem(context, 'Mężczyzna', _choosedOptions[0] == 0),
         ),
         GestureDetector(
           onTap: () => setGender(1),
-          child: genderItem(context, 'Kobieta', _choosedGender == 1),
+          child: genderItem(context, 'Kobieta', _choosedOptions[0] == 1),
         ),
       ],
     );
@@ -254,7 +357,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: optionItem(
             context,
             element,
-            _choosedGoals.contains(index),
+            index == _choosedOptions[1],
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget experienceLevelView(context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: _experienceLevels.map((element) {
+        var index = _experienceLevels.indexOf(element);
+        return GestureDetector(
+          onTap: () => setExperienceLevel(index),
+          child: optionItem(
+            context,
+            element,
+            index == _choosedOptions[2],
           ),
         );
       }).toList(),
@@ -287,8 +407,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Widget optionItem(context, String title, bool isChosen) {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.9,
-      height: MediaQuery.of(context).size.width * 0.25,
+      width: MediaQuery.of(context).size.width * 0.8,
+      height: MediaQuery.of(context).size.width * 0.2,
       margin: const EdgeInsets.symmetric(vertical: 5.0),
       decoration: BoxDecoration(
         border: Border.all(
@@ -312,44 +432,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget progressIndicator(context, isChecked) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Container(
+      children: _questions.map((element) {
+        var index = _questions.indexOf(element);
+        return Container(
           margin: EdgeInsets.symmetric(horizontal: 3.0),
           width: MediaQuery.of(context).size.width * 0.035,
           height: MediaQuery.of(context).size.width * 0.035,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: isChecked[0] ? Theme.of(context).accentColor : Colors.white,
+            color:
+                isChecked[index] ? Theme.of(context).accentColor : Colors.white,
           ),
-        ),
-        Container(
-          margin: EdgeInsets.symmetric(horizontal: 3.0),
-          width: MediaQuery.of(context).size.width * 0.035,
-          height: MediaQuery.of(context).size.width * 0.035,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: isChecked[1] ? Theme.of(context).accentColor : Colors.white,
-          ),
-        ),
-        Container(
-          margin: EdgeInsets.symmetric(horizontal: 3.0),
-          width: MediaQuery.of(context).size.width * 0.035,
-          height: MediaQuery.of(context).size.width * 0.035,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: isChecked[2] ? Theme.of(context).accentColor : Colors.white,
-          ),
-        ),
-        // Container(
-        //   margin: EdgeInsets.symmetric(horizontal: 3.0),
-        //   width: MediaQuery.of(context).size.width * 0.035,
-        //   height: MediaQuery.of(context).size.width * 0.035,
-        //   decoration: BoxDecoration(
-        //     shape: BoxShape.circle,
-        //     color: isChecked[3] ? Theme.of(context).accentColor : Colors.white,
-        //   ),
-        // ),
-      ],
+        );
+      }).toList(),
     );
   }
 }
