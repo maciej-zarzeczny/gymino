@@ -8,6 +8,8 @@ class Workout {
   final int duration;
   final String difficulty;
   final Map<dynamic, dynamic> keywords;
+  final List<dynamic> exercises;
+  
 
   Workout({
     this.id,
@@ -16,6 +18,7 @@ class Workout {
     @required this.duration,
     @required this.difficulty,
     @required this.keywords,
+    this.exercises,
   });
 
   factory Workout.fromSnapshot(DocumentSnapshot doc) {
@@ -33,7 +36,8 @@ class Workout {
       imageUrl: data['image_url'] ?? '',
       duration: data['duration'] ?? 0,
       difficulty: difficultyToString(data['difficulty']),
-      keywords: data['keywords'],
+      keywords: data['keywords'] ?? [],
+      exercises: data['exercises'] ?? [],
     );
   }
 }

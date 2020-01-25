@@ -12,25 +12,25 @@ class WorkoutsProvider with ChangeNotifier {
   bool _allWorkoutsLoaded = false;
 
   List<Workout> _loadedWorkouts = [];
-  List<Workout> _workouts = [];
-  List<Exercise> _exercises = [];
+  Map<String, List<Workout>> _workoutsMap = new Map();  
+  List<ExerciseData> _exerciseData = [];
 
   String _trainerId = '';
 
+  set currentTrainerId(id) {
+    _trainerId = id;
+  }
+
   String get currentTrainerId {
     return _trainerId;
-  }
+  }  
 
   List<Workout> get workouts {
-    return [..._workouts];
-  }
-
-  List<Exercise> get exercises {
-    return [..._exercises];
+    return _workoutsMap[_trainerId];
   }
 
   int get numberOfWorkouts {
-    return _workouts.length;
+    return _workoutsMap[_trainerId].length;
   }
 
   bool get allWorkoutsLoaded {
@@ -39,36 +39,47 @@ class WorkoutsProvider with ChangeNotifier {
 
   // TODO: Change to return last 4 workouts based on timestamps
   List<Workout> get recentWorkouts {
-    if (_workouts.length >= 4) {
-      return [_workouts[0], _workouts[1], _workouts[2]];
+    if (_workoutsMap[_trainerId].length >= 4) {
+      return [_workoutsMap[_trainerId][0], _workoutsMap[_trainerId][1], _workoutsMap[_trainerId][2]];
     } else {
       return [];
     }
   }
 
   Workout findById(String id) {
-    return _workouts.firstWhere((workout) => workout.id == id);
+    return _workoutsMap[_trainerId].firstWhere((workout) => workout.id == id);
   }
 
-  Future<void> fetchWorkouts(String trainerId) async {
-    _trainerId = trainerId;
+  dynamic findExerciseById(String id) {
+    ExerciseData exerciseData;
+    try {
+      exerciseData = _exerciseData.firstWhere((exercise) => exercise.id == id);
+      return exerciseData;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<void> fetchWorkouts() async {    
+    _allWorkoutsLoaded = false;
     var result = await _db
         .collection('trainers')
-        .document(trainerId)
+        .document(_trainerId)
         .collection('workouts')
         .orderBy('name')
         .limit(_workoutsLimit)
         .getDocuments();
 
     if (result.documents.length > 0) {
+      print(result.documents.length);
       _lastDocument = result.documents[result.documents.length - 1];
       _loadedWorkouts = result.documents
           .map((workout) => Workout.fromSnapshot(workout))
           .toList();
-
-      _workouts = _loadedWorkouts;
-    } else {
-      _workouts = [];
+      
+      _workoutsMap[_trainerId] = _loadedWorkouts;
+    } else {      
+      _workoutsMap[_trainerId] = [];
     }
     if (result.documents.length < _workoutsLimit) {
       _allWorkoutsLoaded = true;
@@ -88,12 +99,13 @@ class WorkoutsProvider with ChangeNotifier {
         .getDocuments();
 
     if (result.documents.length > 0) {
+      print(result.documents.length);
       _lastDocument = result.documents[result.documents.length - 1];
       _loadedWorkouts = result.documents
           .map((workout) => Workout.fromSnapshot(workout))
           .toList();
-
-      _workouts.addAll(_loadedWorkouts);
+      
+      _workoutsMap[_trainerId].addAll(_loadedWorkouts);
     }
     if (result.documents.length < _workoutsLimit) {
       _allWorkoutsLoaded = true;
@@ -101,39 +113,21 @@ class WorkoutsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchExercises(String workoutId) async {
-    var result = await _db
-        .collection('trainers')
-        .document(_trainerId)
-        .collection('workouts')
-        .document(workoutId)
-        .collection('exercises')
-        .getDocuments();
-
-    final List<Exercise> loadedExercises = result.documents
-        .map((exercise) => Exercise.fromSnapshot(exercise))
+  List<Exercise> getExercises(String workoutId) {
+    List<Exercise> loadedExercises = findById(workoutId)
+        .exercises
+        .map((exercise) => Exercise.fromMap(exercise))
         .toList();
 
-    _exercises = loadedExercises;
-    notifyListeners();
+    return loadedExercises;
   }
 
-  Future<void> fetchExercisesData() async {
-    var futures = <Future>[];
-    for (int i = 0; i < _exercises.length; i++) {
-      futures
-          .add(_db.document('exercises/${_exercises[i].id}').get().then((data) {
-        _exercises[i].setExerciseData(
-            data['name'],
-            data['description'],
-            data['instructions'],
-            data['imageUrl'],
-            data['keywords'],
-            data['bulletPoints']);
-      }));
-    }
+  Future<void> fetchExerciseData(String id) async {
+    DocumentSnapshot result =
+        await _db.collection('exercises').document(id).get();
 
-    await Future.wait(futures);
+    print('1');
+    _exerciseData.add(ExerciseData.fromSnapshot(result));
     notifyListeners();
   }
 }

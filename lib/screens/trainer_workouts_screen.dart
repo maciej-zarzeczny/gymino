@@ -8,6 +8,7 @@ import '../widgets/trainer_header.dart';
 import '../widgets/recent_workouts.dart';
 import '../widgets/workout_card.dart';
 import '../widgets/more_loading_indicator.dart';
+import '../models/workout.dart';
 
 class TrainerWorkoutsScreen extends StatefulWidget {
   static const routeName = '/trainer';
@@ -21,16 +22,19 @@ class _TrainerWorkoutsScreenState extends State<TrainerWorkoutsScreen> {
   bool _isLoading = true;
   bool _moreLoading = false;
   ScrollController _scrollController = ScrollController();
+  var workoutsProvider;
 
   @override
   void initState() {
     Future.microtask(() {
       _trainerId = ModalRoute.of(context).settings.arguments as String;
-      var workoutsProvider =
-          Provider.of<WorkoutsProvider>(context, listen: false);                
+      workoutsProvider =
+          Provider.of<WorkoutsProvider>(context, listen: false);       
+      workoutsProvider.currentTrainerId = _trainerId;         
 
-      if (workoutsProvider.workouts.isEmpty || _trainerId != workoutsProvider.currentTrainerId) {
-        workoutsProvider.fetchWorkouts(_trainerId).then((_) {          
+      if (workoutsProvider.workouts == null) {
+        print('fetching workouts');
+        workoutsProvider.fetchWorkouts().then((_) {          
           setState(() {
             _isLoading = false;
           });
@@ -79,15 +83,16 @@ class _TrainerWorkoutsScreenState extends State<TrainerWorkoutsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {    
     Trainer trainer;
-    final workoutsProvider = Provider.of<WorkoutsProvider>(context);
-    final workouts = workoutsProvider.workouts;
-    final recentWorkouts = workoutsProvider.recentWorkouts;
+    List<Workout> workouts;
+    List<Workout> recentWorkouts;    
 
     if (_trainerId != null) {
       trainer = Provider.of<TrainersProvider>(context, listen: false)
           .findById(_trainerId);
+      workouts = workoutsProvider.workouts;
+      recentWorkouts = workoutsProvider.recentWorkouts;
     }
 
     return Scaffold(
@@ -110,7 +115,7 @@ class _TrainerWorkoutsScreenState extends State<TrainerWorkoutsScreen> {
                         TrainerHeader(trainer, workouts.length),
                         recentWorkouts.isNotEmpty
                             ? RecentWorkouts(recentWorkouts)
-                            : Container(),
+                            : SizedBox(height: 10.0,),
                         workouts.isNotEmpty
                             ? Padding(
                                 padding: const EdgeInsets.only(

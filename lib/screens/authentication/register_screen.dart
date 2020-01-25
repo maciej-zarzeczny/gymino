@@ -52,7 +52,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (!currentFocus.hasPrimaryFocus) {
       currentFocus.unfocus();
     }
-    
+
     dynamic result = await _authProvider.registerWithEmailAndPassword(
       _emailController.text.trim(),
       _passwordController.text.trim(),
@@ -308,24 +308,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
           icon: Icons.person_outline,
           controller: _nameController,
           isPassword: false,
+          color: Colors.white,
+          withIcon: true,
         ),
         CustomTextInput(
           hintText: 'Adres email',
           icon: Icons.email,
           controller: _emailController,
           isPassword: false,
+          color: Colors.white,
+          withIcon: true,
         ),
         CustomTextInput(
           hintText: 'Hasło',
           icon: Icons.lock_outline,
           controller: _passwordController,
           isPassword: true,
+          color: Colors.white,
+          withIcon: true,
         ),
         CustomTextInput(
           hintText: 'Powtórz hasło',
           icon: Icons.lock_outline,
           controller: _passwordCheckController,
           isPassword: true,
+          color: Colors.white,
+          withIcon: true,
         ),
       ],
     );

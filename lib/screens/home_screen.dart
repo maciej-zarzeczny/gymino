@@ -24,7 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
-      statusBarColor: Colors.white,
+      statusBarColor: Theme.of(context).primaryColor,
       statusBarBrightness: Brightness.light,
     ));
     List<Widget> _views = [

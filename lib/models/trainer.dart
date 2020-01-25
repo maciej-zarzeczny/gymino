@@ -42,7 +42,7 @@ class Trainer {
       name: data['name'] ?? '',
       imageUrl: data['image_url'] ?? '',
       numberOfFollowers: followersToString(data['number_of_followers']) ?? followersToString(0),
-      keywords: data['keywords'],
+      keywords: data['keywords'] ?? [],
       supplements: data['supplements'] ?? [],
       age: data['age'] ?? 0,
       height: data['height'] ?? 0,

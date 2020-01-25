@@ -15,10 +15,20 @@ class TopTrainer extends StatelessWidget {
       width: double.infinity,
       height: (MediaQuery.of(context).size.height -
               MediaQuery.of(context).padding.top) *
-          0.3,      
+          0.3,
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black38,
+            offset: Offset(0.0, 5.0),
+            blurRadius: 5.0,
+          ),
+        ],
+      ),
       child: GestureDetector(
-        onTap: () {          
-          Navigator.of(context).pushNamed(TrainerWorkoutsScreen.routeName, arguments: topTrainer.id);
+        onTap: () {
+          Navigator.of(context).pushNamed(TrainerWorkoutsScreen.routeName,
+              arguments: topTrainer.id);
         },
         child: Stack(
           children: <Widget>[
@@ -27,7 +37,10 @@ class TopTrainer extends StatelessWidget {
               imageUrl: topTrainer.imageUrl,
               fit: BoxFit.cover,
               alignment: Alignment.topCenter,
-              errorWidget: (context, url, error) => Icon(Icons.error_outline, color: Colors.white,),
+              errorWidget: (context, url, error) => Icon(
+                Icons.error_outline,
+                color: Colors.white,
+              ),
             ),
             Container(
               color: Colors.black12,
@@ -37,7 +50,8 @@ class TopTrainer extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(15),
               alignment: Alignment.bottomLeft,
-              child: Text(topTrainer.name, style: Theme.of(context).textTheme.title),
+              child: Text(topTrainer.name,
+                  style: Theme.of(context).textTheme.title),
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,

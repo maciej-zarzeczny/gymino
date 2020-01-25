@@ -140,12 +140,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                   controller: _emailController,
                                   icon: Icons.person_outline,
                                   isPassword: false,
+                                  color: Colors.white,
+                                  withIcon: true,
                                 ),
                                 CustomTextInput(
                                   hintText: 'Hasło',
                                   controller: _passwordController,
                                   icon: Icons.lock_outline,
                                   isPassword: true,
+                                  color: Colors.white,
+                                  withIcon: true,
                                 ),
                                 Button(
                                   text: 'Zaloguj',

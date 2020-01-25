@@ -19,6 +19,8 @@ class TrainersProvider with ChangeNotifier {
   List<Question> _loadedQuestions = [];
   List<Question> _questions = [];
 
+  String _trainerId;
+
   List<Trainer> get trainers {
     return [..._trainers];
   }
@@ -35,8 +37,8 @@ class TrainersProvider with ChangeNotifier {
     return _allQuestionsLoaded;
   }
 
-  void resetQuestions() {
-    _questions = [];
+  String get currentTrainerId {
+    return _trainerId;
   }
 
   // TODO: Chnage algorythm
@@ -62,6 +64,7 @@ class TrainersProvider with ChangeNotifier {
         .getDocuments();
 
     if (result.documents.length > 0) {
+      print(result.documents.length);
       _lastTrainer = result.documents[result.documents.length - 1];
       _loadedTrainers = result.documents
           .map((trainer) => Trainer.fromSnapshot(trainer))
@@ -85,6 +88,7 @@ class TrainersProvider with ChangeNotifier {
         .getDocuments();
 
     if (result.documents.length > 0) {
+      print(result.documents.length);
       _lastTrainer = result.documents[result.documents.length - 1];
       _loadedTrainers = result.documents
           .map((trainer) => Trainer.fromSnapshot(trainer))
@@ -99,15 +103,18 @@ class TrainersProvider with ChangeNotifier {
   }
 
   Future<void> fetchQuestions(String id) async {
+    _trainerId = id;
+    _allQuestionsLoaded = false;
     var result = await _db
         .collection('trainers')
-        .document(id)
+        .document(_trainerId)
         .collection('questions')
         .orderBy('question')
         .limit(_questionsLimit)
         .getDocuments();
 
     if (result.documents.length > 0) {
+      print(result.documents.length);
       _lastQuestion = result.documents[result.documents.length - 1];
       _loadedQuestions = result.documents
           .map((question) => Question.fromSnapshot(question))
@@ -124,10 +131,10 @@ class TrainersProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchMoreQuestions(String id) async {
+  Future<void> fetchMoreQuestions() async {
     var result = await _db
         .collection('trainers')
-        .document(id)
+        .document(_trainerId)
         .collection('questions')
         .orderBy('question')
         .startAfterDocument(_lastQuestion)
@@ -135,6 +142,7 @@ class TrainersProvider with ChangeNotifier {
         .getDocuments();
 
     if (result.documents.length > 0) {
+      print(result.documents.length);
       _lastQuestion = result.documents[result.documents.length - 1];
       _loadedQuestions = result.documents
           .map((question) => Question.fromSnapshot(question))

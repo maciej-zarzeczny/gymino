@@ -8,6 +8,7 @@ import '../models/question.dart';
 import '../providers/trainers_provider.dart';
 import '../widgets/question_card.dart';
 import '../widgets/more_loading_indicator.dart';
+import '../widgets/custom_text_input.dart';
 
 class TrainerInfoScreen extends StatefulWidget {
   static const routeName = '/trainerInfo';
@@ -24,6 +25,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
   List<Question> _questions;
   List<dynamic> _supplements = [];
   ScrollController _scrollController = ScrollController();
+  final TextEditingController _askQuestionController = TextEditingController();
 
   @override
   void initState() {
@@ -31,7 +33,8 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
       _trainer = ModalRoute.of(context).settings.arguments as Trainer;
       var trainersProvider =
           Provider.of<TrainersProvider>(context, listen: false);
-      if (trainersProvider.questions.isEmpty) {
+      if (trainersProvider.questions.isEmpty ||
+          _trainer.id != trainersProvider.currentTrainerId) {
         trainersProvider.fetchQuestions(_trainer.id).then((_) {
           setState(() {
             _isLoading = false;
@@ -51,7 +54,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
           });
 
           if (!trainersProvider.allQuestionsLoaded) {
-            trainersProvider.fetchMoreQuestions(_trainer.id).then((_) {
+            trainersProvider.fetchMoreQuestions().then((_) {
               setState(() {
                 _moreLoading = false;
               });
@@ -109,12 +112,21 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
             )
           : Padding(
               padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-              child: Column(
-                children: <Widget>[
-                  header(context, _trainer, trainersProvider.resetQuestions),
-                  picker(context),
-                  _infoChoosen ? infoPage() : questionsPage(),
-                ],
+              child: GestureDetector(
+                onTap: () {
+                  FocusScopeNode currentFocus = FocusScope.of(context);
+                  if (!currentFocus.hasPrimaryFocus) {
+                    currentFocus.unfocus();
+                  }
+                },
+                child: Column(
+                  children: <Widget>[
+                    header(context, _trainer),
+                    picker(context),
+                    _infoChoosen ? infoPage() : questionsPage(),
+                    _infoChoosen ? Container() : askQuestion(context),
+                  ],
+                ),
               ),
             ),
     );
@@ -124,8 +136,11 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
     return Expanded(
       child: ListView.builder(
         padding: const EdgeInsets.all(0.0),
-        itemCount: _supplements.length + 2,
+        itemCount: _supplements.length == 0
+            ? _supplements.length + 1
+            : _supplements.length + 2,
         itemBuilder: (context, index) {
+          bool last = _supplements.length == index - 1;
           if (index == 0) {
             return infoGrid([
               _trainer.age.toString(),
@@ -159,6 +174,8 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
               _supplements[index - 2]['amount'],
               _supplements[index - 2]['portionsPerDay'],
               _supplements[index - 2]['comment'],
+              _supplements[index - 2]['imageUrl'],
+              last,
             );
           }
         },
@@ -169,7 +186,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
   Widget questionsPage() {
     return Expanded(
       child: ListView.builder(
-        controller: _scrollController,        
+        controller: _scrollController,
         padding: const EdgeInsets.all(0.0),
         itemCount: _questions.length + 2,
         itemBuilder: (context, index) {
@@ -202,7 +219,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
     );
   }
 
-  Widget header(context, Trainer trainer, Function resetQuestions) {
+  Widget header(context, Trainer trainer) {
     return Container(
       width: double.infinity,
       height: (MediaQuery.of(context).size.height -
@@ -239,10 +256,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
             left: 0,
             child: IconButton(
               iconSize: 30,
-              onPressed: () {
-                resetQuestions();
-                Navigator.of(context).pop();
-              } ,
+              onPressed: () => Navigator.of(context).pop(),
               icon: Icon(Icons.arrow_back),
               color: Colors.white,
             ),
@@ -285,21 +299,97 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
     );
   }
 
-  Widget supplementItem(
-      String name, int amount, int portionsPerDay, String comment) {
+  Widget askQuestion(context) {
+    return Container(
+      width: double.infinity,
+      height: MediaQuery.of(context).size.height * 0.15,
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).padding.bottom,
+        top: 10.0,
+        left: 20.0,
+        right: 20.0,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            'Zadaj pytanie',
+            style: TextStyle(
+              fontSize: 15,
+              color: Theme.of(context).primaryColor,
+              fontWeight: FontWeight.normal,
+            ),
+          ),
+          SizedBox(
+            height: 10.0,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              CustomTextInput(
+                hintText: 'Treść pytania...',
+                controller: _askQuestionController,
+                isPassword: false,
+                withIcon: false,
+                color: Theme.of(context).primaryColor,
+              ),
+              Icon(
+                Icons.send,
+                color: Theme.of(context).accentColor,
+                size: 35,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget supplementItem(String name, int amount, int portionsPerDay,
+      String comment, String imageUrl, bool isLast) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.15,
-      margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 20.0),
+      margin: isLast
+          ? EdgeInsets.only(
+              left: 20.0,
+              right: 20.0,
+              top: 5.0,
+              bottom: MediaQuery.of(context).padding.bottom + 5.0,
+            )
+          : const EdgeInsets.symmetric(vertical: 5.0, horizontal: 20.0),
       padding: const EdgeInsets.all(10.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10.0),
         image: DecorationImage(
-          image: AssetImage('assets/images/vitamins.jpg'),
+          image: AssetImage('assets/images/supplements/$imageUrl'),
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(
-            Colors.black12,
+            Colors.black26,
             BlendMode.darken,
           ),
+        ),
+      ),
+      child: Align(
+        alignment: Alignment.bottomLeft,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text(
+              name,
+              style: Theme.of(context).textTheme.title.copyWith(fontSize: 30),
+            ),
+            SizedBox(height: 5),
+            Text(
+              '$amount g - $portionsPerDay x dziennie',
+              style: Theme.of(context)
+                  .textTheme
+                  .display2
+                  .copyWith(color: Colors.white),
+            ),
+          ],
         ),
       ),
     );

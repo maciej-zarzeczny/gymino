@@ -11,7 +11,7 @@ class TrainerPick extends StatelessWidget {
   TrainerPick(this.trainer);
 
   @override
-  Widget build(BuildContext context) { 
+  Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         Navigator.of(context)
@@ -31,7 +31,10 @@ class TrainerPick extends StatelessWidget {
                 imageUrl: trainer.imageUrl,
                 fit: BoxFit.cover,
                 alignment: Alignment.topCenter,
-                errorWidget: (context, url, error) => Icon(Icons.error_outline, color: Colors.white,),
+                errorWidget: (context, url, error) => Icon(
+                  Icons.error_outline,
+                  color: Colors.white,
+                ),
               ),
             ),
             Container(

@@ -5,17 +5,16 @@ import '../screens/exercise_overview_screen.dart';
 
 class ExerciseCard extends StatelessWidget {
   final Exercise _exercise;
-
   ExerciseCard(this._exercise);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {    
     final size =
         MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top;
 
     return GestureDetector(
       onTap: () =>
-          Navigator.of(context).pushNamed(ExerciseOverviewScreen.routeName, arguments: _exercise),
+          Navigator.of(context).pushNamed(ExerciseOverviewScreen.routeName, arguments: _exercise.id),
       child: Container(        
         height: size * 0.15,
         padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),

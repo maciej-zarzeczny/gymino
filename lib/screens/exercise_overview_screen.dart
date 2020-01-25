@@ -1,38 +1,77 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sqilly/providers/workouts_provider.dart';
 
 import '../models/exercise.dart';
 import '../widgets/keyword.dart';
 
-class ExerciseOverviewScreen extends StatelessWidget {
+class ExerciseOverviewScreen extends StatefulWidget {
   static const routeName = '/exerciseOverview';
 
   @override
+  _ExerciseOverviewScreenState createState() => _ExerciseOverviewScreenState();
+}
+
+class _ExerciseOverviewScreenState extends State<ExerciseOverviewScreen> {
+  bool _isLoading = true;
+  String _exerciseId;
+
+  @override
+  void initState() {
+    Future.microtask(() {
+      _exerciseId = ModalRoute.of(context).settings.arguments as String;
+      var workoutsProvider =
+          Provider.of<WorkoutsProvider>(context, listen: false);
+      if (workoutsProvider.findExerciseById(_exerciseId) == null) {
+        workoutsProvider.fetchExerciseData(_exerciseId).then((_) {
+          setState(() {
+            _isLoading = false;
+          });
+        });
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final Exercise _exercise =
-        ModalRoute.of(context).settings.arguments as Exercise;
+    ExerciseData _exerciseData;
+    if (_exerciseId != null) {
+      _exerciseData =
+          Provider.of<WorkoutsProvider>(context).findExerciseById(_exerciseId);
+    }
 
     return Scaffold(
-      body: Column(
-        children: <Widget>[
-          Container(
-            height: (MediaQuery.of(context).size.height -
-                    MediaQuery.of(context).padding.top) *
-                0.55,
-            width: double.infinity,
-            margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-            child: header(context),
-          ),
-          Container(
-            height: (MediaQuery.of(context).size.height -
-                    MediaQuery.of(context).padding.top) *
-                0.45,
-            width: double.infinity,
-            child: SingleChildScrollView(
-              child: content(_exercise, context),
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : Column(
+              children: <Widget>[
+                Container(
+                  height: (MediaQuery.of(context).size.height -
+                          MediaQuery.of(context).padding.top) *
+                      0.55,
+                  width: double.infinity,
+                  margin:
+                      EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+                  child: header(context),
+                ),
+                Container(
+                  height: (MediaQuery.of(context).size.height -
+                          MediaQuery.of(context).padding.top) *
+                      0.45,
+                  width: double.infinity,
+                  child: SingleChildScrollView(
+                    child: content(_exerciseData, context),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -85,7 +124,7 @@ class ExerciseOverviewScreen extends StatelessWidget {
     );
   }
 
-  Widget content(Exercise exercise, context) {
+  Widget content(ExerciseData exercise, context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15.0),
       child: Column(
@@ -122,18 +161,18 @@ class ExerciseOverviewScreen extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.only(top: 20.0, bottom: 35.0),
-            child: Column(              
+            child: Column(
               children: exercise.bulletPoints.map((element) {
                 return Padding(
                   padding: const EdgeInsets.only(top: 5.0),
-                  child: Row(                  
+                  child: Row(
                     children: <Widget>[
                       Icon(
                         Icons.star_border,
                         color: Theme.of(context).primaryColor,
                       ),
                       Container(
-                        padding: const EdgeInsets.only(left: 5.0, right: 15.0),                      
+                        padding: const EdgeInsets.only(left: 5.0, right: 15.0),
                         width: MediaQuery.of(context).size.width - 55,
                         child: Text(
                           element,
