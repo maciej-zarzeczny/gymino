@@ -15,16 +15,7 @@ class TopTrainer extends StatelessWidget {
       width: double.infinity,
       height: (MediaQuery.of(context).size.height -
               MediaQuery.of(context).padding.top) *
-          0.3,
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black38,
-            offset: Offset(0.0, 5.0),
-            blurRadius: 5.0,
-          ),
-        ],
-      ),
+          0.3,      
       child: GestureDetector(
         onTap: () {
           Navigator.of(context).pushNamed(TrainerWorkoutsScreen.routeName,

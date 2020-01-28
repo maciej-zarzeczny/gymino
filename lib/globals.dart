@@ -16,6 +16,24 @@ class Global {
     900: Color.fromRGBO(26, 26, 26, 1),
   };
 
+  Widget loadingIndicator(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+      color: Colors.white,
+      child: Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+  }
+
+  Widget backArrow() {
+    return Icon(
+      Platform.isIOS ? CupertinoIcons.back : Icons.arrow_back,
+      color: Colors.white,
+      size: 35,
+    );
+  }
+
   Future<void> showAlertDialog(BuildContext context, String title,
       String subtitle, String actionText, Function actionFunction) async {
     return Platform.isIOS
@@ -51,6 +69,7 @@ class Global {
                   ),
                 ],
               );
-            });
+            },
+          );
   }
 }

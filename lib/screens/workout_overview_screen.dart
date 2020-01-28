@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/workouts_provider.dart';
 
+import '../globals.dart';
+import '../providers/workouts_provider.dart';
 import '../models/workout.dart';
 import '../widgets/workout_header.dart';
 import '../widgets/exercise_card.dart';
 import '../screens/workout_screen.dart';
 import '../models/exercise.dart';
+import '../providers/users_provider.dart';
+import '../models/user.dart';
 
 class WorkoutOverviewScreen extends StatefulWidget {
   static const String routeName = '/workout-overview';
@@ -16,14 +19,50 @@ class WorkoutOverviewScreen extends StatefulWidget {
 }
 
 class _WorkoutOverviewScreenState extends State<WorkoutOverviewScreen> {
+  String workoutId;
+  WorkoutsProvider workoutsProvider;
+  Workout workout;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    Future.microtask(() {
+      workoutsProvider = Provider.of<WorkoutsProvider>(context, listen: false);
+      workoutId = ModalRoute.of(context).settings.arguments as String;
+      workout = workoutsProvider.findById(workoutId);
+      if (workout == null) {
+        workoutsProvider.fetchWorkoutById(workoutId).then((_) {
+          setState(() {
+            _isLoading = false;
+          });
+        });
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final String workoutId =
-        ModalRoute.of(context).settings.arguments as String;
-    final workoutsProvider = Provider.of<WorkoutsProvider>(context);
-    final Workout workout = workoutsProvider.findById(workoutId);        
-    final List<Exercise> exercises = workoutsProvider.getExercises(workoutId);    
+    UsersProvider usersProvider;
+    List<Exercise> exercises;
+    UserData userData;
+    bool isSaved = false;
+
+    if (!_isLoading) {
+      workout = workoutsProvider.findById(workoutId);
+      usersProvider = Provider.of<UsersProvider>(context);
+      exercises = workoutsProvider.getExercises(workoutId);
+      userData = usersProvider.userData;
+
+      if (userData.savedWorkouts != null &&
+          userData.savedWorkouts.containsKey(workoutId)) {
+        isSaved = true;
+      }
+    }
 
     void startWorkout() {
       Navigator.of(context).pushNamed(WorkoutScreen.routeName, arguments: {
@@ -31,19 +70,30 @@ class _WorkoutOverviewScreenState extends State<WorkoutOverviewScreen> {
       });
     }
 
+    void addToFavourites() {
+      setState(() => isSaved = true);
+      usersProvider.addWorkoutToFavourites(
+          workoutId,
+          workout.difficulty,
+          workout.duration,
+          workout.name,
+          workout.imageUrl,
+          workoutsProvider.currentTrainerId);
+    }
+
+    void removeFromFavourites() {
+      setState(() => isSaved = false);
+      usersProvider.removeWorkoutFromFavourites(workoutId);
+    }
+
     return Scaffold(
-      body: Container(
-        height: (MediaQuery.of(context).size.height -
-                MediaQuery.of(context).padding.top) *
-            1,
-        width: double.infinity,
-        margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-        child: ListView.builder(
-          padding: const EdgeInsets.all(0.0),
-          itemCount: exercises.length + 1,
-          itemBuilder: (context, i) {
-            if (i == 0) {
-              return Column(
+      body: _isLoading
+          ? Global().loadingIndicator(context)
+          : Container(
+              height: MediaQuery.of(context).size.height,
+              color: Colors.white,
+              width: double.infinity,
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   WorkoutHeader(
@@ -93,23 +143,32 @@ class _WorkoutOverviewScreenState extends State<WorkoutOverviewScreen> {
                         ),
                         Padding(
                           padding: const EdgeInsets.only(left: 5.0),
-                          child: Icon(
-                            Icons.bookmark_border,
-                            color: Theme.of(context).primaryColor,
-                            size: 28,
+                          child: GestureDetector(
+                            onTap: isSaved
+                                ? removeFromFavourites
+                                : addToFavourites,
+                            child: Icon(
+                              isSaved ? Icons.bookmark : Icons.bookmark_border,
+                              color: Theme.of(context).primaryColor,
+                              size: 28,
+                            ),
                           ),
                         ),
                       ],
                     ),
-                  )
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(0.0),
+                      itemCount: exercises.length,
+                      itemBuilder: (context, i) {
+                        return ExerciseCard(exercises[i]);
+                      },
+                    ),
+                  ),
                 ],
-              );
-            } else {
-              return ExerciseCard(exercises[i - 1]);
-            }
-          },
-        ),
-      ),
+              ),
+            ),
     );
   }
 }

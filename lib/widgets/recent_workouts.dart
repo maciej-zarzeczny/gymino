@@ -11,7 +11,7 @@ class RecentWorkouts extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: (MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top) * 0.2,      
+      height: MediaQuery.of(context).size.height * 0.2,
       constraints: BoxConstraints(minHeight: 170),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -21,7 +21,7 @@ class RecentWorkouts extends StatelessWidget {
             child: Text(
               'Ostatnio dodane',
               style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 16,
                   color: Theme.of(context).primaryColor,
                   fontWeight: FontWeight.normal),
             ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
+import 'package:sqilly/providers/users_provider.dart';
 
 import './globals.dart';
 import './providers/trainers_provider.dart';
@@ -15,6 +16,7 @@ import './screens/trainer_info_screen.dart';
 import './screens/authentication/login_screen.dart';
 import './screens/authentication/auth_wrapper.dart';
 import './screens/authentication/register_screen.dart';
+import './screens/saved_workouts_screen.dart';
 import './models/user.dart';
 
 void main() {
@@ -23,11 +25,11 @@ void main() {
 
 class MyApp extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {    
+  Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
-    ]);    
+    ]);
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(
@@ -35,6 +37,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider.value(
           value: WorkoutsProvider(),
+        ),
+        ChangeNotifierProvider.value(
+          value: UsersProvider(),
         ),
         StreamProvider<User>.value(
           value: AuthProvider().user,
@@ -45,6 +50,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: MaterialColor(0xFF1A1A1A, Global().primaryColor),
           accentColor: Color.fromRGBO(224, 22, 22, 1),
+          canvasColor: Color.fromRGBO(26, 26, 26, 1.0),         
           // fontFamily: 'Proxima-Nova',
           fontFamily: 'Roboto',
           textTheme: TextTheme(
@@ -109,6 +115,7 @@ class MyApp extends StatelessWidget {
           ExerciseOverviewScreen.routeName: (context) =>
               ExerciseOverviewScreen(),
           TrainerInfoScreen.routeName: (context) => TrainerInfoScreen(),
+          SavedWorkoutsScreen.routeName: (context) => SavedWorkoutsScreen(),          
         },
       ),
     );

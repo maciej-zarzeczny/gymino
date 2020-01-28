@@ -6,10 +6,11 @@ import '../models/exercise.dart';
 
 class WorkoutsProvider with ChangeNotifier {
   final Firestore _db = Firestore.instance;
-  final int _workoutsLimit = 5;
+  final int workoutsLimit = 5;
 
   DocumentSnapshot _lastDocument;
   bool _allWorkoutsLoaded = false;
+  bool _fromSavedWorkouts = false;
 
   List<Workout> _loadedWorkouts = [];
   Map<String, List<Workout>> _workoutsMap = new Map();  
@@ -21,9 +22,17 @@ class WorkoutsProvider with ChangeNotifier {
     _trainerId = id;
   }
 
+  set fromSavedWorkouts(value) {
+    _fromSavedWorkouts = value;
+  }
+
+  bool get fromSavedWorkouts {
+    return _fromSavedWorkouts;
+  }
+
   String get currentTrainerId {
     return _trainerId;
-  }  
+  }
 
   List<Workout> get workouts {
     return _workoutsMap[_trainerId];
@@ -47,7 +56,13 @@ class WorkoutsProvider with ChangeNotifier {
   }
 
   Workout findById(String id) {
-    return _workoutsMap[_trainerId].firstWhere((workout) => workout.id == id);
+    Workout workout;
+    try {
+      workout = _workoutsMap[_trainerId].firstWhere((workout) => workout.id == id);
+      return workout;
+    } catch (e) {
+      return null;
+    }    
   }
 
   dynamic findExerciseById(String id) {
@@ -60,14 +75,25 @@ class WorkoutsProvider with ChangeNotifier {
     }
   }
 
+  Future<void> fetchWorkoutById(String id) async {
+    var result = await _db.collection('trainers').document(_trainerId).collection('workouts').document(id).get();
+      if (result != null) {
+        _fromSavedWorkouts = true;
+        print('1');
+        _workoutsMap[_trainerId] = [Workout.fromSnapshot(result)];        
+      }      
+      notifyListeners();
+  } 
+
   Future<void> fetchWorkouts() async {    
     _allWorkoutsLoaded = false;
+    _fromSavedWorkouts = false;
     var result = await _db
         .collection('trainers')
         .document(_trainerId)
         .collection('workouts')
         .orderBy('name')
-        .limit(_workoutsLimit)
+        .limit(workoutsLimit)
         .getDocuments();
 
     if (result.documents.length > 0) {
@@ -81,7 +107,7 @@ class WorkoutsProvider with ChangeNotifier {
     } else {      
       _workoutsMap[_trainerId] = [];
     }
-    if (result.documents.length < _workoutsLimit) {
+    if (result.documents.length < workoutsLimit) {
       _allWorkoutsLoaded = true;
     }
 
@@ -89,13 +115,14 @@ class WorkoutsProvider with ChangeNotifier {
   }
 
   Future<void> fetchMoreWorkouts() async {
+    _fromSavedWorkouts = false;
     var result = await _db
         .collection('trainers')
         .document(_trainerId)
         .collection('workouts')
         .orderBy('name')
         .startAfterDocument(_lastDocument)
-        .limit(_workoutsLimit)
+        .limit(workoutsLimit)
         .getDocuments();
 
     if (result.documents.length > 0) {
@@ -107,13 +134,13 @@ class WorkoutsProvider with ChangeNotifier {
       
       _workoutsMap[_trainerId].addAll(_loadedWorkouts);
     }
-    if (result.documents.length < _workoutsLimit) {
+    if (result.documents.length < workoutsLimit) {
       _allWorkoutsLoaded = true;
     }
     notifyListeners();
   }
 
-  List<Exercise> getExercises(String workoutId) {
+  List<Exercise> getExercises(String workoutId) {    
     List<Exercise> loadedExercises = findById(workoutId)
         .exercises
         .map((exercise) => Exercise.fromMap(exercise))

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../globals.dart';
 import '../../providers/auth_provider.dart';
 import './register_screen.dart';
 import '../../widgets/button.dart';
 import '../../widgets/custom_text_input.dart';
-import '../../globals.dart';
 
 class LoginScreen extends StatefulWidget {
   static const String routeName = '/login';
@@ -23,7 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _isLoading = false;
 
-  void signIn() async {    
+  void signIn() async {
     setState(() => _isLoading = true);
 
     FocusScopeNode currentFocus = FocusScope.of(context);
@@ -32,28 +32,28 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     dynamic result = await _authProvider.signInWithEmailAndPassword(
-        _emailController.text.trim(), _passwordController.text.trim());    
+        _emailController.text.trim(), _passwordController.text.trim());
 
     String _errTitle;
     String _errSubtitle;
 
-    switch(result) {
+    switch (result) {
       case 'ERROR_WRONG_PASSWORD':
         _errTitle = 'Błąd logowania';
         _errSubtitle = 'Podany email lub hasło są nieprawidłowe.';
-        break;     
+        break;
 
       case 'ERROR_USER_NOT_FOUND':
         _errTitle = 'Błąd logowania';
         _errSubtitle = 'Podany email lub hasło są nieprawidłowe.';
-        break; 
+        break;
 
       case 'ERROR_INVALID_EMAIL':
         _errTitle = 'Błąd logowania';
         _errSubtitle = 'Podany email lub hasło są nieprawidłowe.';
         break;
 
-      default :
+      default:
         _errTitle = 'Bład logowania';
         _errSubtitle = 'Podczas logowania wystąpił błąd spróbuj jeszcze raz.';
         break;
@@ -61,16 +61,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => _isLoading = false);
 
-    _globals.showAlertDialog(
+    if (result.runtimeType != FirebaseUser) {
+      _globals.showAlertDialog(
         context,
         _errTitle,
         _errSubtitle,
         'Ok',
         () => Navigator.of(context).pop(),
       );
+    }
   }
 
-  void signInWithGoogle() async {    
+  void signInWithGoogle() async {
     setState(() => _isLoading = true);
 
     FocusScopeNode currentFocus = FocusScope.of(context);
@@ -79,17 +81,22 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     dynamic result = await _authProvider.signInWithGoogle();
-    if (result == null) {
+    if (result.runtimeType == FirebaseUser) {
       setState(() => _isLoading = false);
+    } else {
+      setState(() => _isLoading = false);
+      _globals.showAlertDialog(
+        context,
+        'Błąd logowania',
+        'Podczas logowania wystąpił błąd spróbuj jeszcze raz.',
+        'Ok',
+        () => Navigator.of(context).pop(),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
-      statusBarColor: Colors.white,
-      statusBarBrightness: Brightness.dark,
-    ));
     return Container(
       height: MediaQuery.of(context).size.height,
       decoration: BoxDecoration(

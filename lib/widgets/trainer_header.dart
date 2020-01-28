@@ -6,11 +6,9 @@ import '../screens/trainer_info_screen.dart';
 
 class TrainerHeader extends StatelessWidget {
   final Trainer trainer;
-  final int numberOfWorkouts;
 
   TrainerHeader(
     this.trainer,
-    this.numberOfWorkouts,
   );
 
   @override
@@ -22,13 +20,11 @@ class TrainerHeader extends StatelessWidget {
       },
       child: Container(
         width: double.infinity,
-        height: (MediaQuery.of(context).size.height -
-                MediaQuery.of(context).padding.top) *
-            0.3,
+        height: MediaQuery.of(context).size.height * 0.3,
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: Colors.black38,
+              color: Colors.black45,
               offset: Offset(0.0, 5.0),
               blurRadius: 5.0,
             ),
@@ -51,60 +47,72 @@ class TrainerHeader extends StatelessWidget {
               width: double.infinity,
               height: double.infinity,
             ),
-            Positioned(
-              top: 0,
-              left: 0,
-              child: IconButton(
-                iconSize: 30,
-                onPressed: () => Navigator.of(context).pop(),
-                icon: Icon(Icons.arrow_back),
-                color: Colors.white,
-              ),
-            ),
-            Positioned(
-              top: 0,
-              right: 0,
-              child: IconButton(
-                onPressed: () {
-                  Navigator.of(context).pushNamed(TrainerInfoScreen.routeName,
-                      arguments: trainer);
-                },
-                icon: Icon(Icons.info_outline),
-                color: Colors.white,
-                iconSize: 30,
-              ),
-            ),
             Padding(
-              padding: const EdgeInsets.all(15),
+              padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Icon(Icons.favorite,
-                          color: Theme.of(context).primaryColor),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 3),
-                        child: Text(
-                          trainer.numberOfFollowers,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).primaryColor,
-                              fontSize: 23),
+                      IconButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: Icon(
+                          Icons.arrow_back,
+                          size: 30,
                         ),
+                        color: Colors.white,
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          Navigator.of(context).pushNamed(
+                              TrainerInfoScreen.routeName,
+                              arguments: trainer);
+                        },
+                        icon: Icon(Icons.info_outline),
+                        color: Colors.white,
+                        iconSize: 30,
                       ),
                     ],
                   ),
-                  Text(trainer.name, style: Theme.of(context).textTheme.title),
                   Padding(
-                    padding: const EdgeInsets.only(top: 5),
-                    child: Text(
-                      '$numberOfWorkouts treningów',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.normal,
-                          fontSize: 18),
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[
+                            Icon(
+                              Icons.favorite,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 3),
+                              child: Text(
+                                trainer.numberOfFollowers,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).primaryColor,
+                                    fontSize: 23),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Text(trainer.name,
+                            style: Theme.of(context).textTheme.title),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 5),
+                          child: Text(
+                            '${trainer.numberOfWorkouts} treningów',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.normal,
+                                fontSize: 18),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

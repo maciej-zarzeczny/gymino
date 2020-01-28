@@ -2,22 +2,16 @@ import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../models/trainer.dart';
-import '../models/question.dart';
 
 class TrainersProvider with ChangeNotifier {
   final Firestore _db = Firestore.instance;
   final int _trainersLimit = 5;
-  final int _questionsLimit = 5;
 
-  bool _allTrainersLoaded = false;
-  bool _allQuestionsLoaded = false;
+  bool _allTrainersLoaded = false;  
   DocumentSnapshot _lastTrainer;
-  DocumentSnapshot _lastQuestion;
 
   List<Trainer> _loadedTrainers = [];
-  List<Trainer> _trainers = [];
-  List<Question> _loadedQuestions = [];
-  List<Question> _questions = [];
+  List<Trainer> _trainers = [];  
 
   String _trainerId;
 
@@ -25,16 +19,8 @@ class TrainersProvider with ChangeNotifier {
     return [..._trainers];
   }
 
-  List<Question> get questions {
-    return [..._questions];
-  }
-
   bool get allTrainersLoaded {
     return _allTrainersLoaded;
-  }
-
-  bool get allQuestionsLoaded {
-    return _allQuestionsLoaded;
   }
 
   String get currentTrainerId {
@@ -99,61 +85,6 @@ class TrainersProvider with ChangeNotifier {
     if (result.documents.length < _trainersLimit) {
       _allTrainersLoaded = true;
     }
-    notifyListeners();
-  }
-
-  Future<void> fetchQuestions(String id) async {
-    _trainerId = id;
-    _allQuestionsLoaded = false;
-    var result = await _db
-        .collection('trainers')
-        .document(_trainerId)
-        .collection('questions')
-        .orderBy('question')
-        .limit(_questionsLimit)
-        .getDocuments();
-
-    if (result.documents.length > 0) {
-      print(result.documents.length);
-      _lastQuestion = result.documents[result.documents.length - 1];
-      _loadedQuestions = result.documents
-          .map((question) => Question.fromSnapshot(question))
-          .toList();
-
-      _questions = _loadedQuestions;
-    } else {
-      _questions = [];
-    }
-    if (result.documents.length < _questionsLimit) {
-      _allQuestionsLoaded = true;
-    }
-
-    notifyListeners();
-  }
-
-  Future<void> fetchMoreQuestions() async {
-    var result = await _db
-        .collection('trainers')
-        .document(_trainerId)
-        .collection('questions')
-        .orderBy('question')
-        .startAfterDocument(_lastQuestion)
-        .limit(_questionsLimit)
-        .getDocuments();
-
-    if (result.documents.length > 0) {
-      print(result.documents.length);
-      _lastQuestion = result.documents[result.documents.length - 1];
-      _loadedQuestions = result.documents
-          .map((question) => Question.fromSnapshot(question))
-          .toList();
-
-      _questions.addAll(_loadedQuestions);
-    }
-    if (result.documents.length < _questionsLimit) {
-      _allQuestionsLoaded = true;
-    }
-
     notifyListeners();
   }
 }

@@ -6,6 +6,7 @@ class Trainer {
   final String name;
   final String imageUrl;
   final String numberOfFollowers;
+  final int numberOfWorkouts;
   final List<dynamic> keywords;
   final List<dynamic> supplements;
   final int age;
@@ -18,6 +19,7 @@ class Trainer {
     @required this.name,
     @required this.imageUrl,
     @required this.numberOfFollowers,
+    this.numberOfWorkouts,
     this.keywords,
     this.supplements,
     this.age,
@@ -42,6 +44,7 @@ class Trainer {
       name: data['name'] ?? '',
       imageUrl: data['image_url'] ?? '',
       numberOfFollowers: followersToString(data['number_of_followers']) ?? followersToString(0),
+      numberOfWorkouts: data['numberOfWorkouts'] ?? 0,
       keywords: data['keywords'] ?? [],
       supplements: data['supplements'] ?? [],
       age: data['age'] ?? 0,

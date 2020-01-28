@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:flutter/services.dart';
 
 import '../widgets/button.dart';
 import '../size_config.dart';
@@ -30,7 +29,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 
   @override
   void initState() {
-    Future.delayed(Duration.zero).then((_) {
+    Future.microtask(() {
       final args =
           ModalRoute.of(context).settings.arguments as Map<String, dynamic>;
       setState(() {
@@ -154,7 +153,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {    
+  Widget build(BuildContext context) {
     SizeConfig().init(context);
     Exercise _currentExercise;
     int _setsNumber;
@@ -165,60 +164,70 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
       _repsNumber = _currentExercise.sets.elementAt(_currentSet - 1);
     }
 
-    return Scaffold(
-      body: _isLoading
-          ? Center(
-              child: RefreshProgressIndicator(),
-            )
-          : SingleChildScrollView(
-              child: GestureDetector(
-                onTap: () {
-                  if (weightInputController.text == '') {
-                    weightInputController.text = '0';
-                  }
-                  FocusScope.of(context).requestFocus(new FocusNode());
-                },
-                child: Container(
-                  height: MediaQuery.of(context).size.height,                  
-                  child: Stack(
-                    children: <Widget>[
-                      Image(
-                        width: double.infinity,
-                        height: double.infinity,
-                        image: AssetImage('assets/images/aj.jpg'),
-                        fit: BoxFit.cover,
-                      ),
-                      Container(
-                        width: double.infinity,
-                        height: double.infinity,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.center,
-                            colors: [
-                              Color.fromRGBO(0, 0, 0, 0.05),
-                              Color.fromRGBO(26, 26, 26, 0.95),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          topHeader(),
-                          exerciseTitle(
-                              _currentExercise.name, _currentSet, _setsNumber),
-                          repsCounter(_currentReps, _repsNumber),
-                          weightCounter(),
-                          nextButton(),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
+    return Container(
+      height: MediaQuery.of(context).size.height,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/images/aj.jpg'),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: Stack(
+        children: <Widget>[
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.center,
+                colors: [
+                  Color.fromRGBO(0, 0, 0, 0.05),
+                  Color.fromRGBO(26, 26, 26, 0.95),
+                ],
               ),
             ),
+          ),
+          Scaffold(
+            backgroundColor: Colors.transparent,
+            body: _isLoading
+                ? Center(
+                    child: RefreshProgressIndicator(),
+                  )
+                : GestureDetector(
+                    onTap: () {
+                      if (weightInputController.text == '') {
+                        weightInputController.text = '0';
+                      }
+                      FocusScope.of(context).requestFocus(new FocusNode());
+                    },
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return SingleChildScrollView(
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minWidth: constraints.maxWidth,
+                              minHeight: constraints.maxHeight,
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: <Widget>[
+                                topHeader(),
+                                exerciseTitle(_currentExercise.name,
+                                    _currentSet, _setsNumber),
+                                repsCounter(_currentReps, _repsNumber),
+                                weightCounter(),
+                                nextButton(),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -461,7 +470,9 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
           color: Colors.white,
           size: 35,
         ),
-        onPressed: () => Navigator.of(context).pop(),
+        onPressed: () {          
+          Navigator.of(context).pop();
+        },
       ),
     );
   }

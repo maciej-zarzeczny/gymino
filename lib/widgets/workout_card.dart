@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../models/workout.dart';
 import './badge.dart';
@@ -14,17 +15,18 @@ class WorkoutCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
+        SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
         Navigator.of(context).pushNamed(WorkoutOverviewScreen.routeName, arguments: workout.id);
       },
       child: Container(
+        padding: isFullSize ? const EdgeInsets.symmetric(horizontal: 10.0) : const EdgeInsets.only(left: 10.0),
         width: isFullSize
             ? double.infinity
             : MediaQuery.of(context).size.width * 0.7,
         height: isFullSize
             ? MediaQuery.of(context).size.height * 0.2
             : double.infinity,
-        constraints: BoxConstraints(minHeight: 180),
-        padding: const EdgeInsets.only(left: 5.0, right: 5.0, bottom: 10.0),
+        constraints: BoxConstraints(minHeight: 180),        
         child: Stack(
           children: <Widget>[
             ClipRRect(

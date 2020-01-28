@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
+import '../globals.dart';
+import '../screens/trainer_info_screen.dart';
 import '../models/trainer.dart';
 import '../providers/trainers_provider.dart';
 import '../providers/workouts_provider.dart';
-import '../widgets/trainer_header.dart';
 import '../widgets/recent_workouts.dart';
 import '../widgets/workout_card.dart';
 import '../widgets/more_loading_indicator.dart';
@@ -22,19 +24,23 @@ class _TrainerWorkoutsScreenState extends State<TrainerWorkoutsScreen> {
   bool _isLoading = true;
   bool _moreLoading = false;
   ScrollController _scrollController = ScrollController();
-  var workoutsProvider;
+  WorkoutsProvider workoutsProvider;
+  Trainer trainer;
+  double _nameOpacity = 1.0;
 
   @override
   void initState() {
     Future.microtask(() {
       _trainerId = ModalRoute.of(context).settings.arguments as String;
-      workoutsProvider =
-          Provider.of<WorkoutsProvider>(context, listen: false);       
-      workoutsProvider.currentTrainerId = _trainerId;         
+      workoutsProvider = Provider.of<WorkoutsProvider>(context, listen: false);
+      workoutsProvider.currentTrainerId = _trainerId;
+      trainer = Provider.of<TrainersProvider>(context, listen: false)
+          .findById(_trainerId);
 
-      if (workoutsProvider.workouts == null) {
+      if (workoutsProvider.workouts == null ||
+          workoutsProvider.fromSavedWorkouts) {
         print('fetching workouts');
-        workoutsProvider.fetchWorkouts().then((_) {          
+        workoutsProvider.fetchWorkouts().then((_) {
           setState(() {
             _isLoading = false;
           });
@@ -78,73 +84,159 @@ class _TrainerWorkoutsScreenState extends State<TrainerWorkoutsScreen> {
           }
         }
       });
+
+      _scrollController.addListener(() {
+        if (_scrollController.position.pixels >=
+                MediaQuery.of(context).size.height * 0.18 &&
+            _nameOpacity != 0.0) {
+          setState(() {
+            _nameOpacity = 0.0;
+          });
+        } else if (_scrollController.position.pixels < 100 &&
+            _nameOpacity == 0.0) {
+          setState(() {
+            _nameOpacity = 1.0;
+          });
+        }
+      });
     });
     super.initState();
   }
 
   @override
-  Widget build(BuildContext context) {    
-    Trainer trainer;
+  Widget build(BuildContext context) {
     List<Workout> workouts;
-    List<Workout> recentWorkouts;    
+    List<Workout> recentWorkouts;
 
     if (_trainerId != null) {
-      trainer = Provider.of<TrainersProvider>(context, listen: false)
-          .findById(_trainerId);
       workouts = workoutsProvider.workouts;
       recentWorkouts = workoutsProvider.recentWorkouts;
     }
 
     return Scaffold(
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? Global().loadingIndicator(context)
           : Container(
-              height: (MediaQuery.of(context).size.height -
-                      MediaQuery.of(context).padding.top) *
-                  1,
-              margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-              child: ListView.builder(
+              color: Colors.white,
+              child: CustomScrollView(
                 controller: _scrollController,
-                padding: const EdgeInsets.all(0.0),
-                itemCount: workouts.length + 2,                
-                itemBuilder: (context, i) {
-                  if (i == 0) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        TrainerHeader(trainer, workouts.length),
-                        recentWorkouts.isNotEmpty
-                            ? RecentWorkouts(recentWorkouts)
-                            : SizedBox(height: 10.0,),
-                        workouts.isNotEmpty
-                            ? Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 10, right: 10, bottom: 10),
-                                child: Text(
-                                  'Wszystkie treningi',
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      color: Theme.of(context).primaryColor,
-                                      fontWeight: FontWeight.normal),
-                                ),
-                              )
-                            : Container(
-                                height: (MediaQuery.of(context).size.height -
-                                        MediaQuery.of(context).padding.top) *
-                                    0.7,
-                                width: double.infinity,
-                                child: Center(
-                                  child: Text('Brak dodanych treningów'),
+                slivers: <Widget>[
+                  SliverAppBar(
+                    pinned: true,
+                    floating: false,
+                    snap: false,
+                    expandedHeight: MediaQuery.of(context).size.height * 0.25,
+                    flexibleSpace: FlexibleSpaceBar(
+                      centerTitle: true,
+                      title: AnimatedOpacity(
+                        opacity: 1.0 - _nameOpacity,
+                        duration: Duration(milliseconds: 200),
+                        child: Text(trainer.name),
+                      ),
+                      background: GestureDetector(
+                        onTap: () => Navigator.of(context).pushNamed(
+                            TrainerInfoScreen.routeName,
+                            arguments: trainer),
+                        child: Stack(
+                          children: <Widget>[
+                            CachedNetworkImage(
+                              width: double.infinity,
+                              imageUrl: trainer.imageUrl,
+                              fit: BoxFit.cover,
+                              alignment: Alignment.topCenter,
+                              errorWidget: (context, url, error) => Icon(
+                                Icons.error_outline,
+                                color: Colors.white,
+                              ),
+                            ),
+                            Container(
+                              width: double.infinity,
+                              height: double.infinity,
+                              color: Colors.black12,
+                            ),
+                            Align(
+                              alignment: Alignment.bottomLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text(
+                                      trainer.name,
+                                      style: Theme.of(context).textTheme.title,
+                                    ),
+                                    Text(
+                                      '${trainer.numberOfWorkouts} treningów',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.normal,
+                                          fontSize: 18),
+                                    ),
+                                  ],
                                 ),
                               ),
-                      ],
-                    );
-                  } else if (i == workouts.length + 1) {
-                    return MoreLoadingIndicator(_moreLoading);
-                  } else {
-                    return WorkoutCard(workouts[i - 1], true);
-                  }
-                },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    actions: <Widget>[
+                      IconButton(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        onPressed: () => Navigator.of(context).pushNamed(
+                            TrainerInfoScreen.routeName,
+                            arguments: trainer),
+                        icon: Icon(
+                          Icons.info_outline,
+                          color: Colors.white,
+                          size: 25,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        if (index == 0) {
+                          return recentWorkouts.isNotEmpty
+                              ? RecentWorkouts(recentWorkouts)
+                              : Container();
+                        } else if (index == 1) {
+                          return workouts.isNotEmpty
+                              ? Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 10.0, left: 10.0, right: 10.0),
+                                  child: Text(
+                                    'Wszystkie treningi',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Theme.of(context).primaryColor,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                )
+                              : Center(                                
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 10.0),
+                                    child: Text('Brak dodanych treningów'),
+                                  ),
+                                );
+                        } else if (index == workouts.length + 2) {
+                          return MoreLoadingIndicator(_moreLoading);
+                        } else {
+                          return Padding(
+                            padding: index == workouts.length + 1
+                                ? const EdgeInsets.symmetric(vertical: 10.0)
+                                : const EdgeInsets.only(top: 10.0),
+                            child: WorkoutCard(workouts[index - 2], true),
+                          );
+                        }
+                      },
+                      childCount: workouts.length + 3,
+                    ),
+                  )
+                ],
               ),
             ),
     );

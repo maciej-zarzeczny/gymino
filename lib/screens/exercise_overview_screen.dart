@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sqilly/providers/workouts_provider.dart';
 
+import '../globals.dart';
+import '../providers/workouts_provider.dart';
 import '../models/exercise.dart';
 import '../widgets/keyword.dart';
 
@@ -47,24 +48,17 @@ class _ExerciseOverviewScreenState extends State<ExerciseOverviewScreen> {
 
     return Scaffold(
       body: _isLoading
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
+          ? Global().loadingIndicator(context)
           : Column(
               children: <Widget>[
                 Container(
-                  height: (MediaQuery.of(context).size.height -
-                          MediaQuery.of(context).padding.top) *
-                      0.55,
+                  height: MediaQuery.of(context).size.height * 0.55,
                   width: double.infinity,
-                  margin:
-                      EdgeInsets.only(top: MediaQuery.of(context).padding.top),
                   child: header(context),
                 ),
                 Container(
-                  height: (MediaQuery.of(context).size.height -
-                          MediaQuery.of(context).padding.top) *
-                      0.45,
+                  height: MediaQuery.of(context).size.height * 0.45,
+                  color: Colors.white,
                   width: double.infinity,
                   child: SingleChildScrollView(
                     child: content(_exerciseData, context),
@@ -89,15 +83,13 @@ class _ExerciseOverviewScreenState extends State<ExerciseOverviewScreen> {
           width: double.infinity,
           height: double.infinity,
         ),
-        Positioned(
-          top: 0,
-          left: 0,
-          child: IconButton(
-            onPressed: () => Navigator.of(context).pop(),
-            icon: Icon(
-              Icons.arrow_back,
-              color: Colors.white,
-              size: 30,
+        Align(
+          alignment: Alignment.topLeft,
+          child: Padding(
+            padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+            child: IconButton(
+              onPressed: () => Navigator.of(context).pop(),
+              icon: Global().backArrow(),
             ),
           ),
         ),
@@ -116,7 +108,7 @@ class _ExerciseOverviewScreenState extends State<ExerciseOverviewScreen> {
                 topLeft: Radius.circular(30.0),
                 topRight: Radius.circular(30.0),
               ),
-              color: Theme.of(context).canvasColor,
+              color: Colors.white,
             ),
           ),
         ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../globals.dart';
 import '../providers/trainers_provider.dart';
 import '../widgets/no_data.dart';
 import '../widgets/top_trainer.dart';
@@ -42,7 +43,7 @@ class _TrainersScreenState extends State<TrainersScreen> {
             _moreLoading = true;
           });
 
-          if (!trainersProvider.allTrainersLoaded) {            
+          if (!trainersProvider.allTrainersLoaded) {
             trainersProvider.fetchMoreTrainers().then((_) {
               setState(() {
                 _moreLoading = false;
@@ -84,11 +85,12 @@ class _TrainersScreenState extends State<TrainersScreen> {
     final mediaQuery = MediaQuery.of(context);
 
     return _isLoading
-        ? Center(child: CircularProgressIndicator())
+        ? Global().loadingIndicator(context)
         : trainers.isEmpty
             ? NoData('Brak dostępnych trenerów', trainersProvider.fetchTrainers)
             : Container(
                 height: (mediaQuery.size.height - mediaQuery.padding.top) * 1,
+                color: Colors.white,
                 margin: EdgeInsets.only(top: mediaQuery.padding.top),
                 child: ListView.builder(
                   padding: const EdgeInsets.all(0.0),
@@ -110,7 +112,7 @@ class _TrainersScreenState extends State<TrainersScreen> {
                             child: Text(
                               'Wszyscy trenerzy',
                               style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 16,
                                   color: Theme.of(context).primaryColor,
                                   fontWeight: FontWeight.normal),
                             ),
@@ -125,5 +127,5 @@ class _TrainersScreenState extends State<TrainersScreen> {
                   },
                 ),
               );
-  }  
+  }
 }

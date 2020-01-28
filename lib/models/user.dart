@@ -12,6 +12,7 @@ class UserData {
   final String gender;
   final String trainingGoal;
   final String experienceLevel;
+  final Map<dynamic, dynamic> savedWorkouts;
   // final String trainingType;  
   final bool isPremium;
 
@@ -21,6 +22,7 @@ class UserData {
     this.gender,
     this.trainingGoal,
     this.experienceLevel,
+    this.savedWorkouts,
     // this.trainingType,    
     this.isPremium,
   });
@@ -61,6 +63,7 @@ class UserData {
       gender: genderToString(data['gender'] ?? 0),            
       trainingGoal: trainingGoalToString(data['trainingGoal'] ?? 0),
       experienceLevel: experienceLevelToString(data['experienceLevel'] ?? 0),
+      savedWorkouts: data['savedWorkouts'],
       // trainingType: trainingTypeToString(data['trainingType'] ?? 0),            
       isPremium: data['isPremium'] ?? 0,
     );

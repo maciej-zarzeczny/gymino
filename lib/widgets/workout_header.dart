@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
+import '../globals.dart';
 import '../models/workout.dart';
 import '../widgets/keyword.dart';
 
@@ -15,9 +17,7 @@ class WorkoutHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: (MediaQuery.of(context).size.height -
-              MediaQuery.of(context).padding.top) *
-          0.35,
+      height: MediaQuery.of(context).size.height * 0.35,
       width: double.infinity,
       child: Stack(
         children: <Widget>[
@@ -32,44 +32,47 @@ class WorkoutHeader extends StatelessWidget {
             width: double.infinity,
             height: double.infinity,
           ),
-          Positioned(
-            top: 0,
-            left: 0,
-            child: IconButton(
-              iconSize: 30,
-              onPressed: () => Navigator.of(context).pop(),
-              icon: Icon(Icons.arrow_back),
-              color: Colors.white,
-            ),
-          ),
-          Positioned(
-            top: 30,
-            left: 0,
-            child: Container(
-              constraints: BoxConstraints(minWidth: 100),
-              child: Text(
-                workout.difficulty,
-                style: Theme.of(context).textTheme.headline,
-                textAlign: TextAlign.center,
+          Padding(
+            padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  IconButton(
+                    padding: const EdgeInsets.all(0.0),
+                    onPressed: () {
+                      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
+                      Navigator.of(context).pop();
+                    },
+                    icon: Global().backArrow(),
+                  ),
+                  Container(
+                      constraints: BoxConstraints(minWidth: 100),
+                      child: Text(
+                        workout.difficulty,
+                        style: Theme.of(context).textTheme.headline,
+                        textAlign: TextAlign.center,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor,
+                        borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(10),
+                          bottomRight: Radius.circular(10),
+                        ),
+                      ),
+                      padding: const EdgeInsets.all(10),
+                      margin: const EdgeInsets.only(bottom: 10.0)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Row(
+                      children: workout.keywords.entries.map((keyword) {
+                        return Keyword(keyword.value, false);
+                      }).toList(),
+                    ),
+                  ),
+                ],
               ),
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(10),
-                  bottomRight: Radius.circular(10),
-                ),
-              ),
-              padding: const EdgeInsets.all(10),
-              margin: const EdgeInsets.only(top: 15, bottom: 5),
-            ),
-          ),
-          Positioned(
-            top: 85,
-            left: 15,
-            child: Row(
-              children: workout.keywords.entries.map((keyword) {
-                return Keyword(keyword.value, false);
-              }).toList(),
             ),
           ),
           Positioned(
@@ -79,7 +82,7 @@ class WorkoutHeader extends StatelessWidget {
             child: Container(
               height: (MediaQuery.of(context).size.height -
                       MediaQuery.of(context).padding.top) *
-                  0.05,
+                  0.05,                  
               padding: const EdgeInsets.all(0.0),
               margin: const EdgeInsets.all(0.0),
               decoration: BoxDecoration(
@@ -87,7 +90,7 @@ class WorkoutHeader extends StatelessWidget {
                   topLeft: Radius.circular(30.0),
                   topRight: Radius.circular(30.0),
                 ),
-                color: Theme.of(context).canvasColor,
+                color: Colors.white,
               ),
             ),
           ),
