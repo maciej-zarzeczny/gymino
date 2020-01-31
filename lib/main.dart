@@ -51,8 +51,8 @@ class MyApp extends StatelessWidget {
           primarySwatch: MaterialColor(0xFF1A1A1A, Global().primaryColor),
           accentColor: Color.fromRGBO(224, 22, 22, 1),
           canvasColor: Color.fromRGBO(26, 26, 26, 1.0),         
-          // fontFamily: 'Proxima-Nova',
-          fontFamily: 'Roboto',
+          fontFamily: 'Montserrat',
+          // fontFamily: 'Roboto',
           textTheme: TextTheme(
               // TOP TRAINER NAME
               title: TextStyle(

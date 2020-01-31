@@ -16,6 +16,11 @@ class Global {
     900: Color.fromRGBO(26, 26, 26, 1),
   };
 
+  final Color darkGrey = Color.fromRGBO(66, 75, 81, 1.0);
+  final Color mediumGrey = Color.fromRGBO(149, 158, 164, 1.0);
+  final Color softGrey = Color.fromRGBO(218, 225, 228, 1.0);
+  final Color lightGrey = Color.fromRGBO(244, 245, 246, 1.0);
+
   Widget loadingIndicator(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
