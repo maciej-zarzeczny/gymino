@@ -9,7 +9,6 @@ class Workout {
   final String difficulty;
   final Map<dynamic, dynamic> keywords;
   final List<dynamic> exercises;
-  
 
   Workout({
     this.id,
@@ -25,9 +24,12 @@ class Workout {
     Map data = doc.data;
 
     String difficultyToString(int number) {
-      if (number == 0) return 'POCZĄTKUJĄCY';
-      else if (number == 1) return 'ŚREDNI';
-      else return 'ZAAWANSOWANY';
+      if (number == 0)
+        return 'POCZĄTKUJĄCY';
+      else if (number == 1)
+        return 'ŚREDNI';
+      else
+        return 'ZAAWANSOWANY';
     }
 
     return Workout(
@@ -40,4 +42,40 @@ class Workout {
       exercises: data['exercises'] ?? [],
     );
   }
+}
+
+class FinishedWorkout {
+  final String id;
+  final String name;
+  final Timestamp date;  
+  final String imageUrl;
+  final List<dynamic> exercises;
+
+  FinishedWorkout({
+    this.id,
+    this.name,
+    this.date,    
+    this.imageUrl,
+    this.exercises,
+  });
+
+  factory FinishedWorkout.fromSnapshot(DocumentSnapshot doc) {
+    Map data = doc.data;
+
+    return FinishedWorkout(
+      id: doc.documentID ?? '',
+      name: data['name'] ?? '',      
+      date: data['date'],
+      imageUrl: data['imageUrl'] ?? '',
+      exercises: data['exercises'] ?? [],
+    );
+  }
+
+  Map<String, dynamic> toJson() => 
+  {
+    'name': name,
+    'date': date,
+    'imageUrl': imageUrl,
+    'exercises': exercises,
+  };
 }

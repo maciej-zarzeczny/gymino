@@ -33,31 +33,46 @@ class _HomeScreenState extends State<HomeScreen> {
       _currentIndex = index;
       if (_currentIndex == 2) {
         _showAppBar = true;
+      } else if (_currentIndex == 3) {
+        _showAppBar = true;
       } else {
         _showAppBar = false;
       }
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    AppBar appBar = AppBar(
+  AppBar _appBar() {
+    return AppBar(
       elevation: 5.0,
       centerTitle: true,
-      title: Text('Zapisane treningi'),
+      title: _currentIndex == 2 ? Text('Zapisane treningi') : Text('Profil'),
+      actions: <Widget>[
+        _currentIndex == 3
+            ? IconButton(
+                icon: Icon(
+                  Icons.more_vert,
+                  color: Colors.white,
+                ),
+                onPressed: () => print('Profile settings'),
+              )
+            : Container(),
+      ],
     );
+  }
 
+  @override
+  Widget build(BuildContext context) {
     List<Widget> _views = [
       TrainersScreen(),
       Center(
         child: Text('Szukaj...'),
       ),
-      SavedWorkoutsScreen.withAppBar(appBar.preferredSize.height),
+      SavedWorkoutsScreen.withAppBar(_appBar().preferredSize.height),
       UserProfileScreen(),
     ];
 
     return Scaffold(
-      appBar: _showAppBar ? appBar : null,
+      appBar: _showAppBar ? _appBar() : null,
       body: _views[_currentIndex],
       bottomNavigationBar: NavigationBar(
         onItemTapped: _onItemTapped,

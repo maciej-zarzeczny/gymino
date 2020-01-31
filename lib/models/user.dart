@@ -12,8 +12,8 @@ class UserData {
   final String gender;
   final String trainingGoal;
   final String experienceLevel;
+  int finishedWorkouts;
   final Map<dynamic, dynamic> savedWorkouts;
-  // final String trainingType;  
   final bool isPremium;
 
   UserData({
@@ -22,8 +22,8 @@ class UserData {
     this.gender,
     this.trainingGoal,
     this.experienceLevel,
-    this.savedWorkouts,
-    // this.trainingType,    
+    this.finishedWorkouts,
+    this.savedWorkouts,    
     this.isPremium,
   });
 
@@ -43,13 +43,6 @@ class UserData {
       else return '';
     }
 
-    // String trainingTypeToString(int number) {
-    //   if (number == 0) return 'Siłownia';
-    //   else if (number == 1) return 'Kalistenika';
-    //   else if (number == 2) return 'Trening hybrydowy';
-    //   else return '';
-    // }
-
     String experienceLevelToString(int number) {
       if (number == 0) return 'Początkujący';
       else if (number == 1) return 'Średniozaawansowany';
@@ -63,8 +56,8 @@ class UserData {
       gender: genderToString(data['gender'] ?? 0),            
       trainingGoal: trainingGoalToString(data['trainingGoal'] ?? 0),
       experienceLevel: experienceLevelToString(data['experienceLevel'] ?? 0),
-      savedWorkouts: data['savedWorkouts'],
-      // trainingType: trainingTypeToString(data['trainingType'] ?? 0),            
+      finishedWorkouts: data['finishedWorkouts'] ?? 0,
+      savedWorkouts: data['savedWorkouts'] ?? {},      
       isPremium: data['isPremium'] ?? 0,
     );
   }

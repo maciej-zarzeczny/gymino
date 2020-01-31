@@ -38,8 +38,7 @@ class _TrainerWorkoutsScreenState extends State<TrainerWorkoutsScreen> {
           .findById(_trainerId);
 
       if (workoutsProvider.workouts == null ||
-          workoutsProvider.fromSavedWorkouts) {
-        print('fetching workouts');
+          workoutsProvider.fromSavedWorkouts) {        
         workoutsProvider.fetchWorkouts().then((_) {
           setState(() {
             _isLoading = false;

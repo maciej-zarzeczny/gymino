@@ -67,18 +67,21 @@ class _WorkoutOverviewScreenState extends State<WorkoutOverviewScreen> {
     void startWorkout() {
       Navigator.of(context).pushNamed(WorkoutScreen.routeName, arguments: {
         'exercises': exercises,
+        'workoutName': workout.name,
+        'imageUrl': workout.imageUrl,
       });
     }
 
     void addToFavourites() {
       setState(() => isSaved = true);
       usersProvider.addWorkoutToFavourites(
-          workoutId,
-          workout.difficulty,
-          workout.duration,
-          workout.name,
-          workout.imageUrl,
-          workoutsProvider.currentTrainerId);
+        workoutId,
+        workout.difficulty,
+        workout.duration,
+        workout.name,
+        workout.imageUrl,
+        workoutsProvider.currentTrainerId,
+      );
     }
 
     void removeFromFavourites() {

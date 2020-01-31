@@ -44,7 +44,7 @@ class _SavedWorkoutsScreenState extends State<SavedWorkoutsScreen> {
           MediaQuery.of(context).padding.top -
           widget.appBarHeight,
       color: Colors.white,
-      child: ListView.builder(
+      child: savedWorkouts.isNotEmpty ? ListView.builder(
         padding: const EdgeInsets.all(0.0),
         itemCount: savedWorkouts.length,
         itemBuilder: (context, index) {
@@ -77,7 +77,7 @@ class _SavedWorkoutsScreenState extends State<SavedWorkoutsScreen> {
             ),
           );
         },
-      ),
+      ) : Center(child: Text('Brak zapisanych treningów'),),
     );
   }
 

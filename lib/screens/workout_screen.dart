@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:provider/provider.dart';
 
 import '../widgets/button.dart';
 import '../size_config.dart';
 import '../models/exercise.dart';
+import '../providers/users_provider.dart';
 
 class WorkoutScreen extends StatefulWidget {
   static const routeName = '/workout';
@@ -26,14 +28,21 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   int _timerDuration;
   int _restDuration = 0;
   final weightInputController = TextEditingController(text: '0');
+  List<dynamic> _doneExercises = [];  
+  UsersProvider _usersProvider;
+  String _workoutName;
+  String _workoutImageUrl;
 
   @override
   void initState() {
     Future.microtask(() {
       final args =
-          ModalRoute.of(context).settings.arguments as Map<String, dynamic>;
+          ModalRoute.of(context).settings.arguments as Map<String, dynamic>;      
+      _usersProvider = Provider.of<UsersProvider>(context,listen: false);
       setState(() {
         _exercises = args['exercises'];
+        _workoutName = args['workoutName'];
+        _workoutImageUrl = args['imageUrl'];
         _currentExerciseIndex = 0;
         _currentSet = 1;
         _isLoading = false;
@@ -43,9 +52,16 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   }
 
   void setDone() {
-    FocusScope.of(context).requestFocus(new FocusNode());
-    weightInputController.text = '0';
-    setState(() {
+    FocusScope.of(context).requestFocus(new FocusNode());    
+    if (_currentSet == 1) {
+      _doneExercises.add({'name' : _exercises[_currentExerciseIndex].name, 'sets' : []});                              
+    }
+    Map<dynamic, dynamic> _set = {'reps' : _currentReps, 'weight' : double.parse(weightInputController.text.trim())};
+    _doneExercises[_currentExerciseIndex]['sets'].add(_set);    
+
+    weightInputController.text = '0';    
+
+    setState(() {      
       if (_currentSet < _exercises[_currentExerciseIndex].sets.length) {
         _currentSet += 1;
         _currentReps = 0;
@@ -59,11 +75,21 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
           startRest(_restDuration);
           _currentExerciseIndex += 1;
         } else {
-          print('Workout finished');
-          _currentExerciseIndex = 0;
+          setState(() => _isLoading = true);
+          _finishWorkout().then((_) {
+            setState(() => _isLoading = false);
+            Navigator.of(context).pop();
+          }).catchError((err) {
+            setState(() => _isLoading = false);
+            print(err.toString());
+          });
         }
       }
     });
+  }
+
+  Future<void> _finishWorkout() async {    
+    return await _usersProvider.saveWorkoutToDb(_workoutName, _workoutImageUrl, _doneExercises);
   }
 
   void startRest(int time) {
@@ -190,7 +216,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
             backgroundColor: Colors.transparent,
             body: _isLoading
                 ? Center(
-                    child: RefreshProgressIndicator(),
+                    child: CircularProgressIndicator(),
                   )
                 : GestureDetector(
                     onTap: () {
