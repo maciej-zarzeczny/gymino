@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../globals.dart';
@@ -42,6 +43,15 @@ class _WorkoutOverviewScreenState extends State<WorkoutOverviewScreen> {
         });
       }
     });
+
+    // Future.delayed(Duration(milliseconds: 300)).then((_) {
+    //   SystemChrome.setSystemUIOverlayStyle(
+    //     SystemUiOverlayStyle.dark.copyWith(
+    //       statusBarColor: Colors.white,
+    //       statusBarBrightness: Brightness.dark,
+    //     ),
+    //   );
+    // });
     super.initState();
   }
 
@@ -72,106 +82,145 @@ class _WorkoutOverviewScreenState extends State<WorkoutOverviewScreen> {
       });
     }
 
-    void addToFavourites() {
+    void addToFavourites(context) {
       setState(() => isSaved = true);
-      usersProvider.addWorkoutToFavourites(
+      usersProvider
+          .addWorkoutToFavourites(
         workoutId,
         workout.difficulty,
         workout.duration,
         workout.name,
         workout.imageUrl,
         workoutsProvider.currentTrainerId,
-      );
+      )
+          .then((_) {
+        Scaffold.of(context).showSnackBar(SnackBar(
+          content: Text("Dodano do zapisanych"),
+        ));
+      }).catchError((err) {
+        Global().showAlertDialog(
+            context,
+            'Błąd',
+            'Podczas łączenia z serwerem wystąpił błąd, spróbuj ponownie później.',
+            'Ok',
+            () => Navigator.of(context).pop());
+      });
     }
 
-    void removeFromFavourites() {
+    void removeFromFavourites(context) {
       setState(() => isSaved = false);
-      usersProvider.removeWorkoutFromFavourites(workoutId);
+      usersProvider.removeWorkoutFromFavourites(workoutId).then((_) {
+        Scaffold.of(context).showSnackBar(SnackBar(
+          content: Text("Usunięto z zapisanych"),
+        ));
+      }).catchError((err) {
+        Global().showAlertDialog(
+            context,
+            'Błąd',
+            'Podczas łączenia z serwerem wystąpił błąd, spróbuj ponownie później.',
+            'Ok',
+            () => Navigator.of(context).pop());
+      });
     }
 
     return Scaffold(
       body: _isLoading
           ? Global().loadingIndicator(context)
-          : Container(
-              height: MediaQuery.of(context).size.height,
-              color: Colors.white,
-              width: double.infinity,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  WorkoutHeader(
-                    workout: workout,
-                    startWorkout: startWorkout,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: Text(
-                      workout.name,
-                      style: Theme.of(context).textTheme.body2,
+          : Builder(
+              builder: (context) => Container(
+                height: MediaQuery.of(context).size.height,
+                color: Global().canvasColor,
+                width: double.infinity,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    WorkoutHeader(workout),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: Text(
+                        workout.name,
+                        style: Theme.of(context).textTheme.display1,
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10.0, vertical: 5.0),
-                          decoration: BoxDecoration(
-                            color: Color.fromRGBO(227, 227, 227, 1),
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: <Widget>[
-                              Icon(
-                                Icons.access_time,
-                                color: Color.fromRGBO(119, 119, 119, 1),
-                                size: 17,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 3.0),
-                                child: Text(
-                                  '${workout.duration} min',
-                                  style: TextStyle(
-                                    color: Color.fromRGBO(119, 119, 119, 1),
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
+                    SizedBox(height: 8.0),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10.0, vertical: 5.0),
+                            decoration: BoxDecoration(
+                              color: Global().lightGrey,
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: <Widget>[
+                                Icon(
+                                  Icons.access_time,
+                                  color: Global().mediumGrey,
+                                  size: 17,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 3.0),
+                                  child: Text(
+                                    '${workout.duration} min',
+                                    style: TextStyle(
+                                      color: Global().mediumGrey,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 5.0),
-                          child: GestureDetector(
-                            onTap: isSaved
-                                ? removeFromFavourites
-                                : addToFavourites,
+                          SizedBox(width: 5.0),
+                          GestureDetector(
+                            onTap: () {
+                              if (isSaved) {
+                                removeFromFavourites(context);
+                              } else {
+                                addToFavourites(context);
+                              }
+                            },
                             child: Icon(
                               isSaved ? Icons.bookmark : Icons.bookmark_border,
                               color: Theme.of(context).primaryColor,
                               size: 28,
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    child: ListView.builder(
-                      padding: const EdgeInsets.all(0.0),
-                      itemCount: exercises.length,
-                      itemBuilder: (context, i) {
-                        return ExerciseCard(exercises[i]);
-                      },
+                    SizedBox(height: 10.0),
+                    Expanded(
+                      child: ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        itemCount: exercises.length,
+                        itemBuilder: (context, i) {
+                          return ExerciseCard(exercises[i]);
+                        },
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: FloatingActionButton(
+          onPressed: startWorkout,
+          backgroundColor: Theme.of(context).accentColor,
+          elevation: 5,
+          child: Icon(
+            Icons.play_arrow,
+            color: Colors.white,
+          ),
+        ),
+      ),
     );
   }
 }

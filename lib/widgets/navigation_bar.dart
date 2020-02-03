@@ -19,19 +19,19 @@ class NavigationBar extends StatelessWidget {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            title: Text('Home'),
+            title: Text('Główna'),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            title: Text('Search'),
+            icon: Icon(Icons.insert_chart),
+            title: Text('Statystyki'),
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.bookmark_border),
-            title: Text('Saved'),
+            title: Text('Zapisane'),
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
-            title: Text('Profile'),
+            title: Text('Profil'),
           ),
         ],
         type: BottomNavigationBarType.fixed,

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 import '../globals.dart';
 import '../screens/trainer_info_screen.dart';
@@ -11,6 +10,9 @@ import '../widgets/recent_workouts.dart';
 import '../widgets/workout_card.dart';
 import '../widgets/more_loading_indicator.dart';
 import '../models/workout.dart';
+import '../widgets/custom_title.dart';
+import '../widgets/trainer_header.dart';
+import '../providers/users_provider.dart';
 
 class TrainerWorkoutsScreen extends StatefulWidget {
   static const routeName = '/trainer';
@@ -36,13 +38,22 @@ class _TrainerWorkoutsScreenState extends State<TrainerWorkoutsScreen> {
       workoutsProvider.currentTrainerId = _trainerId;
       trainer = Provider.of<TrainersProvider>(context, listen: false)
           .findById(_trainerId);
+      int userExperience = Provider.of<UsersProvider>(context, listen: false).userData.experienceLevel;
 
       if (workoutsProvider.workouts == null ||
-          workoutsProvider.fromSavedWorkouts) {        
-        workoutsProvider.fetchWorkouts().then((_) {
+          workoutsProvider.fromSavedWorkouts) {
+        workoutsProvider.fetchWorkouts(userExperience).then((_) {
           setState(() {
             _isLoading = false;
           });
+        }).catchError((err) {
+          print(err);
+          Global().showAlertDialog(
+              context,
+              'Błąd',
+              'Podczas połączenia z serwerem wystąpił błąd, spróbuj ponownie później.',
+              'Ok',
+              () => Navigator.of(context).pop());
         });
       } else {
         setState(() {
@@ -105,11 +116,11 @@ class _TrainerWorkoutsScreenState extends State<TrainerWorkoutsScreen> {
   @override
   Widget build(BuildContext context) {
     List<Workout> workouts;
-    List<Workout> recentWorkouts;
+    List<Workout> recommendedWorkouts;
 
     if (_trainerId != null) {
       workouts = workoutsProvider.workouts;
-      recentWorkouts = workoutsProvider.recentWorkouts;
+      recommendedWorkouts = workoutsProvider.recommendedWorkouts;
     }
 
     return Scaffold(
@@ -130,54 +141,18 @@ class _TrainerWorkoutsScreenState extends State<TrainerWorkoutsScreen> {
                       title: AnimatedOpacity(
                         opacity: 1.0 - _nameOpacity,
                         duration: Duration(milliseconds: 200),
-                        child: Text(trainer.name),
+                        child: Text(
+                          trainer.name.toUpperCase(),
+                          style: Theme.of(context).textTheme.title.copyWith(
+                                color: Global().canvasColor,
+                              ),
+                        ),
                       ),
                       background: GestureDetector(
                         onTap: () => Navigator.of(context).pushNamed(
                             TrainerInfoScreen.routeName,
                             arguments: trainer),
-                        child: Stack(
-                          children: <Widget>[
-                            CachedNetworkImage(
-                              width: double.infinity,
-                              imageUrl: trainer.imageUrl,
-                              fit: BoxFit.cover,
-                              alignment: Alignment.topCenter,
-                              errorWidget: (context, url, error) => Icon(
-                                Icons.error_outline,
-                                color: Colors.white,
-                              ),
-                            ),
-                            Container(
-                              width: double.infinity,
-                              height: double.infinity,
-                              color: Colors.black12,
-                            ),
-                            Align(
-                              alignment: Alignment.bottomLeft,
-                              child: Padding(
-                                padding: const EdgeInsets.all(10.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Text(
-                                      trainer.name,
-                                      style: Theme.of(context).textTheme.title,
-                                    ),
-                                    Text(
-                                      '${trainer.numberOfWorkouts} treningów',
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.normal,
-                                          fontSize: 18),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                        child: TrainerHeader(trainer),
                       ),
                     ),
                     actions: <Widget>[
@@ -198,26 +173,16 @@ class _TrainerWorkoutsScreenState extends State<TrainerWorkoutsScreen> {
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
                         if (index == 0) {
-                          return recentWorkouts.isNotEmpty
-                              ? RecentWorkouts(recentWorkouts)
+                          return recommendedWorkouts.isNotEmpty
+                              ? RecentWorkouts(recommendedWorkouts)
                               : Container();
                         } else if (index == 1) {
                           return workouts.isNotEmpty
-                              ? Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 10.0, left: 10.0, right: 10.0),
-                                  child: Text(
-                                    'Wszystkie treningi',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Theme.of(context).primaryColor,
-                                      fontWeight: FontWeight.normal,
-                                    ),
-                                  ),
-                                )
-                              : Center(                                
+                              ? CustomTitle('Wszystkie treningi')
+                              : Center(
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 10.0),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 30.0, horizontal: 10.0),
                                     child: Text('Brak dodanych treningów'),
                                   ),
                                 );
@@ -225,9 +190,12 @@ class _TrainerWorkoutsScreenState extends State<TrainerWorkoutsScreen> {
                           return MoreLoadingIndicator(_moreLoading);
                         } else {
                           return Padding(
-                            padding: index == workouts.length + 1
-                                ? const EdgeInsets.symmetric(vertical: 10.0)
-                                : const EdgeInsets.only(top: 10.0),
+                            padding: EdgeInsets.only(
+                              left: 20.0,
+                              right: 20.0,
+                              top: index == 2 ? 0 : 5.0,
+                              bottom: 5.0,
+                            ),
                             child: WorkoutCard(workouts[index - 2], true),
                           );
                         }

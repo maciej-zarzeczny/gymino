@@ -42,8 +42,7 @@ class UsersProvider with ChangeNotifier {
       'trainingGoal': trainingGoal,
       'experienceLevel': experienceLevel,
       'isPremium': isPremium,
-      'chartData': [],
-      'savedWorkouts': [],
+      'savedWorkouts': {},
     });
   }
 
@@ -54,21 +53,12 @@ class UsersProvider with ChangeNotifier {
     _userData = UserData.fromSnapshot(result);
   }
 
-  int _difficultyToInt(String difficulty) {
-    if (difficulty == 'POCZĄTKUJĄCY')
-      return 0;
-    else if (difficulty == 'ŚREDNI')
-      return 1;
-    else
-      return 2;
-  }
-
-  Future<void> addWorkoutToFavourites(String id, String difficulty,
+  Future<void> addWorkoutToFavourites(String id, int difficulty,
       int duration, String name, String imageUrl, String trainerId) async {
     Map<dynamic, dynamic> newWorkout = new Map();
     newWorkout['name'] = name;
     newWorkout['duration'] = duration;
-    newWorkout['difficulty'] = _difficultyToInt(difficulty);
+    newWorkout['difficulty'] = difficulty;
     newWorkout['imageUrl'] = imageUrl;
     newWorkout['trainerId'] = trainerId;
 

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter/services.dart';
 
 import '../../providers/users_provider.dart';
 import '../../models/user.dart';
@@ -15,8 +14,7 @@ class AuthWrapper extends StatelessWidget {
     final user = Provider.of<User>(context);
     final usersProvider = Provider.of<UsersProvider>(context, listen: false);
 
-    if (user == null) {
-      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
+    if (user == null) {      
       return LoginScreen();
     } else {
       if (usersProvider.userData == null ||

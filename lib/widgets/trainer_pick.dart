@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import '../models/trainer.dart';
-import './badge.dart';
 import '../screens/trainer_workouts_screen.dart';
 
 class TrainerPick extends StatelessWidget {
@@ -19,40 +18,23 @@ class TrainerPick extends StatelessWidget {
       },
       child: Container(
         width: double.infinity,
-        height: MediaQuery.of(context).size.height * 0.2,
-        constraints: BoxConstraints(minHeight: 180),
-        padding: const EdgeInsets.only(left: 5.0, right: 5.0, bottom: 10.0),
-        child: Stack(
-          children: <Widget>[
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10.0),
-              child: CachedNetworkImage(
-                width: double.infinity,
-                imageUrl: trainer.imageUrl,
-                fit: BoxFit.cover,
-                alignment: Alignment.topCenter,
-                errorWidget: (context, url, error) => Icon(
-                  Icons.error_outline,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.black12,
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-            ),
-            Container(
-              alignment: Alignment.bottomLeft,
-              padding: const EdgeInsets.all(15.0),
-              child: Text(
-                trainer.name,
-                style: Theme.of(context).textTheme.display1,
-              ),
-            ),
-            Badge(trainer.numberOfFollowers, true),
-          ],
+        height: MediaQuery.of(context).size.height * 0.15,
+        constraints: BoxConstraints(minHeight: 100),
+        margin: const EdgeInsets.only(left: 20.0, right: 20.0, bottom: 10.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15.0),
+          image: DecorationImage(
+            image: CachedNetworkImageProvider(trainer.imageUrl),
+            fit: BoxFit.cover,
+            alignment: Alignment.topCenter,
+            colorFilter: ColorFilter.mode(Colors.black38, BlendMode.darken),
+          ),
+        ),
+        child: Center(
+          child: Text(
+            trainer.name,
+            style: Theme.of(context).textTheme.display2,
+          ),
         ),
       ),
     );

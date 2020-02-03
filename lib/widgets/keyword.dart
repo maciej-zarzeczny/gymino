@@ -23,11 +23,10 @@ class Keyword extends StatelessWidget {
       child: Text(
         keyword.toUpperCase(),
         textAlign: TextAlign.center,
-        style: TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.normal,
-          color: isBlack ? Theme.of(context).primaryColor : Colors.white,
-        ),
+        style: Theme.of(context).textTheme.body1.copyWith(
+              fontSize: 13,
+              color: isBlack ? Theme.of(context).primaryColor : Colors.white,
+            ),
       ),
     );
   }

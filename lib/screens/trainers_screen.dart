@@ -8,6 +8,7 @@ import '../widgets/top_trainer.dart';
 import '../widgets/popular_trainers.dart';
 import '../widgets/trainer_pick.dart';
 import '../widgets/more_loading_indicator.dart';
+import '../widgets/custom_title.dart';
 
 class TrainersScreen extends StatefulWidget {
   @override
@@ -89,9 +90,9 @@ class _TrainersScreenState extends State<TrainersScreen> {
         : trainers.isEmpty
             ? NoData('Brak dostępnych trenerów', trainersProvider.fetchTrainers)
             : Container(
-                height: (mediaQuery.size.height - mediaQuery.padding.top) * 1,
-                color: Colors.white,
+                height: mediaQuery.size.height - mediaQuery.padding.top,
                 margin: EdgeInsets.only(top: mediaQuery.padding.top),
+                color: Global().canvasColor,
                 child: ListView.builder(
                   padding: const EdgeInsets.all(0.0),
                   controller: _scrollController,
@@ -100,23 +101,21 @@ class _TrainersScreenState extends State<TrainersScreen> {
                     if (i == 0) {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
+                        children: <Widget>[                          
                           topTrainer == null
                               ? Container()
-                              : TopTrainer(topTrainer),
+                              : Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  CustomTitle('Najczęściej wybierany'),
+                                  TopTrainer(topTrainer),
+                                ],
+                              ),
                           popularTrainers == null
                               ? Container()
-                              : PopularTrainers(popularTrainers),
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Text(
-                              'Wszyscy trenerzy',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  color: Theme.of(context).primaryColor,
-                                  fontWeight: FontWeight.normal),
-                            ),
-                          ),
+                              : PopularTrainers(popularTrainers), 
+                          CustomTitle('Wszyscy'),                         
                         ],
                       );
                     } else if (i == trainers.length + 1) {

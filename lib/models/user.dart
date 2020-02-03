@@ -11,7 +11,7 @@ class UserData {
   final String name;
   final String gender;
   final String trainingGoal;
-  final String experienceLevel;
+  final int experienceLevel;
   int finishedWorkouts;
   final Map<dynamic, dynamic> savedWorkouts;
   final bool isPremium;
@@ -43,19 +43,12 @@ class UserData {
       else return '';
     }
 
-    String experienceLevelToString(int number) {
-      if (number == 0) return 'Początkujący';
-      else if (number == 1) return 'Średniozaawansowany';
-      else if (number == 2) return 'Zaawansowany';
-      else return '';
-    }
-
     return UserData(
       uid: snapshot.documentID,
       name: data['name'] ?? '',
       gender: genderToString(data['gender'] ?? 0),            
       trainingGoal: trainingGoalToString(data['trainingGoal'] ?? 0),
-      experienceLevel: experienceLevelToString(data['experienceLevel'] ?? 0),
+      experienceLevel: data['experienceLevel'] ?? 0,
       finishedWorkouts: data['finishedWorkouts'] ?? 0,
       savedWorkouts: data['savedWorkouts'] ?? {},      
       isPremium: data['isPremium'] ?? 0,

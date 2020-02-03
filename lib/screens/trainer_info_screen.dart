@@ -7,6 +7,7 @@ import '../models/trainer.dart';
 import '../widgets/keyword.dart';
 import '../providers/trainers_provider.dart';
 import '../size_config.dart';
+import '../widgets/custom_title.dart';
 
 class TrainerInfoScreen extends StatefulWidget {
   static const routeName = '/trainerInfo';
@@ -35,10 +36,6 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           header(context, _trainer),
-          Container(
-            height: 10.0,
-            color: Colors.white,
-          ),
           infoPage(),
         ],
       ),
@@ -66,20 +63,10 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
                 'Wiek',
                 'Wzrost',
                 'Waga',
-                'Staż treningowy'
+                'Staż'
               ]);
             } else if (index == 1) {
-              return Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Text(
-                  'Suplementacja',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Theme.of(context).primaryColor,
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-              );
+              return CustomTitle('Suplementacja');
             } else {
               return supplementItem(
                 _supplements[index - 2]['name'],
@@ -97,76 +84,52 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
   }
 
   Widget header(context, Trainer trainer) {
+    final _appBar = AppBar(
+      backgroundColor: Colors.transparent,      
+    );
+
     return Container(
       width: double.infinity,
       height: MediaQuery.of(context).size.height * 0.3,
+      // padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
       decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 5.0,
-            color: Colors.black45,
-            offset: Offset(0.0, 5.0),
-          ),
-        ],
+        image: DecorationImage(
+          image: CachedNetworkImageProvider(trainer.imageUrl),
+          alignment: Alignment.topCenter,
+          fit: BoxFit.cover,
+          colorFilter: ColorFilter.mode(Colors.black26, BlendMode.darken),
+        ),
       ),
       child: Stack(
         children: <Widget>[
-          CachedNetworkImage(
-            width: double.infinity,
-            imageUrl: trainer.imageUrl,
-            fit: BoxFit.cover,
-            alignment: Alignment.topCenter,
-            errorWidget: (context, url, error) => Icon(
-              Icons.error_outline,
-              color: Colors.white,
-            ),
-          ),
-          Container(
-            color: Colors.black12,
-            width: double.infinity,
-            height: double.infinity,
-          ),
+          _appBar,
+          // Align(
+          //   alignment: Alignment.topLeft,
+          //   child: IconButton(
+          //     onPressed: () => Navigator.of(context).pop(),
+          //     icon: Global().backArrow(),
+          //   ),
+          // ),
           Padding(
-            padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+            padding: const EdgeInsets.all(20.0),
             child: Align(
-              alignment: Alignment.topLeft,
-              child: IconButton(                
-                onPressed: () => Navigator.of(context).pop(),
-                icon: Global().backArrow(),             
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Icon(Icons.favorite, color: Theme.of(context).primaryColor),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 3),
-                      child: Text(
-                        trainer.numberOfFollowers,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).primaryColor,
-                            fontSize: 23),
-                      ),
-                    ),
-                  ],
-                ),
-                Text(trainer.name, style: Theme.of(context).textTheme.title),
-                Padding(
-                  padding: const EdgeInsets.only(top: 5.0),
-                  child: Row(
+              alignment: Alignment.bottomLeft,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    trainer.name,
+                    style: Theme.of(context).textTheme.display2,
+                  ),
+                  SizedBox(height: 5.0),
+                  Row(
                     children: trainer.keywords.map((keyword) {
                       return Keyword(keyword, false);
                     }).toList(),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
@@ -178,6 +141,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
       String comment, String imageUrl, bool isLast) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.15,
+      constraints: BoxConstraints(minHeight: 100),
       margin: isLast
           ? EdgeInsets.only(
               left: 20.0,
@@ -186,14 +150,14 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
               bottom: MediaQuery.of(context).padding.bottom + 5.0,
             )
           : const EdgeInsets.symmetric(vertical: 5.0, horizontal: 20.0),
-      padding: const EdgeInsets.all(10.0),
+      padding: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10.0),
+        borderRadius: BorderRadius.circular(15.0),
         image: DecorationImage(
           image: AssetImage('assets/images/supplements/$imageUrl'),
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(
-            Colors.black26,
+            Colors.black38,
             BlendMode.darken,
           ),
         ),
@@ -205,19 +169,12 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
           mainAxisAlignment: MainAxisAlignment.end,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Text(
-              name,
-              style: Theme.of(context)
-                  .textTheme
-                  .title
-                  .copyWith(fontSize: SizeConfig.safeBlockHorizontal * 7.0),
-            ),
-            SizedBox(height: 5),
+            Text(name, style: Theme.of(context).textTheme.display2),
+            SizedBox(height: 3),
             Text(
               '$amount g - $portionsPerDay x dziennie',
-              style: Theme.of(context).textTheme.display2.copyWith(
-                    color: Colors.white,
-                    fontSize: SizeConfig.safeBlockHorizontal * 4.5,
+              style: Theme.of(context).textTheme.body1.copyWith(
+                    color: Global().canvasColor,
                   ),
             ),
           ],
@@ -230,17 +187,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0),
-          child: Text(
-            'Informacje',
-            style: TextStyle(
-              fontSize: 15,
-              color: Theme.of(context).primaryColor,
-              fontWeight: FontWeight.normal,
-            ),
-          ),
-        ),
+        CustomTitle('Informacje'),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -265,8 +212,8 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
       height: MediaQuery.of(context).size.width * 0.3,
       margin: const EdgeInsets.all(5.0),
       decoration: BoxDecoration(
-        color: Color.fromRGBO(240, 240, 240, 1.0),
-        borderRadius: BorderRadius.circular(10.0),
+        color: Global().lightGrey,
+        borderRadius: BorderRadius.circular(15.0),
       ),
       child: Stack(
         children: <Widget>[
@@ -274,9 +221,9 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
             child: Text(
               title,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.title.copyWith(
+              style: Theme.of(context).textTheme.display2.copyWith(
+                    fontWeight: FontWeight.bold,
                     color: Theme.of(context).primaryColor,
-                    fontSize: SizeConfig.safeBlockHorizontal * 7.0,
                   ),
             ),
           ),
@@ -287,11 +234,9 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
               child: Text(
                 subtitle,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Color.fromRGBO(190, 190, 190, 1.0),
-                  fontWeight: FontWeight.bold,
-                  fontSize: SizeConfig.safeBlockHorizontal * 4.5,
-                ),
+                style: Theme.of(context).textTheme.body1.copyWith(
+                      color: Global().mediumGrey,
+                    ),
               ),
             ),
           ),

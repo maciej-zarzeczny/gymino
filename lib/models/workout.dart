@@ -6,7 +6,7 @@ class Workout {
   final String name;
   final String imageUrl;
   final int duration;
-  final String difficulty;
+  final int difficulty;  
   final Map<dynamic, dynamic> keywords;
   final List<dynamic> exercises;
 
@@ -21,23 +21,14 @@ class Workout {
   });
 
   factory Workout.fromSnapshot(DocumentSnapshot doc) {
-    Map data = doc.data;
-
-    String difficultyToString(int number) {
-      if (number == 0)
-        return 'POCZĄTKUJĄCY';
-      else if (number == 1)
-        return 'ŚREDNI';
-      else
-        return 'ZAAWANSOWANY';
-    }
+    Map data = doc.data;    
 
     return Workout(
       id: doc.documentID ?? '',
       name: data['name'] ?? '',
       imageUrl: data['image_url'] ?? '',
       duration: data['duration'] ?? 0,
-      difficulty: difficultyToString(data['difficulty']),
+      difficulty: data['difficulty'] ?? 1,
       keywords: data['keywords'] ?? [],
       exercises: data['exercises'] ?? [],
     );

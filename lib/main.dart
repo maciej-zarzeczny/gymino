@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:sqilly/providers/users_provider.dart';
 
+import './size_config.dart';
 import './globals.dart';
 import './providers/trainers_provider.dart';
 import './providers/workouts_provider.dart';
@@ -50,58 +51,92 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: MaterialColor(0xFF1A1A1A, Global().primaryColor),
           accentColor: Color.fromRGBO(224, 22, 22, 1),
-          canvasColor: Color.fromRGBO(26, 26, 26, 1.0),         
-          fontFamily: 'Montserrat',
+          fontFamily: 'SF-Pro-Display',
           // fontFamily: 'Roboto',
           textTheme: TextTheme(
-              // TOP TRAINER NAME
-              title: TextStyle(
-                fontSize: 25,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 0.7,
-                color: Colors.white,
-              ),
-              headline: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 0.8,
-                color: Colors.white,
-              ),
-              // TRAINER CARD NAME
-              display1: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                fontSize: 20,
-              ),
-              // EXERCISE NAME (WORKOUT OVERVIEW)
-              display2: TextStyle(
-                fontSize: 15,
-                color: Color.fromRGBO(26, 26, 26, 1),
-                fontWeight: FontWeight.bold,
-              ),
-              // SMALL SCREEN TEXTS
-              display3: TextStyle(
-                fontSize: 15,
+            title: TextStyle(
+              color: Color.fromRGBO(26, 26, 26, 1.0),
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1,
+            ),
+            display1: TextStyle(
+              color: Color.fromRGBO(26, 26, 26, 1.0),
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+            display2: TextStyle(
+              color: Global().canvasColor,
+              fontSize: 25,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 0.7,
+            ),
+            overline: TextStyle(
+              color: Global().darkGrey,
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+            ),
+            body1: TextStyle(
                 color: Color.fromRGBO(26, 26, 26, 1.0),
-                fontWeight: FontWeight.normal,
-              ),
-              body1: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.normal,
-              ),
-              // WORKOUT NAME
-              body2: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 0.7,
-                color: Color.fromRGBO(26, 26, 26, 1),
-              ),
-              button: TextStyle(
-                fontSize: 18.0,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 0.7,
-              )),
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                letterSpacing: 0.8),
+            body2: TextStyle(
+              color: Global().darkGrey,
+              fontSize: 15,
+              fontWeight: FontWeight.normal,
+            ),
+            button: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: Global().canvasColor,
+            ),
+          ),
+        ),
+        darkTheme: ThemeData(
+          primarySwatch: MaterialColor(0xFF1A1A1A, Global().primaryColor),
+          accentColor: Color.fromRGBO(224, 22, 22, 1),
+          fontFamily: 'SF-Pro-Display',
+          canvasColor: Color.fromRGBO(26, 26, 26, 1.0),
+          textTheme: TextTheme(
+            title: TextStyle(
+              color: Global().canvasColor,
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1,
+            ),
+            display1: TextStyle(
+              color: Color.fromRGBO(26, 26, 26, 1.0),
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+            display2: TextStyle(
+              color: Global().canvasColor,
+              fontSize: 25,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 0.7,
+            ),
+            overline: TextStyle(
+              color: Global().darkGrey,
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+            ),
+            body1: TextStyle(
+                color: Color.fromRGBO(26, 26, 26, 1.0),
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                letterSpacing: 0.8),
+            body2: TextStyle(
+              color: Global().darkGrey,
+              fontSize: 15,
+              fontWeight: FontWeight.normal,
+            ),
+            button: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: Global().canvasColor,
+            ),
+          ),
         ),
         initialRoute: AuthWrapper.routeName,
         routes: {
@@ -115,7 +150,7 @@ class MyApp extends StatelessWidget {
           ExerciseOverviewScreen.routeName: (context) =>
               ExerciseOverviewScreen(),
           TrainerInfoScreen.routeName: (context) => TrainerInfoScreen(),
-          SavedWorkoutsScreen.routeName: (context) => SavedWorkoutsScreen(),          
+          SavedWorkoutsScreen.routeName: (context) => SavedWorkoutsScreen(),
         },
       ),
     );

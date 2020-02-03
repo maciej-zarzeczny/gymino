@@ -1,70 +1,78 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../globals.dart';
 import '../models/workout.dart';
 import '../widgets/keyword.dart';
+import '../widgets/difficulty_level.dart';
 
 class WorkoutHeader extends StatelessWidget {
   final Workout workout;
-  final Function startWorkout;
 
-  WorkoutHeader({
+  WorkoutHeader(
     this.workout,
-    this.startWorkout,
-  });
+  );
 
   @override
   Widget build(BuildContext context) {
+    final _appBar = AppBar(
+      backgroundColor: Colors.transparent,
+    );
+
     return Container(
       height: MediaQuery.of(context).size.height * 0.35,
       width: double.infinity,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage(workout.imageUrl),
+          fit: BoxFit.cover,
+          alignment: Alignment.topCenter,
+          colorFilter: ColorFilter.mode(Colors.black38, BlendMode.darken),
+        ),
+      ),
       child: Stack(
-        children: <Widget>[
-          Image(
-            width: double.infinity,
-            image: AssetImage(workout.imageUrl),
-            fit: BoxFit.cover,
-            alignment: Alignment.topCenter,
-          ),
-          Container(
-            color: Colors.black26,
-            width: double.infinity,
-            height: double.infinity,
-          ),
+        children: <Widget>[  
+          _appBar,        
           Padding(
-            padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+            padding: EdgeInsets.only(
+                top: MediaQuery.of(context).padding.top +
+                    _appBar.preferredSize.height),
             child: Align(
               alignment: Alignment.topLeft,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  IconButton(
-                    padding: const EdgeInsets.all(0.0),
-                    onPressed: () {
-                      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
-                      Navigator.of(context).pop();
-                    },
-                    icon: Global().backArrow(),
-                  ),
+                  // IconButton(
+                  //   padding: const EdgeInsets.all(0.0),
+                  //   onPressed: () {
+                  //     Navigator.of(context).pop();
+                  //   },
+                  //   icon: Global().backArrow(),
+                  // ),
+                  // SizedBox(height: 5.0),
                   Container(
-                      constraints: BoxConstraints(minWidth: 100),
-                      child: Text(
-                        workout.difficulty,
-                        style: Theme.of(context).textTheme.headline,
-                        textAlign: TextAlign.center,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor,
-                        borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(10),
-                          bottomRight: Radius.circular(10),
+                    margin: const EdgeInsets.symmetric(horizontal: 20.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 7.0, vertical: 7.0),
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(26, 26, 26, 0.7),
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Text(
+                          'Poziom: ',
+                          style: Theme.of(context).textTheme.overline.copyWith(
+                              color: Global().canvasColor,
+                              fontWeight: FontWeight.normal),
                         ),
-                      ),
-                      padding: const EdgeInsets.all(10),
-                      margin: const EdgeInsets.only(bottom: 10.0)),
+                        DifficultyLevel(workout.difficulty),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 10.0),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: Row(
                       children: workout.keywords.entries.map((keyword) {
                         return Keyword(keyword.value, false);
@@ -82,7 +90,7 @@ class WorkoutHeader extends StatelessWidget {
             child: Container(
               height: (MediaQuery.of(context).size.height -
                       MediaQuery.of(context).padding.top) *
-                  0.05,                  
+                  0.05,
               padding: const EdgeInsets.all(0.0),
               margin: const EdgeInsets.all(0.0),
               decoration: BoxDecoration(
@@ -90,24 +98,7 @@ class WorkoutHeader extends StatelessWidget {
                   topLeft: Radius.circular(30.0),
                   topRight: Radius.circular(30.0),
                 ),
-                color: Colors.white,
-              ),
-            ),
-          ),
-          Positioned(
-            right: 40,
-            bottom: ((MediaQuery.of(context).size.height -
-                            MediaQuery.of(context).padding.top) *
-                        0.05) /
-                    2 -
-                5,
-            child: FloatingActionButton(
-              onPressed: startWorkout,
-              backgroundColor: Theme.of(context).accentColor,
-              elevation: 5,
-              child: Icon(
-                Icons.play_arrow,
-                color: Colors.white,
+                color: Global().canvasColor,
               ),
             ),
           ),

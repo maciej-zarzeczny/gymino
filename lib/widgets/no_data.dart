@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../globals.dart';
+
 class NoData extends StatelessWidget {
   final String displayText;
   final Function onPressedFunction;
@@ -10,6 +12,7 @@ class NoData extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
+      color: Global().canvasColor,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,

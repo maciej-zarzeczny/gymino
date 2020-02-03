@@ -7,6 +7,7 @@ import '../models/exercise.dart';
 class WorkoutsProvider with ChangeNotifier {
   final Firestore _db = Firestore.instance;
   final int workoutsLimit = 5;
+  final int _recommendedWorkoutsLimit = 3;
 
   DocumentSnapshot _lastDocument;
   bool _allWorkoutsLoaded = false;
@@ -14,6 +15,7 @@ class WorkoutsProvider with ChangeNotifier {
 
   List<Workout> _loadedWorkouts = [];
   Map<String, List<Workout>> _workoutsMap = new Map();
+  Map<String, List<Workout>> _recommendedWorkouts = new Map();
   List<ExerciseData> _exerciseData = [];
 
   String _trainerId = '';
@@ -38,25 +40,20 @@ class WorkoutsProvider with ChangeNotifier {
     return _workoutsMap[_trainerId];
   }
 
+  List<Workout> get recommendedWorkouts {    
+    if (_workoutsMap[_trainerId].length > 1) {
+      return _recommendedWorkouts[_trainerId].length != null ? _recommendedWorkouts[_trainerId] : [];
+    } else {
+      return [];
+    }
+  }
+
   int get numberOfWorkouts {
     return _workoutsMap[_trainerId].length;
   }
 
   bool get allWorkoutsLoaded {
     return _allWorkoutsLoaded;
-  }
-
-  // TODO: Change to return last 4 workouts based on timestamps
-  List<Workout> get recentWorkouts {
-    if (_workoutsMap[_trainerId].length >= 4) {
-      return [
-        _workoutsMap[_trainerId][0],
-        _workoutsMap[_trainerId][1],
-        _workoutsMap[_trainerId][2]
-      ];
-    } else {
-      return [];
-    }
   }
 
   Workout findById(String id) {
@@ -95,19 +92,36 @@ class WorkoutsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchWorkouts() async {
+  Future<void> fetchWorkouts(int experienceLevel) async {
     _allWorkoutsLoaded = false;
     _fromSavedWorkouts = false;
-    var result = await _db
+
+    QuerySnapshot recommendedResult = await _db
         .collection('trainers')
         .document(_trainerId)
         .collection('workouts')
-        .orderBy('name')
-        .limit(workoutsLimit)
+        .where('difficulty', isEqualTo: experienceLevel)
+        .orderBy('createdDate', descending: true)        
+        .limit(_recommendedWorkoutsLimit)
+        .getDocuments();
+
+    if (recommendedResult.documents.length > 0) {      
+      _recommendedWorkouts[_trainerId] = recommendedResult.documents
+          .map((workout) => Workout.fromSnapshot(workout))
+          .toList();
+    }
+
+    QuerySnapshot result = await _db
+        .collection('trainers')
+        .document(_trainerId)
+        .collection('workouts')
+        .orderBy('createdDate', descending: true)
+        .limit(workoutsLimit - recommendedResult.documents.length)
         .getDocuments();
 
     if (result.documents.length > 0) {
-      print('Read: ${result.documents.length}');
+      print(
+          'Read: ${result.documents.length + recommendedResult.documents.length}');
       _lastDocument = result.documents[result.documents.length - 1];
       _loadedWorkouts = result.documents
           .map((workout) => Workout.fromSnapshot(workout))
@@ -117,7 +131,7 @@ class WorkoutsProvider with ChangeNotifier {
     } else {
       _workoutsMap[_trainerId] = [];
     }
-    if (result.documents.length < workoutsLimit) {
+    if (result.documents.length < workoutsLimit - recommendedResult.documents.length) {
       _allWorkoutsLoaded = true;
     }
 
@@ -130,7 +144,7 @@ class WorkoutsProvider with ChangeNotifier {
         .collection('trainers')
         .document(_trainerId)
         .collection('workouts')
-        .orderBy('name')
+        .orderBy('createdDate', descending: true)
         .startAfterDocument(_lastDocument)
         .limit(workoutsLimit)
         .getDocuments();

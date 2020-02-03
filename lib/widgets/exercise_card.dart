@@ -17,7 +17,8 @@ class ExerciseCard extends StatelessWidget {
           Navigator.of(context).pushNamed(ExerciseOverviewScreen.routeName, arguments: _exercise.id),
       child: Container(        
         height: size * 0.15,
-        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+        width: size * 0.15,
+        padding: const EdgeInsets.symmetric(vertical: 5.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -31,11 +32,11 @@ class ExerciseCard extends StatelessWidget {
               ),
             ),
             Container(
-              width: MediaQuery.of(context).size.width - (size * 0.15) - 25.0,
+              width: MediaQuery.of(context).size.width - (size * 0.15) - 40.0,
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
               child: Text(
                 _exercise.name,
-                style: Theme.of(context).textTheme.display2,                
+                style: Theme.of(context).textTheme.body1,
               ),
             )
           ],

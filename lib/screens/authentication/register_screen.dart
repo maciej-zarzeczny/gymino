@@ -231,11 +231,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     right: 5.0,
                                     bottom: 10.0),
                                 onPressed: () => goBack(context),
-                                icon: Icon(
-                                  Icons.arrow_back,
-                                  color: Colors.white,
-                                  size: 35,
-                                ),
+                                icon: Global().backArrow(),
                               ),
                             ),
                             Column(
@@ -245,7 +241,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       MediaQuery.of(context).size.width * 0.7,
                                   child: Text(
                                     _questions[_currentView],
-                                    style: Theme.of(context).textTheme.title,
+                                    style: Theme.of(context).textTheme.display2,
                                     textAlign: TextAlign.center,
                                   ),
                                 ),
@@ -376,7 +372,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: _experienceLevels.map((element) {
-        var index = _experienceLevels.indexOf(element);
+        var index = _experienceLevels.indexOf(element) + 1;
         return GestureDetector(
           onTap: () => setExperienceLevel(index),
           child: optionItem(

@@ -58,7 +58,7 @@ class _ExerciseOverviewScreenState extends State<ExerciseOverviewScreen> {
                 ),
                 Container(
                   height: MediaQuery.of(context).size.height * 0.45,
-                  color: Colors.white,
+                  color: Global().canvasColor,
                   width: double.infinity,
                   child: SingleChildScrollView(
                     child: content(_exerciseData, context),
@@ -108,7 +108,7 @@ class _ExerciseOverviewScreenState extends State<ExerciseOverviewScreen> {
                 topLeft: Radius.circular(30.0),
                 topRight: Radius.circular(30.0),
               ),
-              color: Colors.white,
+              color: Global().canvasColor,
             ),
           ),
         ),
@@ -124,7 +124,7 @@ class _ExerciseOverviewScreenState extends State<ExerciseOverviewScreen> {
         children: <Widget>[
           Text(
             exercise.name,
-            style: Theme.of(context).textTheme.body2,
+            style: Theme.of(context).textTheme.display1,
           ),
           Padding(
             padding: const EdgeInsets.only(top: 10.0),
@@ -138,18 +138,12 @@ class _ExerciseOverviewScreenState extends State<ExerciseOverviewScreen> {
             padding: const EdgeInsets.symmetric(vertical: 15.0),
             child: Text(
               exercise.description,
-              style: Theme.of(context).textTheme.display3.copyWith(
-                    color: Color.fromRGBO(100, 100, 100, 1),
-                    fontSize: 14,
-                  ),
+              style: Theme.of(context).textTheme.body2,
             ),
           ),
           Text(
             exercise.instructions,
-            style: Theme.of(context).textTheme.display3.copyWith(
-                  color: Color.fromRGBO(100, 100, 100, 1),
-                  fontSize: 14,
-                ),
+            style: Theme.of(context).textTheme.body2,
           ),
           Padding(
             padding: const EdgeInsets.only(top: 20.0, bottom: 35.0),
@@ -168,10 +162,9 @@ class _ExerciseOverviewScreenState extends State<ExerciseOverviewScreen> {
                         width: MediaQuery.of(context).size.width - 55,
                         child: Text(
                           element,
-                          style: Theme.of(context).textTheme.display3.copyWith(
-                                color: Theme.of(context).primaryColor,
+                          style: Theme.of(context).textTheme.body2.copyWith(
                                 fontWeight: FontWeight.bold,
-                                fontSize: 13,
+                                color: Theme.of(context).primaryColor,
                               ),
                         ),
                       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
+import '../globals.dart';
 import '../models/trainer.dart';
 import '../screens/trainer_workouts_screen.dart';
 
@@ -11,76 +12,61 @@ class TopTrainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: (MediaQuery.of(context).size.height -
-              MediaQuery.of(context).padding.top) *
-          0.3,      
-      child: GestureDetector(
-        onTap: () {
-          Navigator.of(context).pushNamed(TrainerWorkoutsScreen.routeName,
-              arguments: topTrainer.id);
-        },
-        child: Stack(
-          children: <Widget>[
-            CachedNetworkImage(
-              width: double.infinity,
-              imageUrl: topTrainer.imageUrl,
-              fit: BoxFit.cover,
-              alignment: Alignment.topCenter,
-              errorWidget: (context, url, error) => Icon(
-                Icons.error_outline,
-                color: Colors.white,
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).pushNamed(TrainerWorkoutsScreen.routeName,
+            arguments: topTrainer.id);
+      },
+      child: Container(
+        width: double.infinity,
+        height: MediaQuery.of(context).size.height * 0.25,        
+        margin: const EdgeInsets.symmetric(horizontal: 20.0),
+        constraints: BoxConstraints(minHeight: 150),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15.0),
+          image: DecorationImage(
+            image: CachedNetworkImageProvider(topTrainer.imageUrl),
+            fit: BoxFit.cover,
+            alignment: Alignment.topCenter,
+            colorFilter: ColorFilter.mode(Colors.black38, BlendMode.darken),
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              Text(
+                topTrainer.name,
+                style: Theme.of(context).textTheme.display2,
               ),
-            ),
-            Container(
-              color: Colors.black12,
-              width: double.infinity,
-              height: double.infinity,
-            ),
-            Container(
-              padding: const EdgeInsets.all(15),
-              alignment: Alignment.bottomLeft,
-              child: Text(topTrainer.name,
-                  style: Theme.of(context).textTheme.title),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  child: Text('NAJCZĘŚCIEJ WYBIERANY',
-                      style: Theme.of(context).textTheme.headline),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor,
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(10),
-                      bottomRight: Radius.circular(10),
-                    ),
+              SizedBox(height: 5.0),
+              Row(
+                children: <Widget>[
+                  Icon(
+                    Icons.people,
+                    color: Global().canvasColor,
                   ),
-                  padding: const EdgeInsets.all(10),
-                  margin: const EdgeInsets.only(top: 15, bottom: 5),
-                ),
-                Row(
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.only(left: 5),
-                      child: Icon(Icons.favorite, color: Colors.white),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 3),
-                      child: Text(
-                        topTrainer.numberOfFollowers,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: 15),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            )
-          ],
+                  SizedBox(width: 5.0),
+                  Text(
+                    topTrainer.numberOfFollowers,
+                    style: Theme.of(context).textTheme.body1.copyWith(color: Global().canvasColor),
+                  ),
+                  SizedBox(width: 20.0),
+                  Icon(
+                    Icons.fitness_center,
+                    color: Global().canvasColor,
+                  ),
+                  SizedBox(width: 5.0),
+                  Text(
+                    topTrainer.numberOfWorkouts.toString(),
+                    style: Theme.of(context).textTheme.body1.copyWith(color: Global().canvasColor),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

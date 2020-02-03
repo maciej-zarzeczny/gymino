@@ -21,10 +21,12 @@ class Global {
   final Color softGrey = Color.fromRGBO(218, 225, 228, 1.0);
   final Color lightGrey = Color.fromRGBO(244, 245, 246, 1.0);
 
+  final Color canvasColor = Color.fromRGBO(250, 250, 250, 1.0);
+
   Widget loadingIndicator(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-      color: Colors.white,
+      color: canvasColor,
       child: Center(
         child: CircularProgressIndicator(),
       ),

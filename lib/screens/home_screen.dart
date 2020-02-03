@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'dart:io';
 
+import '../screens/statistics_screen.dart';
 import '../widgets/navigation_bar.dart';
 import './trainers_screen.dart';
 import '../screens/user_profile_screen.dart';
@@ -16,63 +16,54 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
-  bool _showAppBar = false;
 
-  @override
-  void initState() {
-    if (Platform.isAndroid) {
-      SystemChrome.setSystemUIOverlayStyle(
-        SystemUiOverlayStyle.light.copyWith(statusBarColor: Colors.transparent),
-      );
-    }
-    super.initState();
-  }
+  List<String> _titles = [
+    'TRENERZY',
+    'STATYSTYKI',
+    'ZAPISANE TRENINGI',
+    'PROFIL',
+  ];
 
   void _onItemTapped(int index) {
     setState(() {
       _currentIndex = index;
-      if (_currentIndex == 2) {
-        _showAppBar = true;
-      } else if (_currentIndex == 3) {
-        _showAppBar = true;
-      } else {
-        _showAppBar = false;
-      }
     });
   }
 
   AppBar _appBar() {
     return AppBar(
-      elevation: 5.0,
+      elevation: 0.0,
       centerTitle: true,
-      title: _currentIndex == 2 ? Text('Zapisane treningi') : Text('Profil'),
+      title: Text(
+        _titles[_currentIndex],
+        style: Theme.of(context).textTheme.title,
+      ),
+      backgroundColor: Theme.of(context).canvasColor, 
+      brightness: Brightness.light,     
+  
       actions: <Widget>[
-        _currentIndex == 3
-            ? IconButton(
-                icon: Icon(
-                  Icons.more_vert,
-                  color: Colors.white,
-                ),
-                onPressed: () => print('Profile settings'),
-              )
-            : Container(),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: Icon(
+            Icons.search,
+            color: Theme.of(context).primaryColor,
+          ),
+        ),
       ],
     );
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {    
     List<Widget> _views = [
       TrainersScreen(),
-      Center(
-        child: Text('Szukaj...'),
-      ),
-      SavedWorkoutsScreen.withAppBar(_appBar().preferredSize.height),
+      StatisticsScreen(),
+      SavedWorkoutsScreen(),
       UserProfileScreen(),
     ];
 
     return Scaffold(
-      appBar: _showAppBar ? _appBar() : null,
+      appBar: _appBar(),
       body: _views[_currentIndex],
       bottomNavigationBar: NavigationBar(
         onItemTapped: _onItemTapped,

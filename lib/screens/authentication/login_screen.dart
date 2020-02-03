@@ -107,6 +107,9 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
       child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+        ),
         backgroundColor: Colors.transparent,
         body: _isLoading
             ? Center(
@@ -166,9 +169,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   'Lub',
                                   style: Theme.of(context)
                                       .textTheme
-                                      .display3
+                                      .overline
                                       .copyWith(
-                                        color: Colors.white,
+                                        color: Global().canvasColor,
                                         fontWeight: FontWeight.bold,
                                       ),
                                 ),
@@ -186,13 +189,11 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               child: Text(
                                 'Nie masz konta? Zarejestruj się',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .display3
-                                    .copyWith(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                style:
+                                    Theme.of(context).textTheme.body1.copyWith(
+                                          color: Global().canvasColor,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                               ),
                             ),
                           ),

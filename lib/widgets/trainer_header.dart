@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:sqilly/globals.dart';
 
 import '../models/trainer.dart';
 import '../screens/trainer_info_screen.dart';
@@ -18,108 +19,70 @@ class TrainerHeader extends StatelessWidget {
         Navigator.of(context)
             .pushNamed(TrainerInfoScreen.routeName, arguments: trainer);
       },
-      child: Container(
-        width: double.infinity,
-        height: MediaQuery.of(context).size.height * 0.3,
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black45,
-              offset: Offset(0.0, 5.0),
-              blurRadius: 5.0,
+      child: Stack(
+        children: <Widget>[
+          CachedNetworkImage(
+            width: double.infinity,
+            imageUrl: trainer.imageUrl,
+            fit: BoxFit.cover,
+            alignment: Alignment.topCenter,
+            errorWidget: (context, url, error) => Icon(
+              Icons.error_outline,
+              color: Colors.white,
             ),
-          ],
-        ),
-        child: Stack(
-          children: <Widget>[
-            CachedNetworkImage(
-              width: double.infinity,
-              imageUrl: trainer.imageUrl,
-              fit: BoxFit.cover,
-              alignment: Alignment.topCenter,
-              errorWidget: (context, url, error) => Icon(
-                Icons.error_outline,
-                color: Colors.white,
-              ),
-            ),
-            Container(
-              color: Colors.black12,
-              width: double.infinity,
-              height: double.infinity,
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+          ),
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            color: Colors.black38,
+          ),
+          Align(
+            alignment: Alignment.bottomLeft,
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
+                  Text(
+                    trainer.name,
+                    style: Theme.of(context).textTheme.display2,
+                  ),
+                  SizedBox(height: 5.0),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      IconButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: Icon(
-                          Icons.arrow_back,
-                          size: 30,
-                        ),
-                        color: Colors.white,
+                      Icon(
+                        Icons.people,
+                        color: Global().canvasColor,
                       ),
-                      IconButton(
-                        onPressed: () {
-                          Navigator.of(context).pushNamed(
-                              TrainerInfoScreen.routeName,
-                              arguments: trainer);
-                        },
-                        icon: Icon(Icons.info_outline),
-                        color: Colors.white,
-                        iconSize: 30,
+                      SizedBox(width: 5.0),
+                      Text(
+                        trainer.numberOfFollowers,
+                        style: Theme.of(context)
+                            .textTheme
+                            .body1
+                            .copyWith(color: Global().canvasColor),
+                      ),
+                      SizedBox(width: 20.0),
+                      Icon(
+                        Icons.fitness_center,
+                        color: Global().canvasColor,
+                      ),
+                      SizedBox(width: 5.0),
+                      Text(
+                        trainer.numberOfWorkouts.toString(),
+                        style: Theme.of(context)
+                            .textTheme
+                            .body1
+                            .copyWith(color: Global().canvasColor),
                       ),
                     ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Row(
-                          children: <Widget>[
-                            Icon(
-                              Icons.favorite,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 3),
-                              child: Text(
-                                trainer.numberOfFollowers,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).primaryColor,
-                                    fontSize: 23),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Text(trainer.name,
-                            style: Theme.of(context).textTheme.title),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 5),
-                          child: Text(
-                            '${trainer.numberOfWorkouts} treningów',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.normal,
-                                fontSize: 18),
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
