@@ -12,23 +12,32 @@ class RecentWorkouts extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.35,
+      height: recentWorkouts.length > 1
+          ? MediaQuery.of(context).size.height * 0.35
+          : MediaQuery.of(context).size.height * 0.2,
       constraints: BoxConstraints(minHeight: 250),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          CustomTitle('Wybrane dla ciebie'),
+          recentWorkouts.length > 1
+              ? CustomTitle('Polecane dla ciebie')
+              : CustomTitle('Polecany dla ciebie'),
           Expanded(
-            child: ListView.separated(              
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              itemCount: recentWorkouts.length,
-              itemBuilder: (context, i) =>
-                  WorkoutCard(recentWorkouts[i], false),
-              separatorBuilder: (context, i) => SizedBox(
-                width: 10.0,
-              ),
-            ),
+            child: recentWorkouts.length > 1
+                ? ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    itemCount: recentWorkouts.length,
+                    itemBuilder: (context, i) =>
+                        WorkoutCard(recentWorkouts[i], false),
+                    separatorBuilder: (context, i) => SizedBox(
+                      width: 10.0,
+                    ),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: WorkoutCard(recentWorkouts[0], true),
+                  ),
           ),
         ],
       ),

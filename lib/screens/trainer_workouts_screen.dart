@@ -38,7 +38,9 @@ class _TrainerWorkoutsScreenState extends State<TrainerWorkoutsScreen> {
       workoutsProvider.currentTrainerId = _trainerId;
       trainer = Provider.of<TrainersProvider>(context, listen: false)
           .findById(_trainerId);
-      int userExperience = Provider.of<UsersProvider>(context, listen: false).userData.experienceLevel;
+      int userExperience = Provider.of<UsersProvider>(context, listen: false)
+          .userData
+          .experienceLevel;
 
       if (workoutsProvider.workouts == null ||
           workoutsProvider.fromSavedWorkouts) {
@@ -121,6 +123,13 @@ class _TrainerWorkoutsScreenState extends State<TrainerWorkoutsScreen> {
     if (_trainerId != null) {
       workouts = workoutsProvider.workouts;
       recommendedWorkouts = workoutsProvider.recommendedWorkouts;
+
+      if (workouts.isNotEmpty && recommendedWorkouts.isNotEmpty) {
+        recommendedWorkouts.forEach((recommendedWorkout) {
+          workouts
+              .removeWhere((workout) => workout.id == recommendedWorkout.id);
+        });
+      }
     }
 
     return Scaffold(
@@ -178,7 +187,9 @@ class _TrainerWorkoutsScreenState extends State<TrainerWorkoutsScreen> {
                               : Container();
                         } else if (index == 1) {
                           return workouts.isNotEmpty
-                              ? CustomTitle('Wszystkie treningi')
+                              ? CustomTitle(recommendedWorkouts.isNotEmpty
+                                  ? 'Inne'
+                                  : 'Wszystkie treningi')
                               : Center(
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(

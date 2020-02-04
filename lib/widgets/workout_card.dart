@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sqilly/globals.dart';
 
+import '../globals.dart';
+import '../widgets/badge.dart';
 import '../models/workout.dart';
 import '../screens/workout_overview_screen.dart';
 import '../widgets/difficulty_level.dart';
@@ -49,11 +50,11 @@ class WorkoutCard extends StatelessWidget {
                       workout.name,
                       style: Theme.of(context).textTheme.display1.copyWith(
                             color: Global().canvasColor,
-                            fontWeight: FontWeight.w500,   
-                            fontSize: isFullSize ? 20 : 17,                         
+                            fontWeight: FontWeight.w500,
+                            fontSize: isFullSize ? 20 : 17,
                           ),
-                          maxLines: isFullSize ? 1 : 2,
-                          overflow: TextOverflow.ellipsis,
+                      maxLines: isFullSize ? 1 : 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: 3.0),
                     DifficultyLevel(workout.difficulty),
@@ -62,32 +63,10 @@ class WorkoutCard extends StatelessWidget {
               ),
               Align(
                 alignment: Alignment.topLeft,
-                child: Container(                  
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 7.0, vertical: 7.0),
-                  decoration: BoxDecoration(
-                    color: Color.fromRGBO(26, 26, 26, 0.7),
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Icon(
-                        Icons.access_time,
-                        color: Global().canvasColor,
-                        size: 15,
-                      ),
-                      SizedBox(width: 5.0),
-                      Text(
-                        '${workout.duration} min',
-                        style: Theme.of(context).textTheme.overline.copyWith(
-                              color: Global().canvasColor,
-                              fontWeight: FontWeight.normal,
-                              fontSize: 12,
-                            ),
-                      )
-                    ],
-                  ),
+                child: Badge(
+                  text: '${workout.duration} min',
+                  icon: Icons.access_time,
+                  withIcon: true,
                 ),
               ),
             ],

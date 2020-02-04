@@ -29,20 +29,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   List<String> _questions = [
     'Płeć',
-    'Jaki jest Twój cel treningowy ?',
+    // 'Jaki jest Twój cel treningowy ?',
+    'Jakie treningi preferujesz ?',
     'Jak oceniasz swój poziom zaawansowania ?',
     'Wprowadź swoje dane',
   ];
-  List<String> _trainingGoals = [
-    'Budowanie masy mięśniowej',
-    'Redukacja tkanki tłuszczowej',
-    'Zwiększenie siły',
-    'Nauka technik',
-  ];
+  // List<String> _trainingGoals = [
+  //   'Budowanie masy mięśniowej',
+  //   'Redukacja tkanki tłuszczowej',
+  //   'Zwiększenie siły',
+  //   'Nauka technik',
+  // ];
   List<String> _experienceLevels = [
     'Początkujący',
     'Średniozaawansowany',
     'Zaawansowany',
+  ];
+  List<String> _trainingTypes = [
+    'Na siłowni',
+    'Z masą własnego ciała',
+    'Połączenie jednego i drugiego',
   ];
 
   void signUp() async {
@@ -60,6 +66,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _choosedOptions[0],
       _choosedOptions[1],
       _choosedOptions[2],
+      // _choosedOptions[3],
     );
 
     setState(() => _isLoading = false);
@@ -161,7 +168,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
   }
 
-  void setGoal(int choice) {
+  // void setGoal(int choice) {
+  //   setState(() {
+  //     _choosedOptions[1] = choice;
+  //   });
+  // }
+
+  void setTrainingType(int choice) {
     setState(() {
       _choosedOptions[1] = choice;
     });
@@ -186,8 +199,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     List<Widget> _views = [
-      chooseGenderView(context),
-      chooseGoalView(context),
+      chooseGenderView(context),      
+      chooseTrainingTypeView(context),
       experienceLevelView(context),
       insertDataView(context),
     ];
@@ -264,7 +277,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     _currentView >= 0,
                                     _currentView >= 1,
                                     _currentView >= 2,
-                                    _currentView >= 3
+                                    _currentView >= 3,
+                                    _currentView >= 4,
                                   ],
                                 ),
                                 Container(
@@ -351,13 +365,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget chooseGoalView(context) {
+  // Widget chooseGoalView(context) {
+  //   return Column(
+  //     mainAxisAlignment: MainAxisAlignment.center,
+  //     children: _trainingGoals.map((element) {
+  //       var index = _trainingGoals.indexOf(element);
+  //       return GestureDetector(
+  //         onTap: () => setGoal(index),
+  //         child: optionItem(
+  //           context,
+  //           element,
+  //           index == _choosedOptions[1],
+  //         ),
+  //       );
+  //     }).toList(),
+  //   );
+  // }
+
+  Widget chooseTrainingTypeView(context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: _trainingGoals.map((element) {
-        var index = _trainingGoals.indexOf(element);
+      children: _trainingTypes.map((element) {
+        var index = _trainingTypes.indexOf(element);
         return GestureDetector(
-          onTap: () => setGoal(index),
+          onTap: () => setTrainingType(index),
           child: optionItem(
             context,
             element,
@@ -393,7 +424,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       decoration: BoxDecoration(
         border: Border.all(
           width: isChosen ? 5.0 : 2.0,
-          color: isChosen ? Theme.of(context).accentColor : Colors.white,
+          color: isChosen ? Theme.of(context).accentColor : Global().canvasColor,
         ),
         borderRadius: BorderRadius.circular(10.0),
       ),
@@ -401,7 +432,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         child: Text(
           text,
           style: Theme.of(context).textTheme.body1.copyWith(
-                color: isChosen ? Theme.of(context).accentColor : Colors.white,
+                color: isChosen ? Theme.of(context).accentColor : Global().canvasColor,
                 fontWeight: FontWeight.bold,
               ),
         ),
@@ -417,7 +448,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       decoration: BoxDecoration(
         border: Border.all(
           width: isChosen ? 5.0 : 2.0,
-          color: isChosen ? Theme.of(context).accentColor : Colors.white,
+          color: isChosen ? Theme.of(context).accentColor : Global().canvasColor,
         ),
         borderRadius: BorderRadius.circular(10.0),
       ),
@@ -425,7 +456,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         child: Text(
           title,
           style: Theme.of(context).textTheme.body1.copyWith(
-                color: isChosen ? Theme.of(context).accentColor : Colors.white,
+                color: isChosen ? Theme.of(context).accentColor : Global().canvasColor,
                 fontWeight: FontWeight.bold,
               ),
         ),
@@ -445,7 +476,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color:
-                isChecked[index] ? Theme.of(context).accentColor : Colors.white,
+                isChecked[index] ? Theme.of(context).accentColor : Global().canvasColor,
           ),
         );
       }).toList(),

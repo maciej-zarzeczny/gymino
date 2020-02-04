@@ -31,17 +31,16 @@ class UsersProvider with ChangeNotifier {
   }
 
   Future<void> updateUserData(String uid, String name, int gender,
-      int trainingGoal, int experienceLevel, bool isPremium) async {
+      int trainingType, int experienceLevel) async {
     this.uid = uid;
 
     print('Write: 1');
 
     return await _db.collection('users').document(uid).setData({
       'name': name,
-      'gender': gender,
-      'trainingGoal': trainingGoal,
+      'gender': gender,      
+      'trainingType': trainingType,
       'experienceLevel': experienceLevel,
-      'isPremium': isPremium,
       'savedWorkouts': {},
     });
   }
@@ -53,8 +52,8 @@ class UsersProvider with ChangeNotifier {
     _userData = UserData.fromSnapshot(result);
   }
 
-  Future<void> addWorkoutToFavourites(String id, int difficulty,
-      int duration, String name, String imageUrl, String trainerId) async {
+  Future<void> addWorkoutToFavourites(String id, int difficulty, int duration,
+      String name, String imageUrl, String trainerId) async {
     Map<dynamic, dynamic> newWorkout = new Map();
     newWorkout['name'] = name;
     newWorkout['duration'] = duration;
@@ -91,18 +90,18 @@ class UsersProvider with ChangeNotifier {
         .collection('users')
         .document(uid)
         .collection('finishedWorkouts')
-        .orderBy('date', descending: true)        
+        .orderBy('date', descending: true)
         .limit(_finishedWorkoutsLimit)
         .getDocuments();
 
     if (results.documents.length > 0) {
-      print ('Read: ${results.documents.length}');
+      print('Read: ${results.documents.length}');
       _lastFinishedWorkout = results.documents[results.documents.length - 1];
       _finishedWorkouts = results.documents.map((finishedWorkout) {
         return FinishedWorkout.fromSnapshot(finishedWorkout);
       }).toList();
     }
-    
+
     if (results.documents.length < _finishedWorkoutsLimit) {
       _allFinishedWorkoutsLoaded = true;
     }
@@ -115,8 +114,8 @@ class UsersProvider with ChangeNotifier {
         .collection('users')
         .document(uid)
         .collection('finishedWorkouts')
-        .orderBy('date', descending: true)  
-        .startAfterDocument(_lastFinishedWorkout)      
+        .orderBy('date', descending: true)
+        .startAfterDocument(_lastFinishedWorkout)
         .limit(_finishedWorkoutsLimit)
         .getDocuments();
 
@@ -136,24 +135,31 @@ class UsersProvider with ChangeNotifier {
   }
 
   // Function for saving current workout to database as finished workout
-  Future<void> saveWorkoutToDb(String name, String imageUrl,
-      List<dynamic> exercises) async {
+  Future<void> saveWorkoutToDb(
+      String name, String imageUrl, List<dynamic> exercises) async {
     FinishedWorkout _finishedWorkout = new FinishedWorkout(
       name: name,
-      date: Timestamp.now(),      
+      date: Timestamp.now(),
       imageUrl: imageUrl,
       exercises: exercises,
     );
 
     print('Update: 1');
-    print('Write: 1'); 
-       
+    print('Write: 1');
+
     _finishedWorkouts.insert(0, _finishedWorkout);
     if (_finishedWorkouts.length < _finishedWorkoutsLimit) {
       _lastFinishedWorkoutInserted = true;
     }
     _userData.finishedWorkouts += 1;
-    await _db.collection('users').document(uid).updateData({'finishedWorkouts' : _userData.finishedWorkouts});
-    return await _db.collection('users').document(uid).collection('finishedWorkouts').add(_finishedWorkout.toJson());
+    await _db
+        .collection('users')
+        .document(uid)
+        .updateData({'finishedWorkouts': _userData.finishedWorkouts});
+    return await _db
+        .collection('users')
+        .document(uid)
+        .collection('finishedWorkouts')
+        .add(_finishedWorkout.toJson());
   }
 }

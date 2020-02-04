@@ -1,13 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 
 class Trainer {
   final String id;
   final String name;
-  final String imageUrl;
-  final String numberOfFollowers;
+  final String imageUrl;  
   final int numberOfWorkouts;
-  final List<dynamic> keywords;
+  final bool calisthenics;
+  final bool gym;  
   final List<dynamic> supplements;
   final int age;
   final int height;
@@ -16,11 +15,11 @@ class Trainer {
 
   Trainer({
     this.id,
-    @required this.name,
-    @required this.imageUrl,
-    @required this.numberOfFollowers,
+    this.name,
+    this.imageUrl,    
     this.numberOfWorkouts,
-    this.keywords,
+    this.calisthenics,
+    this.gym,
     this.supplements,
     this.age,
     this.height,
@@ -29,23 +28,15 @@ class Trainer {
   });
 
   factory Trainer.fromSnapshot(DocumentSnapshot doc) {
-    Map data = doc.data;
-
-    String followersToString(int number) {
-      if (number >= 1000) {
-        return '${(number / 1000).round()} K';
-      } else {
-        return number.toString();
-      }
-    }
+    Map data = doc.data;    
 
     return Trainer(
       id: doc.documentID ?? '',
       name: data['name'] ?? '',
-      imageUrl: data['image_url'] ?? '',
-      numberOfFollowers: followersToString(data['number_of_followers']) ?? followersToString(0),
+      imageUrl: data['image_url'] ?? '',      
       numberOfWorkouts: data['numberOfWorkouts'] ?? 0,
-      keywords: data['keywords'] ?? [],
+      calisthenics: data['calisthenics'] ?? false,
+      gym: data['gym'] ?? false,
       supplements: data['supplements'] ?? [],
       age: data['age'] ?? 0,
       height: data['height'] ?? 0,

@@ -1,53 +1,55 @@
 import 'package:flutter/material.dart';
 
+import '../globals.dart';
+
 class Badge extends StatelessWidget {
-  final String badgeText;
+  final String text;
+  final IconData icon;
   final bool withIcon;
 
-  Badge(this.badgeText, this.withIcon);
+  Badge({
+    this.text,
+    this.icon,
+    this.withIcon,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(7.0),
-      margin: const EdgeInsets.all(15.0),
+      padding: const EdgeInsets.symmetric(horizontal: 7.0, vertical: 7.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).primaryColor,
-        borderRadius: BorderRadius.circular(10.0),
+        color: Color.fromRGBO(26, 26, 26, 0.7),
+        borderRadius: BorderRadius.circular(8.0),
       ),
-      constraints: withIcon ? BoxConstraints(maxWidth: 80) : BoxConstraints(minWidth: 100),
-      child: withIcon
-          ? Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                Icon(
-                  Icons.favorite,
-                  color: Colors.white,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          withIcon
+              ? Icon(
+                  icon,
+                  color: Global().canvasColor,
                   size: 15,
+                )
+              : SizedBox(
+                  width: 0,
+                  height: 0,
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 3.0),
-                  child: Text(
-                    badgeText,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
+          withIcon
+              ? SizedBox(width: 5.0)
+              : SizedBox(
+                  width: 0,
+                  height: 0,
                 ),
-              ],
-            )
-          : Text(
-              badgeText,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
+          Text(
+            text,
+            style: Theme.of(context).textTheme.overline.copyWith(
+                  color: Global().canvasColor,
+                  fontWeight: FontWeight.normal,
+                  fontSize: 12,
+                ),
+          )
+        ],
+      ),
     );
   }
 }

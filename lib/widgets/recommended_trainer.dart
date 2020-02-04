@@ -5,6 +5,7 @@ import '../size_config.dart';
 import '../globals.dart';
 import '../models/trainer.dart';
 import '../screens/trainer_workouts_screen.dart';
+import '../widgets/badge.dart';
 
 class RecommendedTrainer extends StatelessWidget {
   final Trainer recommendedTrainer;
@@ -14,7 +15,7 @@ class RecommendedTrainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    
+
     return GestureDetector(
       onTap: () {
         Navigator.of(context).pushNamed(TrainerWorkoutsScreen.routeName,
@@ -33,6 +34,7 @@ class RecommendedTrainer extends StatelessWidget {
         ),
         child: Padding(
           padding: const EdgeInsets.all(20.0),
+          
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.end,
@@ -43,35 +45,24 @@ class RecommendedTrainer extends StatelessWidget {
                     .textTheme
                     .display1
                     .copyWith(color: Global().canvasColor, fontWeight: FontWeight.w500),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,                    
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
               ),
-              SizedBox(height: 5.0),
-              Row(
-                children: <Widget>[
-                  Icon(
-                    Icons.people,
-                    color: Global().canvasColor,
-                    size: SizeConfig.safeBlockHorizontal * 5,
-                  ),
-                  SizedBox(width: 5),
-                  Text(
-                    recommendedTrainer.numberOfFollowers,
-                    style: Theme.of(context).textTheme.body1.copyWith(color: Global().canvasColor, fontSize: SizeConfig.safeBlockHorizontal * 4),
-                  ),
-                  SizedBox(width: 10.0),
-                  Icon(
-                    Icons.fitness_center,
-                    color: Global().canvasColor,
-                    size: SizeConfig.safeBlockHorizontal * 5,
-                  ),
-                  SizedBox(width: 5.0),
-                  Text(
-                    recommendedTrainer.numberOfWorkouts.toString(),
-                    style: Theme.of(context).textTheme.body1.copyWith(color: Global().canvasColor, fontSize: SizeConfig.safeBlockHorizontal * 4),
-                  ),
-                ],
+          SizedBox(height: 5.0),
+          Row(
+            children: <Widget>[
+              Icon(
+                Icons.fitness_center,
+                color: Global().canvasColor,
+                size: SizeConfig.safeBlockHorizontal * 5,
               ),
+              SizedBox(width: 5.0),
+              Text(
+                recommendedTrainer.numberOfWorkouts.toString(),
+                style: Theme.of(context).textTheme.body1.copyWith(color: Global().canvasColor, fontSize: SizeConfig.safeBlockHorizontal * 4),
+              ),
+            ],
+          ),
             ],
           ),
         ),

@@ -5,18 +5,24 @@ import '../models/trainer.dart';
 
 class TrainersProvider with ChangeNotifier {
   final Firestore _db = Firestore.instance;
-  final int _trainersLimit = 5;
+  final int _trainersLimit = 6;
+  final int _recommendedTrainersLimit = 3;
 
-  bool _allTrainersLoaded = false;  
+  bool _allTrainersLoaded = false;
   DocumentSnapshot _lastTrainer;
 
   List<Trainer> _loadedTrainers = [];
-  List<Trainer> _trainers = [];  
+  List<Trainer> _trainers = [];
+  List<Trainer> _recommendedTrainers = [];
 
   String _trainerId;
 
   List<Trainer> get trainers {
     return [..._trainers];
+  }
+
+  List<Trainer> get recommendedTrainers {
+    return [..._recommendedTrainers];
   }
 
   bool get allTrainersLoaded {
@@ -27,48 +33,72 @@ class TrainersProvider with ChangeNotifier {
     return _trainerId;
   }
 
-  // TODO: Chnage algorythm
-  List<Trainer> get popularTrainers {
-    return _trainers.length < 4
-        ? null
-        : [_trainers[1], _trainers[2], _trainers[3]];
-  }
-
-  Trainer get topTrainer {
-    return _trainers.isEmpty ? null : _trainers.first;
-  }
-
   Trainer findById(String id) {
     return _trainers.firstWhere((trainer) => trainer.id == id);
   }
 
-  Future<void> fetchTrainers() async {
-    var result = await _db
+  Future<void> fetchTrainers(int trainingType, int gender) async {
+    bool gym = false;
+    bool calisthenics = false;
+    switch (trainingType) {
+      case 0:
+        gym = true;
+        calisthenics = false;
+        break;
+
+      case 1:
+        gym = false;
+        calisthenics = true;
+        break;
+
+      case 2:
+        gym = true;
+        calisthenics = true;
+        break;
+    }    
+
+    QuerySnapshot topResults = await _db
         .collection('trainers')
-        .orderBy('number_of_followers', descending: true)
+        .where('gym', isEqualTo: gym)
+        .where('calisthenics', isEqualTo: calisthenics)
+        .where('gender', isEqualTo: gender)
+        .orderBy('numberOfWorkouts', descending: true)
+        .limit(_recommendedTrainersLimit)
+        .getDocuments();
+
+    if (topResults.documents.length > 0) {
+      print('Read: ${topResults.documents.length}');
+      _recommendedTrainers = topResults.documents.map((trainer) {
+        return Trainer.fromSnapshot(trainer);
+      }).toList();
+    }    
+
+    QuerySnapshot result = await _db
+        .collection('trainers')        
+        .orderBy('numberOfWorkouts', descending: true)             
         .limit(_trainersLimit)
         .getDocuments();
 
     if (result.documents.length > 0) {
-      print(result.documents.length);
+      print('Read: ${result.documents.length}');
       _lastTrainer = result.documents[result.documents.length - 1];
       _loadedTrainers = result.documents
           .map((trainer) => Trainer.fromSnapshot(trainer))
           .toList();
-
+      
       _trainers = _loadedTrainers;
     }
     if (result.documents.length < _trainersLimit) {
       _allTrainersLoaded = true;
     }
-
+    
     notifyListeners();
   }
 
   Future<void> fetchMoreTrainers() async {
     var result = await _db
         .collection('trainers')
-        .orderBy('number_of_followers', descending: true)
+        .orderBy('numberOfWorkouts', descending: true)
         .limit(_trainersLimit)
         .startAfterDocument(_lastTrainer)
         .getDocuments();

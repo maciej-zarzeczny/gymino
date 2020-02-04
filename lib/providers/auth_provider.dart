@@ -51,12 +51,12 @@ class AuthProvider {
   }
 
   // Registering new user
-  Future registerWithEmailAndPassword(String email, String password, String name, int gender, int trainingGoal, int experienceLevel) async {
+  Future registerWithEmailAndPassword(String email, String password, String name, int gender, int trainingType, int experienceLevel) async {
     try {
       AuthResult result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
       FirebaseUser user = result.user;
       // create a new document for the user with the uid
-      await UsersProvider().updateUserData(user.uid, name, gender, trainingGoal, experienceLevel, false);
+      await UsersProvider().updateUserData(user.uid, name, gender, trainingType, experienceLevel);
       return _userFromFirebaseUser(user);
     } catch (error) {         
       return error.code;
@@ -81,5 +81,9 @@ class AuthProvider {
       print(error.toString());
       return null;
     }
+  }
+
+  Future<FirebaseUser> getSignedInUser() async {
+    return await _auth.currentUser();
   }
 }

@@ -43,17 +43,7 @@ class TopTrainer extends StatelessWidget {
               ),
               SizedBox(height: 5.0),
               Row(
-                children: <Widget>[
-                  Icon(
-                    Icons.people,
-                    color: Global().canvasColor,
-                  ),
-                  SizedBox(width: 5.0),
-                  Text(
-                    topTrainer.numberOfFollowers,
-                    style: Theme.of(context).textTheme.body1.copyWith(color: Global().canvasColor),
-                  ),
-                  SizedBox(width: 20.0),
+                children: <Widget>[                  
                   Icon(
                     Icons.fitness_center,
                     color: Global().canvasColor,

@@ -85,7 +85,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
 
   Widget header(context, Trainer trainer) {
     final _appBar = AppBar(
-      backgroundColor: Colors.transparent,      
+      backgroundColor: Colors.transparent,
     );
 
     return Container(
@@ -124,9 +124,12 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
                   ),
                   SizedBox(height: 5.0),
                   Row(
-                    children: trainer.keywords.map((keyword) {
-                      return Keyword(keyword, false);
-                    }).toList(),
+                    children: <Widget>[
+                      _trainer.calisthenics
+                          ? Keyword('Kalistenika', false)
+                          : Container(),
+                      _trainer.gym ? Keyword('Siłownia', false) : Container(),
+                    ],
                   ),
                 ],
               ),

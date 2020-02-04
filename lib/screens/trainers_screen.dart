@@ -4,11 +4,12 @@ import 'package:provider/provider.dart';
 import '../globals.dart';
 import '../providers/trainers_provider.dart';
 import '../widgets/no_data.dart';
-import '../widgets/top_trainer.dart';
-import '../widgets/popular_trainers.dart';
+import '../widgets/recommended_trainers.dart';
 import '../widgets/trainer_pick.dart';
 import '../widgets/more_loading_indicator.dart';
 import '../widgets/custom_title.dart';
+import '../providers/users_provider.dart';
+import '../models/user.dart';
 
 class TrainersScreen extends StatefulWidget {
   @override
@@ -18,6 +19,8 @@ class TrainersScreen extends StatefulWidget {
 class _TrainersScreenState extends State<TrainersScreen> {
   var _isLoading = true;
   var _moreLoading = false;
+  int _trainingType;
+  int _gender;
   ScrollController _scrollController = ScrollController();
 
   @override
@@ -25,11 +28,25 @@ class _TrainersScreenState extends State<TrainersScreen> {
     Future.microtask(() {
       var trainersProvider =
           Provider.of<TrainersProvider>(context, listen: false);
-      if (trainersProvider.trainers.isEmpty) {
-        trainersProvider.fetchTrainers().then((_) {
-          setState(() {
-            _isLoading = false;
-          });
+      User user = Provider.of<User>(context, listen: false);
+      UsersProvider usersProvider =
+          Provider.of<UsersProvider>(context, listen: false);
+      if (usersProvider.userData == null ||
+          usersProvider.userData.uid != user.uid) {
+        usersProvider.getUserData(user.uid).then((_) {
+          _trainingType = usersProvider.userData.trainingType;
+          _gender = usersProvider.userData.gender;
+          if (trainersProvider.trainers.isEmpty) {
+            trainersProvider.fetchTrainers(_trainingType, _gender).then((_) {
+              setState(() {
+                _isLoading = false;
+              });
+            });
+          } else {
+            setState(() {
+              _isLoading = false;
+            });
+          }
         });
       } else {
         setState(() {
@@ -78,17 +95,21 @@ class _TrainersScreenState extends State<TrainersScreen> {
   Widget build(BuildContext context) {
     final trainersProvider = Provider.of<TrainersProvider>(context);
     final trainers = trainersProvider.trainers;
-    final topTrainer = trainersProvider.topTrainer;
-    final popularTrainers = trainersProvider.popularTrainers;
-    trainers.remove(topTrainer);
-    // trainers.shuffle();
+    final recommendedTrainers = trainersProvider.recommendedTrainers;
+
+    if (trainers.isNotEmpty && recommendedTrainers.isNotEmpty) {
+      recommendedTrainers.forEach((recommendedTrainer) {
+        trainers.removeWhere((trainer) => trainer.id == recommendedTrainer.id);
+      });
+    }    
 
     final mediaQuery = MediaQuery.of(context);
 
     return _isLoading
         ? Global().loadingIndicator(context)
         : trainers.isEmpty
-            ? NoData('Brak dostępnych trenerów', trainersProvider.fetchTrainers)
+            ? NoData('Brak dostępnych trenerów',
+                () => trainersProvider.fetchTrainers(_trainingType, _gender))
             : Container(
                 height: mediaQuery.size.height - mediaQuery.padding.top,
                 margin: EdgeInsets.only(top: mediaQuery.padding.top),
@@ -101,21 +122,11 @@ class _TrainersScreenState extends State<TrainersScreen> {
                     if (i == 0) {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[                          
-                          topTrainer == null
+                        children: <Widget>[
+                          recommendedTrainers.isEmpty
                               ? Container()
-                              : Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  CustomTitle('Najczęściej wybierany'),
-                                  TopTrainer(topTrainer),
-                                ],
-                              ),
-                          popularTrainers == null
-                              ? Container()
-                              : PopularTrainers(popularTrainers), 
-                          CustomTitle('Wszyscy'),                         
+                              : RecommendedTrainers(recommendedTrainers),
+                          recommendedTrainers.isEmpty ? CustomTitle('Wszyscy trenerzy') : CustomTitle('Inni'),
                         ],
                       );
                     } else if (i == trainers.length + 1) {

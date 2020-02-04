@@ -41,8 +41,8 @@ class WorkoutsProvider with ChangeNotifier {
   }
 
   List<Workout> get recommendedWorkouts {    
-    if (_workoutsMap[_trainerId].length > 1) {
-      return _recommendedWorkouts[_trainerId].length != null ? _recommendedWorkouts[_trainerId] : [];
+    if (_workoutsMap[_trainerId].length > 1 && _recommendedWorkouts[_trainerId] != null) {
+      return _recommendedWorkouts[_trainerId];
     } else {
       return [];
     }

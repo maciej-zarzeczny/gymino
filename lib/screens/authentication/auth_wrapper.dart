@@ -11,16 +11,11 @@ class AuthWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<User>(context);
-    final usersProvider = Provider.of<UsersProvider>(context, listen: false);
+    final user = Provider.of<User>(context);    
 
     if (user == null) {      
       return LoginScreen();
-    } else {
-      if (usersProvider.userData == null ||
-          usersProvider.userData.uid != user.uid) {            
-        usersProvider.getUserData(user.uid);        
-      }
+    } else {      
       return HomeScreen();
     }
   }
