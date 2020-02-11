@@ -13,47 +13,54 @@ class UsersProvider with ChangeNotifier {
   DocumentSnapshot _lastFinishedWorkout;
   bool _allFinishedWorkoutsLoaded;
   bool _lastFinishedWorkoutInserted = false;
+  bool userDataChanged = false;
 
-  get finishedWorkouts {
+  List<FinishedWorkout> get finishedWorkouts {
     return [..._finishedWorkouts];
   }
 
-  get lastFinishedWorkoudInserted {
+  bool get lastFinishedWorkoudInserted {
     return _lastFinishedWorkoutInserted;
   }
 
-  get userData {
+  UserData get userData {
     return _userData;
   }
 
-  get allFinishedWorkotusLoaded {
+  bool get allFinishedWorkotusLoaded {
     return _allFinishedWorkoutsLoaded;
   }
 
-  Future<void> updateUserData(String uid, String name, int gender,
-      int trainingType, int experienceLevel) async {
+  Future<void> createUserData(String uid, String name, int gender, int trainingType, int experienceLevel) async {
     this.uid = uid;
 
     print('Write: 1');
 
     return await _db.collection('users').document(uid).setData({
       'name': name,
-      'gender': gender,      
+      'gender': gender,
       'trainingType': trainingType,
       'experienceLevel': experienceLevel,
       'savedWorkouts': {},
     });
   }
 
-  Future<void> getUserData(String uid) async {
-    this.uid = uid;
-    var result = await _db.collection('users').document(uid).get();
-    print('Read: 1');
-    _userData = UserData.fromSnapshot(result);
+  Future<void> updateUserData(UserData userData) async {
+    print('Update: 1');
+    userDataChanged = true;
+    return await _db.collection('users').document(uid).updateData(userData.toJson());
   }
 
-  Future<void> addWorkoutToFavourites(String id, int difficulty, int duration,
-      String name, String imageUrl, String trainerId) async {
+  Future<void> getUserData(String uid) async {
+    if (_userData == null || _userData.uid != uid || userDataChanged) {
+      this.uid = uid;
+      var result = await _db.collection('users').document(uid).get();
+      print('Read: 1');
+      _userData = UserData.fromSnapshot(result);
+    }
+  }
+
+  Future<void> addWorkoutToFavourites(String id, int difficulty, int duration, String name, String imageUrl, String trainerId) async {
     Map<dynamic, dynamic> newWorkout = new Map();
     newWorkout['name'] = name;
     newWorkout['duration'] = duration;
@@ -66,10 +73,7 @@ class UsersProvider with ChangeNotifier {
 
     print('Update: 1');
 
-    return await _db
-        .collection('users')
-        .document(uid)
-        .updateData({'savedWorkouts': _userData.savedWorkouts});
+    return await _db.collection('users').document(uid).updateData({'savedWorkouts': _userData.savedWorkouts});
   }
 
   Future<void> removeWorkoutFromFavourites(String id) async {
@@ -78,10 +82,7 @@ class UsersProvider with ChangeNotifier {
 
     print('Update: 1');
 
-    return await _db
-        .collection('users')
-        .document(uid)
-        .updateData({'savedWorkouts.$id': FieldValue.delete()});
+    return await _db.collection('users').document(uid).updateData({'savedWorkouts.$id': FieldValue.delete()});
   }
 
   Future<void> fetchFinishedWorkouts() async {
@@ -135,8 +136,7 @@ class UsersProvider with ChangeNotifier {
   }
 
   // Function for saving current workout to database as finished workout
-  Future<void> saveWorkoutToDb(
-      String name, String imageUrl, List<dynamic> exercises) async {
+  Future<void> saveWorkoutToDb(String name, String imageUrl, List<dynamic> exercises) async {
     FinishedWorkout _finishedWorkout = new FinishedWorkout(
       name: name,
       date: Timestamp.now(),
@@ -152,14 +152,7 @@ class UsersProvider with ChangeNotifier {
       _lastFinishedWorkoutInserted = true;
     }
     _userData.finishedWorkouts += 1;
-    await _db
-        .collection('users')
-        .document(uid)
-        .updateData({'finishedWorkouts': _userData.finishedWorkouts});
-    return await _db
-        .collection('users')
-        .document(uid)
-        .collection('finishedWorkouts')
-        .add(_finishedWorkout.toJson());
+    await _db.collection('users').document(uid).updateData({'finishedWorkouts': _userData.finishedWorkouts});
+    return await _db.collection('users').document(uid).collection('finishedWorkouts').add(_finishedWorkout.toJson());
   }
 }

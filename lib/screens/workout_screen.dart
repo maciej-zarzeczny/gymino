@@ -37,8 +37,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   @override
   void initState() {
     Future.microtask(() {
-      final args =
-          ModalRoute.of(context).settings.arguments as Map<String, dynamic>;
+      final args = ModalRoute.of(context).settings.arguments as Map<String, dynamic>;
       _usersProvider = Provider.of<UsersProvider>(context, listen: false);
       setState(() {
         _exercises = args['exercises'];
@@ -55,13 +54,9 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   void setDone() {
     FocusScope.of(context).requestFocus(new FocusNode());
     if (_currentSet == 1) {
-      _doneExercises
-          .add({'name': _exercises[_currentExerciseIndex].name, 'sets': []});
+      _doneExercises.add({'name': _exercises[_currentExerciseIndex].name, 'sets': []});
     }
-    Map<dynamic, dynamic> _set = {
-      'reps': _currentReps,
-      'weight': double.parse(weightInputController.text.trim())
-    };
+    Map<dynamic, dynamic> _set = {'reps': _currentReps, 'weight': double.parse(weightInputController.text.trim())};
     _doneExercises[_currentExerciseIndex]['sets'].add(_set);
 
     weightInputController.text = '0';
@@ -94,8 +89,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   }
 
   Future<void> _finishWorkout() async {
-    return await _usersProvider.saveWorkoutToDb(
-        _workoutName, _workoutImageUrl, _doneExercises);
+    return await _usersProvider.saveWorkoutToDb(_workoutName, _workoutImageUrl, _doneExercises);
   }
 
   void startRest(int time) {
@@ -245,8 +239,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: <Widget>[
                                 topHeader(),
-                                exerciseTitle(_currentExercise.name,
-                                    _currentSet, _setsNumber),
+                                exerciseTitle(_currentExercise.name, _currentSet, _setsNumber),
                                 repsCounter(_currentReps, _repsNumber),
                                 weightCounter(),
                                 nextButton(),
@@ -330,8 +323,10 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10.0),
                   ),
-                  child: Text('-30 s',
-                      style: Theme.of(context).textTheme.display1),
+                  child: Text(
+                    '-30 s',
+                    style: Theme.of(context).textTheme.display1.copyWith(fontWeight: FontWeight.normal),
+                  ),
                 ),
               ),
             ),
@@ -340,14 +335,10 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
         CircularPercentIndicator(
           radius: SizeConfig.blockSizeHorizontal * 50.0,
           lineWidth: 13.0,
-          percent:
-              _rest ? _timerDuration / _restDuration : currentReps / repsNumber,
+          percent: _rest ? _timerDuration / _restDuration : currentReps / repsNumber,
           center: Text(
             _rest ? parseDuration(_timerDuration) : '$currentReps/$repsNumber',
-            style: Theme.of(context)
-                .textTheme
-                .display2
-                .copyWith(fontSize: SizeConfig.safeBlockHorizontal * 10.0),
+            style: Theme.of(context).textTheme.display2.copyWith(fontSize: SizeConfig.safeBlockHorizontal * 10.0),
           ),
           progressColor: Theme.of(context).accentColor,
           backgroundColor: Colors.white,
@@ -383,8 +374,10 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10.0),
                   ),
-                  child: Text('+30 s',
-                      style: Theme.of(context).textTheme.display1),
+                  child: Text(
+                    '+30 s',
+                    style: Theme.of(context).textTheme.display1.copyWith(fontWeight: FontWeight.normal),
+                  ),
                 ),
               ),
             ),
@@ -402,7 +395,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
         children: <Widget>[
           Text(
             'Obciążenie',
-            style: Theme.of(context).textTheme.overline.copyWith(
+            style: Theme.of(context).textTheme.body1.copyWith(
                   color: Global().canvasColor,
                   fontSize: SizeConfig.safeBlockHorizontal * 3.0,
                 ),
@@ -436,8 +429,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                       fontSize: SizeConfig.safeBlockHorizontal * 7.0,
                       color: Theme.of(context).primaryColor,
                     ),
-                    keyboardType:
-                        TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: TextInputType.numberWithOptions(decimal: true),
                   ),
                 ),
                 Text(
@@ -457,13 +449,12 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 
   Widget nextButton() {
     return Padding(
-      padding:
-          EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 10.0),
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 10.0),
       child: Column(
         children: <Widget>[
           Text(
             nextExercise(),
-            style: Theme.of(context).textTheme.overline.copyWith(
+            style: Theme.of(context).textTheme.body1.copyWith(
                   color: Global().canvasColor,
                   fontSize: SizeConfig.safeBlockHorizontal * 3.0,
                 ),

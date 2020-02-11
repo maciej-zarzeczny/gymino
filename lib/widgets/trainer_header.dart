@@ -47,6 +47,8 @@ class TrainerHeader extends StatelessWidget {
                   Text(
                     trainer.name,
                     style: Theme.of(context).textTheme.display2,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 5.0),
                   Row(

@@ -52,6 +52,9 @@ class MyApp extends StatelessWidget {
           primarySwatch: MaterialColor(0xFF1A1A1A, Global().primaryColor),
           accentColor: Color.fromRGBO(224, 22, 22, 1),
           fontFamily: 'SF-Pro-Display',
+          iconTheme: IconThemeData(
+            color: Color.fromRGBO(26, 26, 26, 1.0),
+          ),
           // fontFamily: 'Roboto',
           textTheme: TextTheme(
             title: TextStyle(
@@ -98,6 +101,9 @@ class MyApp extends StatelessWidget {
           accentColor: Color.fromRGBO(224, 22, 22, 1),
           fontFamily: 'SF-Pro-Display',
           canvasColor: Color.fromRGBO(26, 26, 26, 1.0),
+          iconTheme: IconThemeData(
+            color: Global().canvasColor,
+          ),
           textTheme: TextTheme(
             title: TextStyle(
               color: Global().canvasColor,

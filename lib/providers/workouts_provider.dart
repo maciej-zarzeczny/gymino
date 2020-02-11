@@ -14,7 +14,7 @@ class WorkoutsProvider with ChangeNotifier {
   bool _fromSavedWorkouts = false;
 
   List<Workout> _loadedWorkouts = [];
-  Map<String, List<Workout>> _workoutsMap = new Map();
+  Map<String, List<Workout>> _workouts = new Map();
   Map<String, List<Workout>> _recommendedWorkouts = new Map();
   List<ExerciseData> _exerciseData = [];
 
@@ -28,6 +28,10 @@ class WorkoutsProvider with ChangeNotifier {
     _fromSavedWorkouts = value;
   }
 
+  void removeRecommendedWorkouts() {
+    _recommendedWorkouts[_trainerId] = [];
+  }
+
   bool get fromSavedWorkouts {
     return _fromSavedWorkouts;
   }
@@ -37,11 +41,11 @@ class WorkoutsProvider with ChangeNotifier {
   }
 
   List<Workout> get workouts {
-    return _workoutsMap[_trainerId];
+    return _workouts[_trainerId];
   }
 
-  List<Workout> get recommendedWorkouts {    
-    if (_workoutsMap[_trainerId].length > 1 && _recommendedWorkouts[_trainerId] != null) {
+  List<Workout> get recommendedWorkouts {
+    if (_recommendedWorkouts[_trainerId] != null) {
       return _recommendedWorkouts[_trainerId];
     } else {
       return [];
@@ -49,7 +53,7 @@ class WorkoutsProvider with ChangeNotifier {
   }
 
   int get numberOfWorkouts {
-    return _workoutsMap[_trainerId].length;
+    return _workouts[_trainerId].length;
   }
 
   bool get allWorkoutsLoaded {
@@ -58,11 +62,25 @@ class WorkoutsProvider with ChangeNotifier {
 
   Workout findById(String id) {
     Workout workout;
+    bool error = false;
     try {
-      workout =
-          _workoutsMap[_trainerId].firstWhere((workout) => workout.id == id);
-      return workout;
+      workout = _workouts[_trainerId].firstWhere((workout) => workout.id == id);
     } catch (e) {
+      error = true;
+    }
+
+    if (workout == null) {
+      try {
+        workout = _recommendedWorkouts[_trainerId].firstWhere((workout) => workout.id == id);
+        error = false;
+      } catch (e) {
+        error = true;
+      }
+    }
+
+    if (!error) {
+      return workout;
+    } else {
       return null;
     }
   }
@@ -78,16 +96,15 @@ class WorkoutsProvider with ChangeNotifier {
   }
 
   Future<void> fetchWorkoutById(String id) async {
-    var result = await _db
-        .collection('trainers')
-        .document(_trainerId)
-        .collection('workouts')
-        .document(id)
-        .get();
+    var result = await _db.collection('trainers').document(_trainerId).collection('workouts').document(id).get();
     if (result != null) {
       _fromSavedWorkouts = true;
-      print('1');
-      _workoutsMap[_trainerId] = [Workout.fromSnapshot(result)];
+      print('Read: 1');
+      if (_workouts[_trainerId] == null) {
+        _workouts[_trainerId] = [(Workout.fromSnapshot(result))];
+      } else {
+        _workouts[_trainerId].add(Workout.fromSnapshot(result));
+      }
     }
     notifyListeners();
   }
@@ -96,43 +113,40 @@ class WorkoutsProvider with ChangeNotifier {
     _allWorkoutsLoaded = false;
     _fromSavedWorkouts = false;
 
-    QuerySnapshot recommendedResult = await _db
-        .collection('trainers')
-        .document(_trainerId)
-        .collection('workouts')
-        .where('difficulty', isEqualTo: experienceLevel)
-        .orderBy('createdDate', descending: true)        
-        .limit(_recommendedWorkoutsLimit)
-        .getDocuments();
-
-    if (recommendedResult.documents.length > 0) {      
-      _recommendedWorkouts[_trainerId] = recommendedResult.documents
-          .map((workout) => Workout.fromSnapshot(workout))
-          .toList();
-    }
-
     QuerySnapshot result = await _db
         .collection('trainers')
         .document(_trainerId)
         .collection('workouts')
         .orderBy('createdDate', descending: true)
-        .limit(workoutsLimit - recommendedResult.documents.length)
+        .limit(workoutsLimit)
         .getDocuments();
 
     if (result.documents.length > 0) {
-      print(
-          'Read: ${result.documents.length + recommendedResult.documents.length}');
+      print('Read: ${result.documents.length}');
       _lastDocument = result.documents[result.documents.length - 1];
-      _loadedWorkouts = result.documents
-          .map((workout) => Workout.fromSnapshot(workout))
-          .toList();
 
-      _workoutsMap[_trainerId] = _loadedWorkouts;
+      _workouts[_trainerId] = result.documents.map((workout) => Workout.fromSnapshot(workout)).toList();
     } else {
-      _workoutsMap[_trainerId] = [];
+      _workouts[_trainerId] = [];
     }
-    if (result.documents.length < workoutsLimit - recommendedResult.documents.length) {
+    if (result.documents.length < workoutsLimit) {
       _allWorkoutsLoaded = true;
+    }
+
+    if (result.documents.length > 4) {
+      QuerySnapshot recommendedResult = await _db
+          .collection('trainers')
+          .document(_trainerId)
+          .collection('workouts')
+          .where('difficulty', isEqualTo: experienceLevel)
+          .orderBy('createdDate', descending: true)
+          .limit(_recommendedWorkoutsLimit)
+          .getDocuments();
+
+      if (recommendedResult.documents.length > 0) {
+        print('Read: ${recommendedResult.documents.length}');
+        _recommendedWorkouts[_trainerId] = recommendedResult.documents.map((workout) => Workout.fromSnapshot(workout)).toList();
+      }
     }
 
     notifyListeners();
@@ -152,11 +166,9 @@ class WorkoutsProvider with ChangeNotifier {
     if (result.documents.length > 0) {
       print('Read: ${result.documents.length}');
       _lastDocument = result.documents[result.documents.length - 1];
-      _loadedWorkouts = result.documents
-          .map((workout) => Workout.fromSnapshot(workout))
-          .toList();
+      _loadedWorkouts = result.documents.map((workout) => Workout.fromSnapshot(workout)).toList();
 
-      _workoutsMap[_trainerId].addAll(_loadedWorkouts);
+      _workouts[_trainerId].addAll(_loadedWorkouts);
     }
     if (result.documents.length < workoutsLimit) {
       _allWorkoutsLoaded = true;
@@ -164,20 +176,10 @@ class WorkoutsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  List<Exercise> getExercises(String workoutId) {
-    List<Exercise> loadedExercises = findById(workoutId)
-        .exercises
-        .map((exercise) => Exercise.fromMap(exercise))
-        .toList();
-
-    return loadedExercises;
-  }
-
   Future<void> fetchExerciseData(String id) async {
-    DocumentSnapshot result =
-        await _db.collection('exercises').document(id).get();
+    DocumentSnapshot result = await _db.collection('exercises').document(id).get();
 
-    print('1');
+    print('Read: 1');
     _exerciseData.add(ExerciseData.fromSnapshot(result));
     notifyListeners();
   }

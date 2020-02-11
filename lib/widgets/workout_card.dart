@@ -15,6 +15,7 @@ class WorkoutCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      
       onTap: () {
         Navigator.of(context)
             .pushNamed(WorkoutOverviewScreen.routeName, arguments: workout.id);

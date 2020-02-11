@@ -16,12 +16,12 @@ class TrainerPick extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         Navigator.of(context)
-            .pushNamed(TrainerWorkoutsScreen.routeName, arguments: trainer.id);
+            .pushNamed(TrainerWorkoutsScreen.routeName, arguments: trainer);
       },
       child: Container(
         width: double.infinity,
         height: MediaQuery.of(context).size.height * 0.2,
-        constraints: BoxConstraints(minHeight: 100),
+        constraints: BoxConstraints(minHeight: 150),
         margin: const EdgeInsets.only(left: 20.0, right: 20.0, bottom: 10.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15.0),
@@ -45,6 +45,8 @@ class TrainerPick extends StatelessWidget {
                     Text(
                       trainer.name,
                       style: Theme.of(context).textTheme.display2,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: 5.0),
                     Row(

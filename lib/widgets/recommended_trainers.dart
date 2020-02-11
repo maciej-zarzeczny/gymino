@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import './recommended_trainer.dart';
 import '../models/trainer.dart';
 import '../widgets/custom_title.dart';
+import '../widgets/trainer_pick.dart';
 
 class RecommendedTrainers extends StatelessWidget {
   final List<Trainer> recommendedTrainers;
@@ -12,9 +13,13 @@ class RecommendedTrainers extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: (MediaQuery.of(context).size.height -
-              MediaQuery.of(context).padding.top) *
-          0.35,
+      height: recommendedTrainers.length > 1
+          ? (MediaQuery.of(context).size.height -
+                  MediaQuery.of(context).padding.top) *
+              0.35
+          : (MediaQuery.of(context).size.height -
+                  MediaQuery.of(context).padding.top) *
+              0.25,
       constraints: BoxConstraints(minHeight: 250),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -23,17 +28,19 @@ class RecommendedTrainers extends StatelessWidget {
               ? CustomTitle('Polecani dla ciebie')
               : CustomTitle('Polecany dla ciebie'),
           Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              scrollDirection: Axis.horizontal,
-              itemCount: recommendedTrainers.length,
-              itemBuilder: (context, index) {
-                return RecommendedTrainer(recommendedTrainers[index]);
-              },
-              separatorBuilder: (context, index) {
-                return SizedBox(width: 10.0);
-              },
-            ),
+            child: recommendedTrainers.length > 1
+                ? ListView.separated(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    scrollDirection: Axis.horizontal,
+                    itemCount: recommendedTrainers.length,
+                    itemBuilder: (context, index) {
+                      return RecommendedTrainer(recommendedTrainers[index]);
+                    },
+                    separatorBuilder: (context, index) {
+                      return SizedBox(width: 10.0);
+                    },
+                  )
+                : TrainerPick(recommendedTrainers[0]),
           ),
         ],
       ),

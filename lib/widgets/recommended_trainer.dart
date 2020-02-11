@@ -5,7 +5,6 @@ import '../size_config.dart';
 import '../globals.dart';
 import '../models/trainer.dart';
 import '../screens/trainer_workouts_screen.dart';
-import '../widgets/badge.dart';
 
 class RecommendedTrainer extends StatelessWidget {
   final Trainer recommendedTrainer;
@@ -19,7 +18,7 @@ class RecommendedTrainer extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         Navigator.of(context).pushNamed(TrainerWorkoutsScreen.routeName,
-            arguments: recommendedTrainer.id);
+            arguments: recommendedTrainer);
       },
       child: Container(
         width: MediaQuery.of(context).size.width * 0.45,
@@ -34,35 +33,34 @@ class RecommendedTrainer extends StatelessWidget {
         ),
         child: Padding(
           padding: const EdgeInsets.all(20.0),
-          
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
               Text(
                 recommendedTrainer.name,
-                style: Theme.of(context)
-                    .textTheme
-                    .display1
-                    .copyWith(color: Global().canvasColor, fontWeight: FontWeight.w500),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.display1.copyWith(
+                    color: Global().canvasColor, fontWeight: FontWeight.w500),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-          SizedBox(height: 5.0),
-          Row(
-            children: <Widget>[
-              Icon(
-                Icons.fitness_center,
-                color: Global().canvasColor,
-                size: SizeConfig.safeBlockHorizontal * 5,
+              SizedBox(height: 5.0),
+              Row(
+                children: <Widget>[
+                  Icon(
+                    Icons.fitness_center,
+                    color: Global().canvasColor,
+                    size: SizeConfig.safeBlockHorizontal * 5,
+                  ),
+                  SizedBox(width: 5.0),
+                  Text(
+                    recommendedTrainer.numberOfWorkouts.toString(),
+                    style: Theme.of(context).textTheme.body1.copyWith(
+                        color: Global().canvasColor,
+                        fontSize: SizeConfig.safeBlockHorizontal * 4),
+                  ),
+                ],
               ),
-              SizedBox(width: 5.0),
-              Text(
-                recommendedTrainer.numberOfWorkouts.toString(),
-                style: Theme.of(context).textTheme.body1.copyWith(color: Global().canvasColor, fontSize: SizeConfig.safeBlockHorizontal * 4),
-              ),
-            ],
-          ),
             ],
           ),
         ),

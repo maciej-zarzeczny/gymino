@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../globals.dart';
@@ -31,11 +30,21 @@ class _WorkoutOverviewScreenState extends State<WorkoutOverviewScreen> {
       workoutsProvider = Provider.of<WorkoutsProvider>(context, listen: false);
       workoutId = ModalRoute.of(context).settings.arguments as String;
       workout = workoutsProvider.findById(workoutId);
+    
       if (workout == null) {
-        workoutsProvider.fetchWorkoutById(workoutId).then((_) {
+        workoutsProvider.fetchWorkoutById(workoutId).then((_) {          
           setState(() {
             _isLoading = false;
           });
+        }).catchError((err) {
+          Global().showAlertDialog(
+            context,
+            'Błąd',
+            'Podczas łączenia z serwerem wystąpił błąd, spróbuj ponownie później.',
+            'Ok',
+            () => Navigator.of(context).pop(),
+          );
+          _isLoading = false;                  
         });
       } else {
         setState(() {
@@ -43,15 +52,6 @@ class _WorkoutOverviewScreenState extends State<WorkoutOverviewScreen> {
         });
       }
     });
-
-    // Future.delayed(Duration(milliseconds: 300)).then((_) {
-    //   SystemChrome.setSystemUIOverlayStyle(
-    //     SystemUiOverlayStyle.dark.copyWith(
-    //       statusBarColor: Colors.white,
-    //       statusBarBrightness: Brightness.dark,
-    //     ),
-    //   );
-    // });
     super.initState();
   }
 
@@ -62,10 +62,10 @@ class _WorkoutOverviewScreenState extends State<WorkoutOverviewScreen> {
     UserData userData;
     bool isSaved = false;
 
-    if (!_isLoading) {
+    if (!_isLoading) {            
       workout = workoutsProvider.findById(workoutId);
       usersProvider = Provider.of<UsersProvider>(context);
-      exercises = workoutsProvider.getExercises(workoutId);
+      exercises = workout.getExercises();
       userData = usersProvider.userData;
 
       if (userData.savedWorkouts != null &&

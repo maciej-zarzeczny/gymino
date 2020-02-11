@@ -19,14 +19,14 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   UsersProvider usersProvider;
   bool _isLoading = true;
   bool _moreLoading = false;
+  bool _loadMoreButton = true;
   ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     Future.microtask(() {
       usersProvider = Provider.of<UsersProvider>(context, listen: false);
-      if (usersProvider.finishedWorkouts.isEmpty ||
-          usersProvider.lastFinishedWorkoudInserted) {
+      if (usersProvider.finishedWorkouts.isEmpty) {
         usersProvider.fetchFinishedWorkouts().then((_) {
           setState(() {
             _isLoading = false;
@@ -36,7 +36,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
           Global().showAlertDialog(
             context,
             'Błąd',
-            'Podczas pobierania historii treningów wystąpił błąd. W przypadku ciągłego pojawiania się błędu skontaktuj się z twórcą aplikacji.',
+            'Podczas łączenia z serwerem wystąpił błąd, spróbuj ponownie później.',
             'Ok',
             () => Navigator.of(context).pop(),
           );
@@ -49,9 +49,9 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     });
 
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels ==
-          _scrollController.position.maxScrollExtent) {
+      if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
         setState(() {
+          _loadMoreButton = false;
           _moreLoading = true;
         });
 
@@ -63,13 +63,10 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
           });
         } else {
           double edge = 50.0;
-          double offsetFromBottom = _scrollController.position.maxScrollExtent -
-              _scrollController.position.pixels;
+          double offsetFromBottom = _scrollController.position.maxScrollExtent - _scrollController.position.pixels;
           if (offsetFromBottom < edge) {
             _scrollController
-                .animateTo(_scrollController.offset - (edge - offsetFromBottom),
-                    duration: new Duration(milliseconds: 500),
-                    curve: Curves.easeOut)
+                .animateTo(_scrollController.offset - (edge - offsetFromBottom), duration: new Duration(milliseconds: 500), curve: Curves.easeOut)
                 .then((_) {
               setState(() {
                 _moreLoading = false;
@@ -89,6 +86,9 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     List<FinishedWorkout> finishedWorkouts;
 
     if (!_isLoading) {
+      if (usersProvider.allFinishedWorkotusLoaded) {
+        _loadMoreButton = false;
+      }
       userData = usersProvider.userData;
       finishedWorkouts = usersProvider.finishedWorkouts;
     }
@@ -96,8 +96,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     return _isLoading
         ? Global().loadingIndicator(context)
         : Container(
-            height: MediaQuery.of(context).size.height -
-                MediaQuery.of(context).padding.top,
+            height: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top,
             width: double.infinity,
             color: Global().canvasColor,
             child: finishedWorkouts.isNotEmpty
@@ -106,25 +105,36 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                     itemCount: finishedWorkouts.length + 2,
                     itemBuilder: (context, index) {
                       if (index == 0) {
-                        return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
+                        return Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: <Widget>[
+                          CustomTitle('Ogólne'),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: <Widget>[
-                              CustomTitle('Ogólne'),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: <Widget>[
-                                  circle(
-                                      context,
-                                      userData.finishedWorkouts.toString(),
-                                      'Wszystkie treningi'),
-                                ],
-                              ),
-                              CustomTitle('Historia treningów')
-                            ]);
-                      } else if (index == finishedWorkouts.length+1) {
-                        return MoreLoadingIndicator(_moreLoading);
+                              circle(context, userData.finishedWorkouts.toString(), 'Wszystkie treningi'),
+                            ],
+                          ),
+                          CustomTitle('Historia treningów')
+                        ]);
+                      } else if (index == finishedWorkouts.length + 1) {
+                        return _loadMoreButton
+                            ? FlatButton(
+                                onPressed: () async {
+                                  setState(() {
+                                    _loadMoreButton = false;
+                                    _moreLoading = true;
+                                  });
+                                  await usersProvider.fetchMoreFinishedWorkouts().then((_) {
+                                    setState(() => _moreLoading = false);
+                                  });
+                                },
+                                child: Text(
+                                  'Pokaż więcej',
+                                  style: Theme.of(context).textTheme.button.copyWith(
+                                        color: Theme.of(context).accentColor,
+                                      ),
+                                ),
+                              )
+                            : MoreLoadingIndicator(_moreLoading);
                       } else {
                         return finishedWorkoutCard(finishedWorkouts[index - 1]);
                       }
@@ -178,8 +188,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         style: Theme.of(context).textTheme.body1.copyWith(
               fontWeight: FontWeight.bold,
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
       ),
       subtitle: Text(
         DateFormat('dd-MM-yyyy').format(
@@ -195,18 +205,14 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         return Align(
           alignment: Alignment.centerLeft,
           child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
                   exercise['name'],
-                  style: Theme.of(context)
-                      .textTheme
-                      .body1
-                      .copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.body1.copyWith(fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 5.0),
                 Column(

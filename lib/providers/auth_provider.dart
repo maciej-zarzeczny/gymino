@@ -56,7 +56,7 @@ class AuthProvider {
       AuthResult result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
       FirebaseUser user = result.user;
       // create a new document for the user with the uid
-      await UsersProvider().updateUserData(user.uid, name, gender, trainingType, experienceLevel);
+      await UsersProvider().createUserData(user.uid, name, gender, trainingType, experienceLevel);
       return _userFromFirebaseUser(user);
     } catch (error) {         
       return error.code;

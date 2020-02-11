@@ -8,7 +8,7 @@ import '../widgets/difficulty_level.dart';
 import '../providers/workouts_provider.dart';
 
 class SavedWorkoutsScreen extends StatefulWidget {
-  static const String routeName = '/savedWorkouts';  
+  static const String routeName = '/savedWorkouts';
 
   @override
   _SavedWorkoutsScreenState createState() => _SavedWorkoutsScreenState();
@@ -20,15 +20,12 @@ class _SavedWorkoutsScreenState extends State<SavedWorkoutsScreen> {
   @override
   Widget build(BuildContext context) {
     usersProvider = Provider.of<UsersProvider>(context);
-    final Map<dynamic, dynamic> savedWorkouts =
-        usersProvider.userData.savedWorkouts;
+    final Map<dynamic, dynamic> savedWorkouts = usersProvider.userData.savedWorkouts;
 
     return Container(
       padding: const EdgeInsets.only(top: 10.0),
       width: double.infinity,
-      height: MediaQuery.of(context).size.height -
-          MediaQuery.of(context).padding.bottom -
-          MediaQuery.of(context).padding.top,          
+      height: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.bottom - MediaQuery.of(context).padding.top,
       color: Global().canvasColor,
       child: savedWorkouts.isNotEmpty
           ? ListView.separated(
@@ -49,8 +46,7 @@ class _SavedWorkoutsScreenState extends State<SavedWorkoutsScreen> {
                   direction: DismissDirection.endToStart,
                   onDismissed: (direction) {
                     usersProvider.removeWorkoutFromFavourites(id);
-                    Scaffold.of(context).showSnackBar(
-                        SnackBar(content: Text("Usunięto z ulubionych")));
+                    Scaffold.of(context).showSnackBar(SnackBar(content: Text("Usunięto z ulubionych")));
                   },
                   child: savedWorkoutCard(
                     context,
@@ -71,14 +67,11 @@ class _SavedWorkoutsScreenState extends State<SavedWorkoutsScreen> {
     );
   }
 
-  Widget savedWorkoutCard(context, String id, String imageUrl, String name,
-      int difficulty, int duration, String trainerId) {
+  Widget savedWorkoutCard(context, String id, String imageUrl, String name, int difficulty, int duration, String trainerId) {
     return GestureDetector(
-      onTap: () {        
-        Provider.of<WorkoutsProvider>(context, listen: false).currentTrainerId =
-            trainerId;
-        Navigator.of(context)
-            .pushNamed(WorkoutOverviewScreen.routeName, arguments: id);
+      onTap: () {
+        Provider.of<WorkoutsProvider>(context, listen: false).currentTrainerId = trainerId;
+        Navigator.of(context).pushNamed(WorkoutOverviewScreen.routeName, arguments: id);
       },
       child: Container(
         width: double.infinity,
@@ -110,8 +103,8 @@ class _SavedWorkoutsScreenState extends State<SavedWorkoutsScreen> {
                             fontWeight: FontWeight.w500,
                             fontSize: 20,
                           ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: 3.0),
                     DifficultyLevel(difficulty),
@@ -121,8 +114,7 @@ class _SavedWorkoutsScreenState extends State<SavedWorkoutsScreen> {
               Align(
                 alignment: Alignment.topLeft,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 7.0, vertical: 7.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 7.0, vertical: 7.0),
                   decoration: BoxDecoration(
                     color: Color.fromRGBO(26, 26, 26, 0.7),
                     borderRadius: BorderRadius.circular(8.0),
@@ -132,14 +124,14 @@ class _SavedWorkoutsScreenState extends State<SavedWorkoutsScreen> {
                     children: <Widget>[
                       Icon(
                         Icons.access_time,
-                        color: Theme.of(context).canvasColor,
+                        color: Global().canvasColor,
                         size: 15,
                       ),
                       SizedBox(width: 5.0),
                       Text(
                         '$duration min',
                         style: Theme.of(context).textTheme.overline.copyWith(
-                              color: Theme.of(context).canvasColor,
+                              color: Global().canvasColor,
                               fontWeight: FontWeight.normal,
                               fontSize: 12,
                             ),

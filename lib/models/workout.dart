@@ -1,12 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import './exercise.dart';
+
 class Workout {
   final String id;
   final String name;
   final String imageUrl;
   final int duration;
-  final int difficulty;  
+  final int difficulty;
   final Map<dynamic, dynamic> keywords;
   final List<dynamic> exercises;
 
@@ -21,7 +23,7 @@ class Workout {
   });
 
   factory Workout.fromSnapshot(DocumentSnapshot doc) {
-    Map data = doc.data;    
+    Map data = doc.data;
 
     return Workout(
       id: doc.documentID ?? '',
@@ -33,19 +35,26 @@ class Workout {
       exercises: data['exercises'] ?? [],
     );
   }
+
+  List<Exercise> getExercises() {
+    List<Exercise> loadedExercises =
+        exercises.map((exercise) => Exercise.fromMap(exercise)).toList();
+
+    return loadedExercises;
+  }
 }
 
 class FinishedWorkout {
   final String id;
   final String name;
-  final Timestamp date;  
+  final Timestamp date;
   final String imageUrl;
   final List<dynamic> exercises;
 
   FinishedWorkout({
     this.id,
     this.name,
-    this.date,    
+    this.date,
     this.imageUrl,
     this.exercises,
   });
@@ -55,18 +64,17 @@ class FinishedWorkout {
 
     return FinishedWorkout(
       id: doc.documentID ?? '',
-      name: data['name'] ?? '',      
+      name: data['name'] ?? '',
       date: data['date'],
       imageUrl: data['imageUrl'] ?? '',
       exercises: data['exercises'] ?? [],
     );
   }
 
-  Map<String, dynamic> toJson() => 
-  {
-    'name': name,
-    'date': date,
-    'imageUrl': imageUrl,
-    'exercises': exercises,
-  };
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        'date': date,
+        'imageUrl': imageUrl,
+        'exercises': exercises,
+      };
 }

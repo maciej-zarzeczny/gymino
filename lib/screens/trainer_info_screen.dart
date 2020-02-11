@@ -90,8 +90,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
 
     return Container(
       width: double.infinity,
-      height: MediaQuery.of(context).size.height * 0.3,
-      // padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+      height: MediaQuery.of(context).size.height * 0.3,      
       decoration: BoxDecoration(
         image: DecorationImage(
           image: CachedNetworkImageProvider(trainer.imageUrl),
@@ -102,14 +101,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
       ),
       child: Stack(
         children: <Widget>[
-          _appBar,
-          // Align(
-          //   alignment: Alignment.topLeft,
-          //   child: IconButton(
-          //     onPressed: () => Navigator.of(context).pop(),
-          //     icon: Global().backArrow(),
-          //   ),
-          // ),
+          _appBar,         
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: Align(
@@ -121,6 +113,8 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
                   Text(
                     trainer.name,
                     style: Theme.of(context).textTheme.display2,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 5.0),
                   Row(
