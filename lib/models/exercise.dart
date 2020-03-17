@@ -6,6 +6,7 @@ class Exercise {
   final int rest;
   final int setRest;
   final String name;
+  final String image;
 
   Exercise({
     this.id,
@@ -13,6 +14,7 @@ class Exercise {
     this.rest,
     this.setRest,
     this.name,
+    this.image,
   });
 
   factory Exercise.fromMap(Map<dynamic, dynamic> data) {
@@ -22,6 +24,7 @@ class Exercise {
       rest: data['rest'] ?? 0,
       setRest: data['setRest'] ?? 0,
       name: data['name'] ?? '',
+      image: data['image'] ?? '',
     );
   }
 }
@@ -29,8 +32,7 @@ class Exercise {
 class ExerciseData {
   String id;
   String name;
-  String description;
-  String instructions;
+  String description;  
   String imageUrl;
   List<dynamic> keywords;
   List<dynamic> bulletPoints;
@@ -38,8 +40,7 @@ class ExerciseData {
   ExerciseData({
     this.id,
     this.name,
-    this.description,
-    this.instructions,
+    this.description,    
     this.imageUrl,
     this.keywords,
     this.bulletPoints,
@@ -51,9 +52,8 @@ class ExerciseData {
     return ExerciseData(
       id: doc.documentID,
       name: data['name'] ?? '',
-      description: data['description'] ?? '',
-      instructions: data['instructions'] ?? '',
-      imageUrl: data['imageUrl'] ?? '',
+      description: data['description'] ?? '',      
+      imageUrl: data['image'] ?? '',
       keywords: data['keywords'] ?? [],
       bulletPoints: data['bulletPoints'] ?? [],
     );

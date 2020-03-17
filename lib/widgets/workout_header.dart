@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../globals.dart';
 import '../models/workout.dart';
@@ -23,9 +24,9 @@ class WorkoutHeader extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage(workout.imageUrl),
+          image: CachedNetworkImageProvider(workout.imageUrl),
           fit: BoxFit.cover,
-          alignment: Alignment.topCenter,
+          alignment: Alignment.center,
           colorFilter: ColorFilter.mode(Colors.black38, BlendMode.darken),
         ),
       ),
@@ -40,15 +41,7 @@ class WorkoutHeader extends StatelessWidget {
               alignment: Alignment.topLeft,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  // IconButton(
-                  //   padding: const EdgeInsets.all(0.0),
-                  //   onPressed: () {
-                  //     Navigator.of(context).pop();
-                  //   },
-                  //   icon: Global().backArrow(),
-                  // ),
-                  // SizedBox(height: 5.0),
+                children: <Widget>[                  
                   Container(
                     margin: const EdgeInsets.symmetric(horizontal: 20.0),
                     padding: const EdgeInsets.symmetric(
@@ -74,8 +67,9 @@ class WorkoutHeader extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: Row(
-                      children: workout.keywords.entries.map((keyword) {
-                        return Keyword(keyword.value, false);
+                      mainAxisSize: MainAxisSize.min,
+                      children: workout.keywords.map((keyword) {
+                        return Expanded(child: Keyword(keyword, false));
                       }).toList(),
                     ),
                   ),

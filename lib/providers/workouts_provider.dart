@@ -117,7 +117,7 @@ class WorkoutsProvider with ChangeNotifier {
         .collection('trainers')
         .document(_trainerId)
         .collection('workouts')
-        .orderBy('createdDate', descending: true)
+        .orderBy('createdAt', descending: true)
         .limit(workoutsLimit)
         .getDocuments();
 
@@ -139,7 +139,7 @@ class WorkoutsProvider with ChangeNotifier {
           .document(_trainerId)
           .collection('workouts')
           .where('difficulty', isEqualTo: experienceLevel)
-          .orderBy('createdDate', descending: true)
+          .orderBy('createdAt', descending: true)
           .limit(_recommendedWorkoutsLimit)
           .getDocuments();
 
@@ -158,7 +158,7 @@ class WorkoutsProvider with ChangeNotifier {
         .collection('trainers')
         .document(_trainerId)
         .collection('workouts')
-        .orderBy('createdDate', descending: true)
+        .orderBy('createdAt', descending: true)
         .startAfterDocument(_lastDocument)
         .limit(workoutsLimit)
         .getDocuments();
@@ -177,7 +177,7 @@ class WorkoutsProvider with ChangeNotifier {
   }
 
   Future<void> fetchExerciseData(String id) async {
-    DocumentSnapshot result = await _db.collection('exercises').document(id).get();
+    DocumentSnapshot result = await _db.collection('trainers').document(_trainerId).collection('exercises').document(id).get();
 
     print('Read: 1');
     _exerciseData.add(ExerciseData.fromSnapshot(result));

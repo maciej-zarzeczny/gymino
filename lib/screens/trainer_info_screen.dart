@@ -23,8 +23,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    final trainersProvider =
-        Provider.of<TrainersProvider>(context, listen: false);
+    final trainersProvider = Provider.of<TrainersProvider>(context, listen: false);
     _trainer = ModalRoute.of(context).settings.arguments as Trainer;
 
     if (_trainer != null) {
@@ -48,9 +47,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
         color: Colors.white,
         child: ListView.builder(
           padding: const EdgeInsets.all(0.0),
-          itemCount: _supplements.length == 0
-              ? _supplements.length + 1
-              : _supplements.length + 2,
+          itemCount: _supplements.length == 0 ? _supplements.length + 1 : _supplements.length + 2,
           itemBuilder: (context, index) {
             bool last = _supplements.length == index - 1;
             if (index == 0) {
@@ -72,8 +69,8 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
                 _supplements[index - 2]['name'],
                 _supplements[index - 2]['amount'],
                 _supplements[index - 2]['portionsPerDay'],
-                _supplements[index - 2]['comment'],
-                _supplements[index - 2]['imageUrl'],
+                _supplements[index - 2]['form'],
+                _supplements[index - 2]['unit'],                
                 last,
               );
             }
@@ -90,10 +87,10 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
 
     return Container(
       width: double.infinity,
-      height: MediaQuery.of(context).size.height * 0.3,      
+      height: MediaQuery.of(context).size.height * 0.3,
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: CachedNetworkImageProvider(trainer.imageUrl),
+          image: CachedNetworkImageProvider(trainer.image),
           alignment: Alignment.topCenter,
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(Colors.black26, BlendMode.darken),
@@ -101,7 +98,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
       ),
       child: Stack(
         children: <Widget>[
-          _appBar,         
+          _appBar,
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: Align(
@@ -119,9 +116,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
                   SizedBox(height: 5.0),
                   Row(
                     children: <Widget>[
-                      _trainer.calisthenics
-                          ? Keyword('Kalistenika', false)
-                          : Container(),
+                      _trainer.calisthenics ? Keyword('Kalistenika', false) : Container(),
                       _trainer.gym ? Keyword('Siłownia', false) : Container(),
                     ],
                   ),
@@ -134,8 +129,15 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
     );
   }
 
-  Widget supplementItem(String name, int amount, int portionsPerDay,
-      String comment, String imageUrl, bool isLast) {
+  Widget supplementItem(String name, int amount, int portionsPerDay, int form, int unit, bool isLast) {
+    String displayUnit = '';
+    if (unit == 1) {
+      displayUnit = 'ug';
+    } else if (unit == 2) {
+      displayUnit = 'mg';
+    } else {
+      displayUnit = 'g';
+    }
     return Container(
       height: MediaQuery.of(context).size.height * 0.15,
       constraints: BoxConstraints(minHeight: 100),
@@ -151,7 +153,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15.0),
         image: DecorationImage(
-          image: AssetImage('assets/images/supplements/$imageUrl'),
+          image: form == 1 ? AssetImage('assets/images/supplements/powder.jpeg') : AssetImage('assets/images/supplements/pills.jpg'),
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(
             Colors.black38,
@@ -169,7 +171,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
             Text(name, style: Theme.of(context).textTheme.display2),
             SizedBox(height: 3),
             Text(
-              '$amount g - $portionsPerDay x dziennie',
+              '$amount $displayUnit x $portionsPerDay dziennie',
               style: Theme.of(context).textTheme.body1.copyWith(
                     color: Global().canvasColor,
                   ),

@@ -55,13 +55,13 @@ class TrainersProvider with ChangeNotifier {
         gym = true;
         calisthenics = true;
         break;
-    }    
+    }            
 
     QuerySnapshot topResults = await _db
         .collection('trainers')
         .where('gym', isEqualTo: gym)
         .where('calisthenics', isEqualTo: calisthenics)
-        .where('gender', isEqualTo: gender)
+        .where('gender', isEqualTo: gender+1)
         .orderBy('numberOfWorkouts', descending: true)
         .limit(_recommendedTrainersLimit)
         .getDocuments();

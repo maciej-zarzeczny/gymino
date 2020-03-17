@@ -199,7 +199,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     Divider(color: Global().darkGrey),
                     pickerField(context, 'Poziom', userData.experienceLevelName, _experienceLevelOptions),
                     Divider(color: Global().darkGrey),
-                    CustomTitle('Aktywne subskrypcje'),
+                    // CustomTitle('Aktywne subskrypcje'),
                   ],
                 ),
               ),

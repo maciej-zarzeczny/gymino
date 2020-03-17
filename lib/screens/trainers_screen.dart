@@ -75,7 +75,7 @@ class _TrainersScreenState extends State<TrainersScreen> {
                 _moreLoading = false;
               });
             });
-          } else {
+          } else {            
             double edge = 50.0;
             double offsetFromBottom = _scrollController.position.maxScrollExtent - _scrollController.position.pixels;
             if (offsetFromBottom < edge) {

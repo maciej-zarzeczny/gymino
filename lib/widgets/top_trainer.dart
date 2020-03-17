@@ -25,7 +25,7 @@ class TopTrainer extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15.0),
           image: DecorationImage(
-            image: CachedNetworkImageProvider(topTrainer.imageUrl),
+            image: CachedNetworkImageProvider(topTrainer.image),
             fit: BoxFit.cover,
             alignment: Alignment.topCenter,
             colorFilter: ColorFilter.mode(Colors.black38, BlendMode.darken),

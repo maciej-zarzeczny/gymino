@@ -1,5 +1,8 @@
+import 'package:flutter/cupertino.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'dart:io';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:sqilly/globals.dart';
@@ -190,70 +193,72 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
       _repsNumber = _currentExercise.sets.elementAt(_currentSet - 1);
     }
 
-    return Container(
-      height: MediaQuery.of(context).size.height,
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('assets/images/aj.jpg'),
-          fit: BoxFit.cover,
-        ),
-      ),
-      child: Stack(
-        children: <Widget>[
-          Container(
+    return _isLoading
+        ? Center(child: CircularProgressIndicator())
+        : Container(
+            height: MediaQuery.of(context).size.height,
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.center,
-                colors: [
-                  Color.fromRGBO(0, 0, 0, 0.05),
-                  Color.fromRGBO(26, 26, 26, 0.95),
-                ],
+              image: DecorationImage(
+                image: CachedNetworkImageProvider(_currentExercise.image),
+                fit: BoxFit.cover,
               ),
             ),
-          ),
-          Scaffold(
-            backgroundColor: Colors.transparent,
-            body: _isLoading
-                ? Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : GestureDetector(
-                    onTap: () {
-                      if (weightInputController.text == '') {
-                        weightInputController.text = '0';
-                      }
-                      FocusScope.of(context).requestFocus(new FocusNode());
-                    },
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        return SingleChildScrollView(
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              minWidth: constraints.maxWidth,
-                              minHeight: constraints.maxHeight,
-                            ),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: <Widget>[
-                                topHeader(),
-                                exerciseTitle(_currentExercise.name, _currentSet, _setsNumber),
-                                repsCounter(_currentReps, _repsNumber),
-                                weightCounter(),
-                                nextButton(),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
+            child: Stack(
+              children: <Widget>[
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.center,
+                      colors: [
+                        Color.fromRGBO(0, 0, 0, 0.05),
+                        Color.fromRGBO(26, 26, 26, 0.95),
+                      ],
                     ),
                   ),
-          ),
-        ],
-      ),
-    );
+                ),
+                Scaffold(
+                  backgroundColor: Colors.transparent,
+                  body: _isLoading
+                      ? Center(
+                          child: CircularProgressIndicator(),
+                        )
+                      : GestureDetector(
+                          onTap: () {
+                            if (weightInputController.text == '') {
+                              weightInputController.text = '0';
+                            }
+                            FocusScope.of(context).requestFocus(new FocusNode());
+                          },
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              return SingleChildScrollView(
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    minWidth: constraints.maxWidth,
+                                    minHeight: constraints.maxHeight,
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: <Widget>[
+                                      topHeader(),
+                                      exerciseTitle(_currentExercise.name, _currentSet, _setsNumber),
+                                      repsCounter(_currentReps, _repsNumber),
+                                      weightCounter(),
+                                      nextButton(),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                ),
+              ],
+            ),
+          );
   }
 
   Widget exerciseTitle(String exerciseName, int currentSet, int setsNumber) {
@@ -483,8 +488,48 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
           color: Colors.white,
           size: 35,
         ),
-        onPressed: () {
-          Navigator.of(context).pop();
+        onPressed: () {          
+          if (_currentSet > 1) {
+            if (Platform.isIOS) {
+              showCupertinoDialog(
+                  context: context,
+                  builder: (bCntx) {
+                    return CupertinoAlertDialog(
+                      title: Text('Zakończyć trening ?'),
+                      content: Text('Czy na pewno chcesz zakończyć trening ?'),
+                      actions: <Widget>[
+                        CupertinoDialogAction(
+                          isDefaultAction: true,
+                          child: Text('Nie'),
+                          onPressed: () => Navigator.of(context).pop(),
+                        ),
+                        CupertinoDialogAction(
+                          child: Text('Tak'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            setState(() => _isLoading = true);
+                            _finishWorkout().then((_) {
+                              setState(() => _isLoading = false);
+                              Navigator.of(context).pop();
+                            }).catchError((err) {
+                              setState(() => _isLoading = false);
+                              Global().showAlertDialog(
+                                context,
+                                'Błąd',
+                                'Podczas zapisywania treningu wystąpił błąd, spróbuj ponownie później.',
+                                'Ok',
+                                () => Navigator.of(context).pop(),
+                              );
+                            });
+                          },
+                        ),
+                      ],
+                    );
+                  });
+            }
+          } else {
+            Navigator.of(context).pop();
+          }
         },
       ),
     );

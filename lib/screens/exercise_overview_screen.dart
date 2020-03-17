@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../globals.dart';
 import '../providers/workouts_provider.dart';
@@ -21,8 +22,7 @@ class _ExerciseOverviewScreenState extends State<ExerciseOverviewScreen> {
   void initState() {
     Future.microtask(() {
       _exerciseId = ModalRoute.of(context).settings.arguments as String;
-      var workoutsProvider =
-          Provider.of<WorkoutsProvider>(context, listen: false);
+      var workoutsProvider = Provider.of<WorkoutsProvider>(context, listen: false);
       if (workoutsProvider.findExerciseById(_exerciseId) == null) {
         workoutsProvider.fetchExerciseData(_exerciseId).then((_) {
           setState(() {
@@ -40,10 +40,13 @@ class _ExerciseOverviewScreenState extends State<ExerciseOverviewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final _appBar = AppBar(
+      backgroundColor: Colors.transparent,
+    );
+
     ExerciseData _exerciseData;
     if (_exerciseId != null) {
-      _exerciseData =
-          Provider.of<WorkoutsProvider>(context).findExerciseById(_exerciseId);
+      _exerciseData = Provider.of<WorkoutsProvider>(context).findExerciseById(_exerciseId);
     }
 
     return Scaffold(
@@ -54,7 +57,7 @@ class _ExerciseOverviewScreenState extends State<ExerciseOverviewScreen> {
                 Container(
                   height: MediaQuery.of(context).size.height * 0.55,
                   width: double.infinity,
-                  child: header(context),
+                  child: header(context, _appBar, _exerciseData.imageUrl),
                 ),
                 Container(
                   height: MediaQuery.of(context).size.height * 0.45,
@@ -69,50 +72,40 @@ class _ExerciseOverviewScreenState extends State<ExerciseOverviewScreen> {
     );
   }
 
-  Widget header(context) {
-    return Stack(
-      children: <Widget>[
-        Image(
-          width: double.infinity,
-          image: AssetImage('assets/images/aj.jpg'),
+  Widget header(context, AppBar appBar, String imageUrl) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: CachedNetworkImageProvider(imageUrl),
           fit: BoxFit.cover,
           alignment: Alignment.topCenter,
+          colorFilter: ColorFilter.mode(Colors.black26, BlendMode.darken),
         ),
-        Container(
-          color: Colors.black26,
-          width: double.infinity,
-          height: double.infinity,
-        ),
-        Align(
-          alignment: Alignment.topLeft,
-          child: Padding(
-            padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-            child: IconButton(
-              onPressed: () => Navigator.of(context).pop(),
-              icon: Global().backArrow(),
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: -1,
-          left: 0,
-          right: 0,
-          child: Container(
-            height: (MediaQuery.of(context).size.height -
-                    MediaQuery.of(context).padding.top) *
-                0.05,
-            padding: const EdgeInsets.all(0.0),
-            margin: const EdgeInsets.all(0.0),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(30.0),
-                topRight: Radius.circular(30.0),
+      ),
+      child: Stack(
+        children: <Widget>[
+          appBar,
+          Padding(            
+            padding: EdgeInsets.only(top: appBar.preferredSize.height),
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                height: (MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top) * 0.05,
+                padding: const EdgeInsets.all(0.0),
+                margin: const EdgeInsets.all(0.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(30.0),
+                    topRight: Radius.circular(30.0),
+                  ),
+                  color: Global().canvasColor,
+                ),
               ),
-              color: Global().canvasColor,
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -141,12 +134,8 @@ class _ExerciseOverviewScreenState extends State<ExerciseOverviewScreen> {
               style: Theme.of(context).textTheme.body2,
             ),
           ),
-          Text(
-            exercise.instructions,
-            style: Theme.of(context).textTheme.body2,
-          ),
           Padding(
-            padding: const EdgeInsets.only(top: 20.0, bottom: 35.0),
+            padding: const EdgeInsets.only(bottom: 35.0),
             child: Column(
               children: exercise.bulletPoints.map((element) {
                 return Padding(

@@ -26,7 +26,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   void initState() {
     Future.microtask(() {
       usersProvider = Provider.of<UsersProvider>(context, listen: false);
-      if (usersProvider.finishedWorkouts.isEmpty) {
+      if (usersProvider.finishedWorkouts.isEmpty || usersProvider.lastFinishedWorkoudInserted) {
         usersProvider.fetchFinishedWorkouts().then((_) {
           setState(() {
             _isLoading = false;

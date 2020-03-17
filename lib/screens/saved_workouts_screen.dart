@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../globals.dart';
 import '../providers/users_provider.dart';
@@ -80,9 +81,9 @@ class _SavedWorkoutsScreenState extends State<SavedWorkoutsScreen> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15.0),
           image: DecorationImage(
-            image: AssetImage(imageUrl),
+            image: CachedNetworkImageProvider(imageUrl),
             fit: BoxFit.cover,
-            alignment: Alignment.topCenter,
+            alignment: Alignment.center,
             colorFilter: ColorFilter.mode(Colors.black38, BlendMode.darken),
           ),
         ),

@@ -9,7 +9,7 @@ class Workout {
   final String imageUrl;
   final int duration;
   final int difficulty;
-  final Map<dynamic, dynamic> keywords;
+  final List<dynamic> keywords;
   final List<dynamic> exercises;
 
   Workout({
@@ -28,7 +28,7 @@ class Workout {
     return Workout(
       id: doc.documentID ?? '',
       name: data['name'] ?? '',
-      imageUrl: data['image_url'] ?? '',
+      imageUrl: data['image'] ?? '',
       duration: data['duration'] ?? 0,
       difficulty: data['difficulty'] ?? 1,
       keywords: data['keywords'] ?? [],

@@ -17,9 +17,19 @@ class NoData extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          Text(displayText),
-          RaisedButton(
-            child: Text('Odśwież'),
+          Text(
+            displayText,
+            style: Theme.of(context).textTheme.body1.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+          FlatButton(
+            child: Text(
+              'Odśwież',
+              style: Theme.of(context).textTheme.button.copyWith(
+                    color: Theme.of(context).accentColor,
+                  ),
+            ),
             onPressed: () => onPressedFunction(),
           ),
         ],

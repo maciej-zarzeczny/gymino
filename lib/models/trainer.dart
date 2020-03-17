@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Trainer {
   final String id;
   final String name;
-  final String imageUrl;  
+  final String image;  
   final int numberOfWorkouts;
   final bool calisthenics;
   final bool gym;  
@@ -16,7 +16,7 @@ class Trainer {
   Trainer({
     this.id,
     this.name,
-    this.imageUrl,    
+    this.image,    
     this.numberOfWorkouts,
     this.calisthenics,
     this.gym,
@@ -33,7 +33,7 @@ class Trainer {
     return Trainer(
       id: doc.documentID ?? '',
       name: data['name'] ?? '',
-      imageUrl: data['image_url'] ?? '',      
+      image: data['image'] ?? '',
       numberOfWorkouts: data['numberOfWorkouts'] ?? 0,
       calisthenics: data['calisthenics'] ?? false,
       gym: data['gym'] ?? false,

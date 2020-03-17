@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:io';
 
 import '../screens/statistics_screen.dart';
 import '../widgets/navigation_bar.dart';
@@ -51,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
         style: Theme.of(context).textTheme.title,
       ),
       backgroundColor: Theme.of(context).canvasColor,
-      brightness: Brightness.light,
+      brightness: Platform.isIOS ? Brightness.light : Brightness.dark,
       actions: <Widget>[
         _showMoreSettings
             ? PopupMenuButton(
@@ -95,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
-  Widget build(BuildContext context) { 
+  Widget build(BuildContext context) {
     List<Widget> _views = [
       TrainersScreen(),
       StatisticsScreen(),

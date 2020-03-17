@@ -15,18 +15,17 @@ class TrainerPick extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context)
-            .pushNamed(TrainerWorkoutsScreen.routeName, arguments: trainer);
+        Navigator.of(context).pushNamed(TrainerWorkoutsScreen.routeName, arguments: trainer);
       },
       child: Container(
         width: double.infinity,
-        height: MediaQuery.of(context).size.height * 0.2,
+        height: MediaQuery.of(context).size.height * 0.22,
         constraints: BoxConstraints(minHeight: 150),
         margin: const EdgeInsets.only(left: 20.0, right: 20.0, bottom: 10.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15.0),
           image: DecorationImage(
-            image: CachedNetworkImageProvider(trainer.imageUrl),
+            image: CachedNetworkImageProvider(trainer.image),
             fit: BoxFit.cover,
             alignment: Alignment.topCenter,
             colorFilter: ColorFilter.mode(Colors.black38, BlendMode.darken),
@@ -84,7 +83,7 @@ class TrainerPick extends StatelessWidget {
                             width: 0,
                             height: 0,
                           ),
-                    SizedBox(width: 5.0),
+                    trainer.gym ? SizedBox(width: 5.0) : SizedBox(width: 0, height: 0),
                     trainer.calisthenics
                         ? Badge(
                             text: 'Kalistenika',

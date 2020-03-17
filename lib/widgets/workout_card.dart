@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../globals.dart';
 import '../widgets/badge.dart';
@@ -31,9 +32,9 @@ class WorkoutCard extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15.0),
           image: DecorationImage(
-            image: AssetImage(workout.imageUrl),
+            image: CachedNetworkImageProvider(workout.imageUrl),
             fit: BoxFit.cover,
-            alignment: Alignment.topCenter,
+            alignment: Alignment.center,
             colorFilter: ColorFilter.mode(Colors.black38, BlendMode.darken),
           ),
         ),

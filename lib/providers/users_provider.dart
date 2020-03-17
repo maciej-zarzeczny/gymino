@@ -11,7 +11,7 @@ class UsersProvider with ChangeNotifier {
   List<FinishedWorkout> _finishedWorkouts = [];
   int _finishedWorkoutsLimit = 5;
   DocumentSnapshot _lastFinishedWorkout;
-  bool _allFinishedWorkoutsLoaded;
+  bool _allFinishedWorkoutsLoaded = false;
   bool _lastFinishedWorkoutInserted = false;
   bool userDataChanged = false;
 

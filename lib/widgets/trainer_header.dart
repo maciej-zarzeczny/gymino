@@ -23,11 +23,11 @@ class TrainerHeader extends StatelessWidget {
         children: <Widget>[
           CachedNetworkImage(
             width: double.infinity,
-            imageUrl: trainer.imageUrl,
+            imageUrl: trainer.image,
             fit: BoxFit.cover,
             alignment: Alignment.topCenter,
             errorWidget: (context, url, error) => Icon(
-              Icons.error_outline,
+            Icons.error_outline,
               color: Colors.white,
             ),
           ),
@@ -56,6 +56,7 @@ class TrainerHeader extends StatelessWidget {
                       Icon(
                         Icons.fitness_center,
                         color: Global().canvasColor,
+                        size: 20,
                       ),
                       SizedBox(width: 5.0),
                       Text(
@@ -63,7 +64,7 @@ class TrainerHeader extends StatelessWidget {
                         style: Theme.of(context)
                             .textTheme
                             .body1
-                            .copyWith(color: Global().canvasColor),
+                            .copyWith(color: Global().canvasColor, fontSize: 15),
                       ),
                     ],
                   ),

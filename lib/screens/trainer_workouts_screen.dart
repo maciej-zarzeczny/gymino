@@ -38,7 +38,7 @@ class _TrainerWorkoutsScreenState extends State<TrainerWorkoutsScreen> {
       usersProvider = Provider.of<UsersProvider>(context, listen: false);
       int userExperience = usersProvider.userData.experienceLevel;
 
-      if (workoutsProvider.workouts == null || workoutsProvider.fromSavedWorkouts) {
+      if (workoutsProvider.workouts == null || workoutsProvider.fromSavedWorkouts) {        
         workoutsProvider.fetchWorkouts(userExperience).then((_) {
           setState(() {
             _isLoading = false;
