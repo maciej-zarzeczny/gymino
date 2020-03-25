@@ -70,7 +70,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
                 _supplements[index - 2]['amount'],
                 _supplements[index - 2]['portionsPerDay'],
                 _supplements[index - 2]['form'],
-                _supplements[index - 2]['unit'],                
+                _supplements[index - 2]['unit'],
                 last,
               );
             }
@@ -83,6 +83,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
   Widget header(context, Trainer trainer) {
     final _appBar = AppBar(
       backgroundColor: Colors.transparent,
+      elevation: 0,
     );
 
     return Container(
@@ -93,7 +94,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
           image: CachedNetworkImageProvider(trainer.image),
           alignment: Alignment.topCenter,
           fit: BoxFit.cover,
-          colorFilter: ColorFilter.mode(Colors.black26, BlendMode.darken),
+          colorFilter: ColorFilter.mode(Colors.black38, BlendMode.darken),
         ),
       ),
       child: Stack(
@@ -139,8 +140,8 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
       displayUnit = 'g';
     }
     return Container(
-      height: MediaQuery.of(context).size.height * 0.15,
-      constraints: BoxConstraints(minHeight: 100),
+      height: MediaQuery.of(context).size.height * 0.2,
+      constraints: BoxConstraints(minHeight: 130),
       margin: isLast
           ? EdgeInsets.only(
               left: 20.0,
@@ -168,7 +169,12 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
           mainAxisAlignment: MainAxisAlignment.end,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Text(name, style: Theme.of(context).textTheme.display2),
+            Text(
+              name,
+              style: Theme.of(context).textTheme.display2,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
             SizedBox(height: 3),
             Text(
               '$amount $displayUnit x $portionsPerDay dziennie',

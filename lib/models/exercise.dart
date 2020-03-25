@@ -7,6 +7,7 @@ class Exercise {
   final int setRest;
   final String name;
   final String image;
+  final bool withWeight;
 
   Exercise({
     this.id,
@@ -15,6 +16,7 @@ class Exercise {
     this.setRest,
     this.name,
     this.image,
+    this.withWeight,
   });
 
   factory Exercise.fromMap(Map<dynamic, dynamic> data) {
@@ -25,6 +27,7 @@ class Exercise {
       setRest: data['setRest'] ?? 0,
       name: data['name'] ?? '',
       image: data['image'] ?? '',
+      withWeight: data['withWeight'] ?? false
     );
   }
 }

@@ -104,7 +104,7 @@ class _SavedWorkoutsScreenState extends State<SavedWorkoutsScreen> {
                             fontWeight: FontWeight.w500,
                             fontSize: 20,
                           ),
-                      maxLines: 2,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: 3.0),

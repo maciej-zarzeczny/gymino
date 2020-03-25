@@ -5,12 +5,13 @@ import 'dart:async';
 import 'dart:io';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
-import 'package:sqilly/globals.dart';
+import 'package:flutter_picker/flutter_picker.dart';
 
 import '../widgets/button.dart';
 import '../size_config.dart';
 import '../models/exercise.dart';
 import '../providers/users_provider.dart';
+import '../globals.dart';
 
 class WorkoutScreen extends StatefulWidget {
   static const routeName = '/workout';
@@ -24,18 +25,19 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   int _currentSet;
   List<Exercise> _exercises;
   bool _isLoading = true;
-  int _repsNumber;
-  int _currentReps = 0;
+  List<dynamic> _sets;
   bool _rest = false;
   double _opacity = 1.0;
   Timer _timer;
-  int _timerDuration;
-  int _restDuration = 0;
-  final weightInputController = TextEditingController(text: '0');
+  int _timerDuration = 1;
+  int _restDuration = 1;
   List<dynamic> _doneExercises = [];
   UsersProvider _usersProvider;
   String _workoutName;
   String _workoutImageUrl;
+  String _appBarTitle = '';
+  bool _workoutFinished = false;
+  bool _setsInit = true;
 
   @override
   void initState() {
@@ -49,45 +51,44 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
         _currentExerciseIndex = 0;
         _currentSet = 1;
         _isLoading = false;
+        _appBarTitle = _exercises[0].name;
       });
     });
     super.initState();
   }
 
-  void setDone() {
-    FocusScope.of(context).requestFocus(new FocusNode());
+  void setDone(int weight, int reps) {
     if (_currentSet == 1) {
       _doneExercises.add({'name': _exercises[_currentExerciseIndex].name, 'sets': []});
     }
-    Map<dynamic, dynamic> _set = {'reps': _currentReps, 'weight': double.parse(weightInputController.text.trim())};
+    Map<dynamic, dynamic> _set = {'reps': reps, 'weight': weight};
     _doneExercises[_currentExerciseIndex]['sets'].add(_set);
 
-    weightInputController.text = '0';
-
     setState(() {
+      _sets[_currentSet - 1] = _set;
       if (_currentSet < _exercises[_currentExerciseIndex].sets.length) {
         _currentSet += 1;
-        _currentReps = 0;
         _restDuration = _exercises[_currentExerciseIndex].rest;
         startRest(_restDuration);
       } else {
-        _currentSet = 1;
-        _currentReps = 0;
         if (_currentExerciseIndex < _exercises.length - 1) {
+          _setsInit = true;
+          _currentSet = 1;
           _restDuration = _exercises[_currentExerciseIndex].setRest;
           startRest(_restDuration);
           _currentExerciseIndex += 1;
         } else {
-          setState(() => _isLoading = true);
-          _finishWorkout().then((_) {
-            setState(() => _isLoading = false);
-            Navigator.of(context).pop();
-          }).catchError((err) {
-            setState(() => _isLoading = false);
-            print(err.toString());
-          });
+          setState(() => _workoutFinished = true);
         }
       }
+    });
+  }
+
+  void changeSet(int index, int weight, int reps) {
+    Map<String, int> _set = {'reps': reps, 'weight': weight};
+    _doneExercises[_currentExerciseIndex]['sets'][index] = _set;
+    setState(() {
+      _sets[index] = _set;
     });
   }
 
@@ -96,6 +97,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   }
 
   void startRest(int time) {
+    setState(() => _appBarTitle = 'Odpoczynek');
     _rest = true;
     _opacity = 0.0;
     startCountdown(time);
@@ -103,52 +105,11 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 
   void finishRest() {
     setState(() {
+      _appBarTitle = _exercises[_currentExerciseIndex].name;
       _rest = false;
       _opacity = 1.0;
       _timerDuration = 0;
-      weightInputController.text = '0';
     });
-  }
-
-  void addRep() {
-    setState(() {
-      if (_currentReps < _repsNumber) {
-        _currentReps += 1;
-      }
-    });
-  }
-
-  void substractRep() {
-    setState(() {
-      if (_currentReps > 0) {
-        _currentReps -= 1;
-      }
-    });
-  }
-
-  void addTime() {
-    setState(() {
-      _restDuration += 30;
-      _timerDuration += 30;
-    });
-  }
-
-  void substractTime() {
-    setState(() {
-      if (_timerDuration >= 30) {
-        _timerDuration -= 30;
-      } else {
-        _timerDuration = 0;
-      }
-    });
-  }
-
-  String nextExercise() {
-    if (_currentExerciseIndex + 1 < _exercises.length) {
-      return 'Następnie: ${_exercises[_currentExerciseIndex + 1].name}';
-    } else {
-      return 'Ostatnie ćwiczenie';
-    }
   }
 
   String parseDuration(int duration) {
@@ -172,365 +133,338 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     });
   }
 
+  void showPickerArray(BuildContext context, int initReps, int initWeight, bool withWeight, int index) {
+    new Picker(
+        adapter: NumberPickerAdapter(data: [
+          NumberPickerColumn(
+            begin: withWeight ? 1 : 0,
+            end: withWeight ? 400 : 0,
+            initValue: initWeight != 0 ? initWeight : 1,
+            suffix: withWeight ? Text(' kg') : Text(''),
+          ),
+          NumberPickerColumn(begin: 1, end: 50, initValue: initReps),
+        ]),
+        delimiter: [
+          PickerDelimiter(
+            child: Container(
+              width: 30.0,
+              alignment: Alignment.center,
+              child: Text('x'),
+            ),
+          ),
+        ],
+        hideHeader: true,
+        title: new Text("Wybierz wartości"),
+        onConfirm: (Picker picker, List value) {
+          if (_doneExercises.length > _currentExerciseIndex && _doneExercises[_currentExerciseIndex]['sets'].length > index) {
+            changeSet(index, picker.getSelectedValues()[0], picker.getSelectedValues()[1]);
+          } else {
+            setDone(picker.getSelectedValues()[0], picker.getSelectedValues()[1]);
+          }
+        }).showDialog(context);
+  }
+
   @override
   void dispose() {
     if (_timer != null) {
       _timer.cancel();
     }
-    weightInputController.dispose();
     super.dispose();
+  }
+
+  Future<bool> _onWillPop() async {
+    return (await showDialog(
+          context: context,
+          builder: (context) => new AlertDialog(
+            title: new Text(
+              'Zakończyć trening ?'.toUpperCase(),
+              style: Theme.of(context).textTheme.title.copyWith(
+                    color: Theme.of(context).primaryColor,
+                  ),
+            ),
+            content: new Text('Czy na pewno chcesz zakończyć obecny trening ? Nie zostanie on zapisany w historii treningów.'),
+            actions: <Widget>[
+              new FlatButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: new Text('Nie'),
+              ),
+              new FlatButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: new Text('Tak'),
+              ),
+            ],
+          ),
+        )) ??
+        false;
   }
 
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     Exercise _currentExercise;
-    int _setsNumber;
+    int _setsNumber = 0;
 
     if (!_isLoading) {
       _currentExercise = _exercises[_currentExerciseIndex];
+      if (_setsInit) {
+        _setsInit = false;
+        _sets = _currentExercise.sets;
+      }
       _setsNumber = _currentExercise.sets.length;
-      _repsNumber = _currentExercise.sets.elementAt(_currentSet - 1);
     }
 
-    return _isLoading
-        ? Center(child: CircularProgressIndicator())
-        : Container(
-            height: MediaQuery.of(context).size.height,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: CachedNetworkImageProvider(_currentExercise.image),
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: Stack(
-              children: <Widget>[
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.center,
-                      colors: [
-                        Color.fromRGBO(0, 0, 0, 0.05),
-                        Color.fromRGBO(26, 26, 26, 0.95),
-                      ],
+    final AppBar _appBar = AppBar(
+      title: Text(
+        _appBarTitle.toUpperCase(),
+        style: Theme.of(context).textTheme.title,
+      ),
+      centerTitle: true,
+      iconTheme: IconThemeData(color: Theme.of(context).textTheme.title.color),
+      backgroundColor: Colors.transparent,
+      brightness: Platform.isIOS ? Brightness.light : Brightness.dark,
+      elevation: 0.0,
+    );
+
+    return new WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        appBar: _appBar,
+        body: _isLoading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : Container(
+                color: Global().canvasColor,
+                child: Stack(
+                  children: <Widget>[
+                    AnimatedOpacity(
+                      duration: Duration(milliseconds: 200),
+                      opacity: 1 - _opacity,
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.width * 0.2),
+                        child: Center(
+                          child: restTimer(),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                Scaffold(
-                  backgroundColor: Colors.transparent,
-                  body: _isLoading
-                      ? Center(
-                          child: CircularProgressIndicator(),
-                        )
-                      : GestureDetector(
-                          onTap: () {
-                            if (weightInputController.text == '') {
-                              weightInputController.text = '0';
-                            }
-                            FocusScope.of(context).requestFocus(new FocusNode());
-                          },
-                          child: LayoutBuilder(
-                            builder: (context, constraints) {
-                              return SingleChildScrollView(
-                                child: ConstrainedBox(
-                                  constraints: BoxConstraints(
-                                    minWidth: constraints.maxWidth,
-                                    minHeight: constraints.maxHeight,
-                                  ),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: <Widget>[
-                                      topHeader(),
-                                      exerciseTitle(_currentExercise.name, _currentSet, _setsNumber),
-                                      repsCounter(_currentReps, _repsNumber),
-                                      weightCounter(),
-                                      nextButton(),
-                                    ],
+                    Column(
+                      children: <Widget>[
+                        Expanded(
+                          child: ListView(
+                            padding: const EdgeInsets.all(0),
+                            children: <Widget>[
+                              SizedBox(height: 10.0),
+                              AnimatedOpacity(
+                                duration: Duration(milliseconds: 200),
+                                opacity: _opacity,
+                                child: Container(
+                                  height: MediaQuery.of(context).size.width * 0.8,
+                                  margin: const EdgeInsets.symmetric(horizontal: 20.0),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15.0),
+                                    color: Global().softGrey,
+                                    image: DecorationImage(
+                                      image: CachedNetworkImageProvider(_currentExercise.image),
+                                      fit: BoxFit.cover,
+                                      colorFilter: ColorFilter.mode(Colors.black26, BlendMode.darken),
+                                    ),
                                   ),
                                 ),
-                              );
-                            },
+                              ),
+                              SizedBox(height: 20.0),
+                              AnimatedOpacity(
+                                duration: Duration(milliseconds: 200),
+                                opacity: _opacity,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: _sets.asMap().entries.map((entry) {
+                                    int index = entry.key + 1;
+                                    int reps = entry.value['reps'];
+                                    int weight = entry.value['weight'];
+                                    return setRow(index, reps, _setsNumber, weight);
+                                  }).toList(),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
+                        SizedBox(height: 10.0),
+                        nextButton(_setsNumber, _sets[_currentSet - 1]['reps'], _sets[_currentSet - 1]['weight'])
+                      ],
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          );
-  }
-
-  Widget exerciseTitle(String exerciseName, int currentSet, int setsNumber) {
-    return Container(
-      child: Column(
-        children: <Widget>[
-          Icon(
-            Icons.fitness_center,
-            color: Global().canvasColor,
-            size: SizeConfig.safeBlockHorizontal * 10.0,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(7.0),
-            child: Text(
-              _rest ? 'Odpoczynek' : exerciseName,
-              style: Theme.of(context).textTheme.display2,
-              textAlign: TextAlign.center,
-            ),
-          ),
-          AnimatedOpacity(
-            duration: Duration(milliseconds: 200),
-            opacity: _opacity,
-            child: Text(
-              'seria $currentSet/$setsNumber',
-              style: Theme.of(context).textTheme.body1.copyWith(
-                    color: Global().canvasColor,
-                    fontSize: SizeConfig.safeBlockHorizontal * 5.0,
-                    fontWeight: FontWeight.normal,
-                  ),
-            ),
-          ),
-        ],
+              ),
       ),
     );
   }
 
-  Widget repsCounter(int currentReps, int repsNumber) {
+  Widget setRow(int setNumber, int reps, int setsNumber, int weight) {
+    bool value = false;
+    if (!_workoutFinished) {
+      value = _currentSet > setNumber;
+    } else {
+      value = _workoutFinished;
+    }
+    bool currentSet = _currentSet == setNumber;
+    bool withWeight = weight > 0;
+
+    String weightSuffix = value ? 'kg' : '%';
+
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: GestureDetector(
+        onTap: () {
+          if (!value && currentSet) {
+            showPickerArray(context, reps, 0, withWeight, setNumber - 1);
+          } else if (value) {
+            showPickerArray(context, reps, weight, withWeight, setNumber - 1);
+          }
+        },
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: <Widget>[
+            Checkbox(
+              value: value,
+              onChanged: (_) {
+                if (!value && currentSet) {
+                  showPickerArray(context, reps, 0, withWeight, setNumber - 1);
+                } else if (value) {
+                  showPickerArray(context, reps, weight, withWeight, setNumber - 1);
+                }
+              },
+            ),
+            Column(
+              children: <Widget>[
+                Text(
+                  'SERIA',
+                  style: TextStyle(
+                    color: Global().mediumGrey,
+                    letterSpacing: 1.0,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 5.0),
+                Text(
+                  setNumber.toString(),
+                  style: TextStyle(
+                    color: !value ? currentSet ? Theme.of(context).primaryColor : Global().mediumGrey : Theme.of(context).accentColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
+              ],
+            ),
+            Column(
+              children: <Widget>[
+                Text(
+                  'KG',
+                  style: TextStyle(
+                    color: Global().mediumGrey,
+                    letterSpacing: 1.0,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 5.0),
+                Text(
+                  withWeight ? '$weight$weightSuffix' : '-',
+                  style: TextStyle(
+                    color: !value ? currentSet ? Theme.of(context).primaryColor : Global().mediumGrey : Theme.of(context).accentColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
+              ],
+            ),
+            Column(
+              children: <Widget>[
+                Text(
+                  'POWTÓRZENIA',
+                  style: TextStyle(
+                    color: Global().mediumGrey,
+                    letterSpacing: 1.0,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 5.0),
+                Text(
+                  reps.toString(),
+                  style: TextStyle(
+                    color: !value ? currentSet ? Theme.of(context).primaryColor : Global().mediumGrey : Theme.of(context).accentColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget restTimer() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
-        Stack(
-          alignment: Alignment.center,
-          children: <Widget>[
-            AnimatedOpacity(
-              duration: Duration(milliseconds: 200),
-              opacity: _opacity,
-              child: IconButton(
-                padding: const EdgeInsets.only(left: 0.0),
-                icon: Icon(
-                  Icons.remove_circle,
-                  color: Colors.white,
-                  size: SizeConfig.safeBlockHorizontal * 13.0,
-                ),
-                onPressed: () {
-                  substractRep();
-                },
-              ),
-            ),
-            AnimatedOpacity(
-              duration: Duration(milliseconds: 200),
-              opacity: 1 - _opacity,
-              child: InkWell(
-                onTap: _rest ? substractTime : substractRep,
-                child: Container(
-                  padding: const EdgeInsets.all(10.0),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: Text(
-                    '-30 s',
-                    style: Theme.of(context).textTheme.display1.copyWith(fontWeight: FontWeight.normal),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
         CircularPercentIndicator(
           radius: SizeConfig.blockSizeHorizontal * 50.0,
           lineWidth: 13.0,
-          percent: _rest ? _timerDuration / _restDuration : currentReps / repsNumber,
+          percent: _timerDuration / _restDuration,
           center: Text(
-            _rest ? parseDuration(_timerDuration) : '$currentReps/$repsNumber',
-            style: Theme.of(context).textTheme.display2.copyWith(fontSize: SizeConfig.safeBlockHorizontal * 10.0),
+            parseDuration(_timerDuration),
+            style: Theme.of(context).textTheme.display2.copyWith(
+                  fontSize: SizeConfig.safeBlockHorizontal * 10.0,
+                  color: Theme.of(context).primaryColor,
+                ),
           ),
           progressColor: Theme.of(context).accentColor,
-          backgroundColor: Colors.white,
+          backgroundColor: Global().softGrey,
           animationDuration: 100,
           animation: true,
           animateFromLastPercent: true,
-        ),
-        Stack(
-          children: <Widget>[
-            AnimatedOpacity(
-              duration: Duration(milliseconds: 200),
-              opacity: _opacity,
-              child: IconButton(
-                padding: const EdgeInsets.only(right: 0.0),
-                icon: Icon(
-                  Icons.add_circle,
-                  color: Colors.white,
-                  size: SizeConfig.safeBlockHorizontal * 13.0,
-                ),
-                onPressed: () {
-                  addRep();
-                },
-              ),
-            ),
-            AnimatedOpacity(
-              duration: Duration(milliseconds: 200),
-              opacity: 1 - _opacity,
-              child: InkWell(
-                onTap: _rest ? addTime : addRep,
-                child: Container(
-                  padding: const EdgeInsets.all(10.0),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: Text(
-                    '+30 s',
-                    style: Theme.of(context).textTheme.display1.copyWith(fontWeight: FontWeight.normal),
-                  ),
-                ),
-              ),
-            ),
-          ],
         ),
       ],
     );
   }
 
-  Widget weightCounter() {
-    return AnimatedOpacity(
-      duration: Duration(milliseconds: 200),
-      opacity: _opacity,
-      child: Column(
-        children: <Widget>[
-          Text(
-            'Obciążenie',
-            style: Theme.of(context).textTheme.body1.copyWith(
-                  color: Global().canvasColor,
-                  fontSize: SizeConfig.safeBlockHorizontal * 3.0,
-                ),
-          ),
-          Container(
-            margin: const EdgeInsets.only(top: 7.0, bottom: 10.0),
-            height: SizeConfig.blockSizeHorizontal * 25.0,
-            width: SizeConfig.blockSizeHorizontal * 25.0,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20.0),
-            ),
-            padding: const EdgeInsets.symmetric(
-              horizontal: 10.0,
-              vertical: 10.0,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Expanded(
-                  child: TextField(
-                    onTap: () => weightInputController.text = '',
-                    controller: weightInputController,
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                    ),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: SizeConfig.safeBlockHorizontal * 7.0,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    keyboardType: TextInputType.numberWithOptions(decimal: true),
-                  ),
-                ),
-                Text(
-                  'kg',
-                  style: TextStyle(
-                    fontSize: SizeConfig.safeBlockHorizontal * 5.0,
-                    color: Color.fromRGBO(94, 94, 94, 1),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget nextButton() {
+  Widget nextButton(int _setsNumber, int _repsNumber, int weight) {
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 10.0),
       child: Column(
         children: <Widget>[
           Text(
-            nextExercise(),
-            style: Theme.of(context).textTheme.body1.copyWith(
-                  color: Global().canvasColor,
-                  fontSize: SizeConfig.safeBlockHorizontal * 3.0,
-                ),
+            (_rest || _workoutFinished) ? '' : 'Seria: $_currentSet / $_setsNumber',
+            style: Theme.of(context).textTheme.title.copyWith(color: Theme.of(context).primaryColor),
           ),
           Container(
-            width: MediaQuery.of(context).size.width * 0.7,
+            width: MediaQuery.of(context).size.width * 0.8,
             child: Button(
-              text: _rest ? 'Pomiń' : 'Gotowe',
-              onTapFunction: _rest ? finishRest : setDone,
+              text: _rest ? 'Pomiń' : _workoutFinished ? 'Zakończ trening' : 'Gotowe',
+              onTapFunction: _rest
+                  ? finishRest
+                  : _workoutFinished
+                      ? () {
+                          setState(() => _isLoading = true);
+                          _finishWorkout().then((_) {
+                            setState(() {
+                              _setsInit = true;
+                              _isLoading = false;
+                            });
+                            Navigator.of(context).pop();
+                          }).catchError((err) {
+                            setState(() => _isLoading = false);
+                            print(err.toString());
+                          });
+                        }
+                      : () => showPickerArray(context, _repsNumber, 0, weight > 0, _currentSet),
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget topHeader() {
-    return Container(
-      margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-      padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0),
-      alignment: Alignment.topLeft,
-      child: IconButton(
-        padding: const EdgeInsets.all(0.0),
-        icon: Icon(
-          Icons.highlight_off,
-          color: Colors.white,
-          size: 35,
-        ),
-        onPressed: () {          
-          if (_currentSet > 1) {
-            if (Platform.isIOS) {
-              showCupertinoDialog(
-                  context: context,
-                  builder: (bCntx) {
-                    return CupertinoAlertDialog(
-                      title: Text('Zakończyć trening ?'),
-                      content: Text('Czy na pewno chcesz zakończyć trening ?'),
-                      actions: <Widget>[
-                        CupertinoDialogAction(
-                          isDefaultAction: true,
-                          child: Text('Nie'),
-                          onPressed: () => Navigator.of(context).pop(),
-                        ),
-                        CupertinoDialogAction(
-                          child: Text('Tak'),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            setState(() => _isLoading = true);
-                            _finishWorkout().then((_) {
-                              setState(() => _isLoading = false);
-                              Navigator.of(context).pop();
-                            }).catchError((err) {
-                              setState(() => _isLoading = false);
-                              Global().showAlertDialog(
-                                context,
-                                'Błąd',
-                                'Podczas zapisywania treningu wystąpił błąd, spróbuj ponownie później.',
-                                'Ok',
-                                () => Navigator.of(context).pop(),
-                              );
-                            });
-                          },
-                        ),
-                      ],
-                    );
-                  });
-            }
-          } else {
-            Navigator.of(context).pop();
-          }
-        },
       ),
     );
   }

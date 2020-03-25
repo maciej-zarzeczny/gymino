@@ -42,6 +42,7 @@ class _ExerciseOverviewScreenState extends State<ExerciseOverviewScreen> {
   Widget build(BuildContext context) {
     final _appBar = AppBar(
       backgroundColor: Colors.transparent,
+      elevation: 0,
     );
 
     ExerciseData _exerciseData;
@@ -80,7 +81,7 @@ class _ExerciseOverviewScreenState extends State<ExerciseOverviewScreen> {
           image: CachedNetworkImageProvider(imageUrl),
           fit: BoxFit.cover,
           alignment: Alignment.topCenter,
-          colorFilter: ColorFilter.mode(Colors.black26, BlendMode.darken),
+          colorFilter: ColorFilter.mode(Colors.black38, BlendMode.darken),
         ),
       ),
       child: Stack(
@@ -121,7 +122,8 @@ class _ExerciseOverviewScreenState extends State<ExerciseOverviewScreen> {
           ),
           Padding(
             padding: const EdgeInsets.only(top: 10.0),
-            child: Row(
+            child: Wrap(
+              runSpacing: 10.0,
               children: exercise.keywords.map((keyword) {
                 return Keyword(keyword, true);
               }).toList(),

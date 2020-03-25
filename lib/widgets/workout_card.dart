@@ -11,26 +11,24 @@ class WorkoutCard extends StatelessWidget {
   final bool isFullSize;
   final Workout workout;
 
-  WorkoutCard(this.workout, this.isFullSize);
+  WorkoutCard(
+    this.workout,
+    this.isFullSize,
+  );
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      
       onTap: () {
-        Navigator.of(context)
-            .pushNamed(WorkoutOverviewScreen.routeName, arguments: workout.id);
+        Navigator.of(context).pushNamed(WorkoutOverviewScreen.routeName, arguments: workout.id);
       },
       child: Container(
-        width: isFullSize
-            ? double.infinity
-            : MediaQuery.of(context).size.width * 0.45,
-        height: isFullSize
-            ? MediaQuery.of(context).size.height * 0.2
-            : double.infinity,
+        width: isFullSize ? double.infinity : MediaQuery.of(context).size.width * 0.5,
+        height: isFullSize ? MediaQuery.of(context).size.height * 0.2 : double.infinity,
         constraints: BoxConstraints(minHeight: 150),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15.0),
+          color: Global().lightGrey,
           image: DecorationImage(
             image: CachedNetworkImageProvider(workout.imageUrl),
             fit: BoxFit.cover,

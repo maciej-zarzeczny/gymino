@@ -17,6 +17,7 @@ class WorkoutHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final _appBar = AppBar(
       backgroundColor: Colors.transparent,
+      elevation: 0,
     );
 
     return Container(
@@ -31,21 +32,17 @@ class WorkoutHeader extends StatelessWidget {
         ),
       ),
       child: Stack(
-        children: <Widget>[  
-          _appBar,        
+        children: <Widget>[          
           Padding(
-            padding: EdgeInsets.only(
-                top: MediaQuery.of(context).padding.top +
-                    _appBar.preferredSize.height),
+            padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + _appBar.preferredSize.height),
             child: Align(
               alignment: Alignment.topLeft,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[                  
+                children: <Widget>[
                   Container(
                     margin: const EdgeInsets.symmetric(horizontal: 20.0),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 7.0, vertical: 7.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 7.0, vertical: 7.0),
                     decoration: BoxDecoration(
                       color: Color.fromRGBO(26, 26, 26, 0.7),
                       borderRadius: BorderRadius.circular(8.0),
@@ -55,9 +52,7 @@ class WorkoutHeader extends StatelessWidget {
                       children: <Widget>[
                         Text(
                           'Poziom: ',
-                          style: Theme.of(context).textTheme.overline.copyWith(
-                              color: Global().canvasColor,
-                              fontWeight: FontWeight.normal),
+                          style: Theme.of(context).textTheme.overline.copyWith(color: Global().canvasColor, fontWeight: FontWeight.normal),
                         ),
                         DifficultyLevel(workout.difficulty),
                       ],
@@ -66,10 +61,10 @@ class WorkoutHeader extends StatelessWidget {
                   SizedBox(height: 10.0),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
+                    child: Wrap(
+                      runSpacing: 10.0,
                       children: workout.keywords.map((keyword) {
-                        return Expanded(child: Keyword(keyword, false));
+                        return Keyword(keyword, false);
                       }).toList(),
                     ),
                   ),
@@ -77,14 +72,27 @@ class WorkoutHeader extends StatelessWidget {
               ),
             ),
           ),
+          workout.isPremium
+              ? Container(
+                  height: MediaQuery.of(context).size.height * 0.35,
+                  width: double.infinity,
+                  color: Colors.black54,
+                  child: Center(
+                    child: Icon(
+                      Icons.lock,
+                      color: Global().canvasColor,  
+                      size: 45,
+                    ),
+                  ),
+                )
+              : Container(),
+          _appBar,
           Positioned(
             bottom: -2,
             left: 0,
             right: 0,
             child: Container(
-              height: (MediaQuery.of(context).size.height -
-                      MediaQuery.of(context).padding.top) *
-                  0.05,
+              height: (MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top) * 0.05,
               padding: const EdgeInsets.all(0.0),
               margin: const EdgeInsets.all(0.0),
               decoration: BoxDecoration(

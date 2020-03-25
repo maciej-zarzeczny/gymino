@@ -26,9 +26,11 @@ class TrainerHeader extends StatelessWidget {
             imageUrl: trainer.image,
             fit: BoxFit.cover,
             alignment: Alignment.topCenter,
-            errorWidget: (context, url, error) => Icon(
-            Icons.error_outline,
-              color: Colors.white,
+            errorWidget: (context, url, error) => Center(
+              child: Icon(
+              Icons.error_outline,
+                color: Colors.white,
+              ),
             ),
           ),
           Container(

@@ -14,8 +14,8 @@ class RecentWorkouts extends StatelessWidget {
     return Container(
       height: recentWorkouts.length > 1
           ? MediaQuery.of(context).size.height * 0.35
-          : MediaQuery.of(context).size.height * 0.2,
-      constraints: BoxConstraints(minHeight: 250),
+          : MediaQuery.of(context).size.height * 0.31,
+      constraints: BoxConstraints(minHeight: 150),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[

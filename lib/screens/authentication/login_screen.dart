@@ -137,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             child: Image(
                               image:
-                                  AssetImage('assets/images/sqilly_logo.png'),
+                                  AssetImage('assets/images/gymino_logo.png'),
                             ),
                           ),
                           Container(

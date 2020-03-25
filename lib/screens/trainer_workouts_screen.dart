@@ -107,7 +107,6 @@ class _TrainerWorkoutsScreenState extends State<TrainerWorkoutsScreen> {
     List<Workout> workouts;
     List<Workout> recommendedWorkouts;
 
-
     if (!_isLoading) {
       workouts = workoutsProvider.workouts;
       recommendedWorkouts = workoutsProvider.recommendedWorkouts;
@@ -123,7 +122,7 @@ class _TrainerWorkoutsScreenState extends State<TrainerWorkoutsScreen> {
       body: _isLoading
           ? Global().loadingIndicator(context)
           : Container(
-              color: Colors.white,
+              color: Global().canvasColor,
               child: CustomScrollView(
                 controller: _scrollController,
                 slivers: <Widget>[

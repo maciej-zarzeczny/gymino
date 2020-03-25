@@ -30,9 +30,10 @@ class _WorkoutOverviewScreenState extends State<WorkoutOverviewScreen> {
       workoutsProvider = Provider.of<WorkoutsProvider>(context, listen: false);
       workoutId = ModalRoute.of(context).settings.arguments as String;
       workout = workoutsProvider.findById(workoutId);
-    
+
       if (workout == null) {
-        workoutsProvider.fetchWorkoutById(workoutId).then((_) {          
+        workoutsProvider.fetchWorkoutById(workoutId).then((_) {
+          workout = workoutsProvider.findById(workoutId);
           setState(() {
             _isLoading = false;
           });
@@ -44,7 +45,7 @@ class _WorkoutOverviewScreenState extends State<WorkoutOverviewScreen> {
             'Ok',
             () => Navigator.of(context).pop(),
           );
-          _isLoading = false;                  
+          _isLoading = false;
         });
       } else {
         setState(() {
@@ -62,14 +63,12 @@ class _WorkoutOverviewScreenState extends State<WorkoutOverviewScreen> {
     UserData userData;
     bool isSaved = false;
 
-    if (!_isLoading) {            
-      workout = workoutsProvider.findById(workoutId);
+    if (!_isLoading) {
       usersProvider = Provider.of<UsersProvider>(context);
       exercises = workout.getExercises();
       userData = usersProvider.userData;
 
-      if (userData.savedWorkouts != null &&
-          userData.savedWorkouts.containsKey(workoutId)) {
+      if (userData.savedWorkouts != null && userData.savedWorkouts.containsKey(workoutId)) {
         isSaved = true;
       }
     }
@@ -99,11 +98,7 @@ class _WorkoutOverviewScreenState extends State<WorkoutOverviewScreen> {
         ));
       }).catchError((err) {
         Global().showAlertDialog(
-            context,
-            'Błąd',
-            'Podczas łączenia z serwerem wystąpił błąd, spróbuj ponownie później.',
-            'Ok',
-            () => Navigator.of(context).pop());
+            context, 'Błąd', 'Podczas łączenia z serwerem wystąpił błąd, spróbuj ponownie później.', 'Ok', () => Navigator.of(context).pop());
       });
     }
 
@@ -115,11 +110,7 @@ class _WorkoutOverviewScreenState extends State<WorkoutOverviewScreen> {
         ));
       }).catchError((err) {
         Global().showAlertDialog(
-            context,
-            'Błąd',
-            'Podczas łączenia z serwerem wystąpił błąd, spróbuj ponownie później.',
-            'Ok',
-            () => Navigator.of(context).pop());
+            context, 'Błąd', 'Podczas łączenia z serwerem wystąpił błąd, spróbuj ponownie później.', 'Ok', () => Navigator.of(context).pop());
       });
     }
 
@@ -149,8 +140,7 @@ class _WorkoutOverviewScreenState extends State<WorkoutOverviewScreen> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
                           Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10.0, vertical: 5.0),
+                            padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
                             decoration: BoxDecoration(
                               color: Global().lightGrey,
                               borderRadius: BorderRadius.circular(10.0),
@@ -197,14 +187,37 @@ class _WorkoutOverviewScreenState extends State<WorkoutOverviewScreen> {
                     ),
                     SizedBox(height: 10.0),
                     Expanded(
-                      child: ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                        itemCount: exercises.length,
-                        itemBuilder: (context, i) {
-                          return ExerciseCard(exercises[i]);
-                        },
-                      ),
-                    ),
+                        child: ListView.builder(
+                      padding: EdgeInsets.only(left: 20.0, right: 20.0, bottom: MediaQuery.of(context).padding.bottom),
+                      itemCount: exercises.length + 1,
+                      itemBuilder: (context, i) {
+                        if (i == 0) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                workout.description,
+                                style: Theme.of(context).textTheme.body1,
+                                textAlign: TextAlign.justify,
+                              ),
+                              !workout.isPremium
+                                  ? Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 20.0),
+                                      child: Text(
+                                        'Lista ćwiczeń',
+                                        style: Theme.of(context).textTheme.display1,
+                                      ),
+                                    )
+                                  : Container(),
+                            ],
+                          );
+                        } else if (!workout.isPremium) {
+                          return ExerciseCard(exercises[i - 1]);
+                        } else {
+                          return Container();
+                        }
+                      },
+                    )),
                   ],
                 ),
               ),

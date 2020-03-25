@@ -11,6 +11,8 @@ class Workout {
   final int difficulty;
   final List<dynamic> keywords;
   final List<dynamic> exercises;
+  final bool isPremium;
+  final String description;
 
   Workout({
     this.id,
@@ -20,6 +22,8 @@ class Workout {
     @required this.difficulty,
     @required this.keywords,
     this.exercises,
+    this.isPremium,
+    this.description,
   });
 
   factory Workout.fromSnapshot(DocumentSnapshot doc) {
@@ -33,6 +37,8 @@ class Workout {
       difficulty: data['difficulty'] ?? 1,
       keywords: data['keywords'] ?? [],
       exercises: data['exercises'] ?? [],
+      isPremium: data['isPremium'] ?? false,
+      description: data['description'] ?? '',
     );
   }
 

@@ -45,6 +45,7 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'SQILLY',
         theme: ThemeData(
           primarySwatch: MaterialColor(0xFF1A1A1A, Global().primaryColor),

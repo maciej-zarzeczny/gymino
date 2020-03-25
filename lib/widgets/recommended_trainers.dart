@@ -19,7 +19,7 @@ class RecommendedTrainers extends StatelessWidget {
               0.35
           : (MediaQuery.of(context).size.height -
                   MediaQuery.of(context).padding.top) *
-              0.25,
+              0.3,
       constraints: BoxConstraints(minHeight: 250),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
