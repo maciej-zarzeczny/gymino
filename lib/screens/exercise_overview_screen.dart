@@ -28,6 +28,11 @@ class _ExerciseOverviewScreenState extends State<ExerciseOverviewScreen> {
           setState(() {
             _isLoading = false;
           });
+        }).catchError((err) {
+          Global().showAlertDialog(context, 'Błąd', 'Podczas łaczenia z serwerem wystąpił błąd', 'Ok', () {
+            Navigator.of(context).pop();
+            Navigator.of(context).pop();
+          });
         });
       } else {
         setState(() {
@@ -87,7 +92,7 @@ class _ExerciseOverviewScreenState extends State<ExerciseOverviewScreen> {
       child: Stack(
         children: <Widget>[
           appBar,
-          Padding(            
+          Padding(
             padding: EdgeInsets.only(top: appBar.preferredSize.height),
             child: Align(
               alignment: Alignment.bottomCenter,

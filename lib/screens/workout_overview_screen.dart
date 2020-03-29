@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../widgets/button.dart';
 import '../globals.dart';
 import '../providers/workouts_provider.dart';
 import '../models/workout.dart';
 import '../widgets/workout_header.dart';
 import '../widgets/exercise_card.dart';
 import '../screens/workout_screen.dart';
+import '../screens/subscription_screen.dart';
 import '../models/exercise.dart';
 import '../providers/users_provider.dart';
 import '../models/user.dart';
@@ -43,7 +45,10 @@ class _WorkoutOverviewScreenState extends State<WorkoutOverviewScreen> {
             'Błąd',
             'Podczas łączenia z serwerem wystąpił błąd, spróbuj ponownie później.',
             'Ok',
-            () => Navigator.of(context).pop(),
+            () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
+            },
           );
           _isLoading = false;
         });
@@ -187,53 +192,81 @@ class _WorkoutOverviewScreenState extends State<WorkoutOverviewScreen> {
                     ),
                     SizedBox(height: 10.0),
                     Expanded(
-                        child: ListView.builder(
-                      padding: EdgeInsets.only(left: 20.0, right: 20.0, bottom: MediaQuery.of(context).padding.bottom),
-                      itemCount: exercises.length + 1,
-                      itemBuilder: (context, i) {
-                        if (i == 0) {
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Text(
-                                workout.description,
-                                style: Theme.of(context).textTheme.body1,
-                                textAlign: TextAlign.justify,
-                              ),
-                              !workout.isPremium
-                                  ? Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 20.0),
-                                      child: Text(
-                                        'Lista ćwiczeń',
-                                        style: Theme.of(context).textTheme.display1,
-                                      ),
-                                    )
-                                  : Container(),
-                            ],
-                          );
-                        } else if (!workout.isPremium) {
-                          return ExerciseCard(exercises[i - 1]);
-                        } else {
-                          return Container();
-                        }
-                      },
-                    )),
+                      child: ListView.builder(
+                        padding: EdgeInsets.only(left: 20.0, right: 20.0, bottom: MediaQuery.of(context).padding.bottom),
+                        itemCount: exercises.length + 1,
+                        itemBuilder: (context, i) {
+                          if (i == 0) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text(
+                                  workout.description,
+                                  style: Theme.of(context).textTheme.body1,
+                                  textAlign: TextAlign.justify,
+                                ),
+                                !workout.isPremium
+                                    ? Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 20.0),
+                                        child: Text(
+                                          'Lista ćwiczeń',
+                                          style: Theme.of(context).textTheme.display1,
+                                        ),
+                                      )
+                                    : Container(),
+                              ],
+                            );
+                          } else if (!workout.isPremium) {
+                            return ExerciseCard(exercises[i - 1]);
+                          } else {
+                            return Container();
+                          }
+                        },
+                      ),
+                    ),
+                    workout.isPremium
+                        ? Align(
+                            alignment: Alignment.bottomCenter,
+                            child: Column(
+                              children: <Widget>[
+                                Container(
+                                  width: MediaQuery.of(context).size.width * 0.8,
+                                  child: Button(
+                                    onTapFunction: () => Navigator.of(context).pushNamed(SubscriptionScreen.routeName),
+                                    text: 'Wykup subskrypcję',
+                                  ),
+                                ),
+                                Container(
+                                  width: MediaQuery.of(context).size.width * 0.7,
+                                  padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+                                  child: Text(
+                                    'Ten trening dostępny jest tylko dla użytkowników subskrybujących tego trenera',
+                                    style: Theme.of(context).textTheme.body2,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                )
+                              ],
+                            ),
+                          )
+                        : Container(),
                   ],
                 ),
               ),
             ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: FloatingActionButton(
-          onPressed: startWorkout,
-          backgroundColor: Theme.of(context).accentColor,
-          elevation: 5,
-          child: Icon(
-            Icons.play_arrow,
-            color: Colors.white,
-          ),
-        ),
-      ),
+      floatingActionButton: workout != null && !workout.isPremium
+          ? Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: FloatingActionButton(
+                onPressed: startWorkout,
+                backgroundColor: Theme.of(context).accentColor,
+                elevation: 5,
+                child: Icon(
+                  Icons.play_arrow,
+                  color: Colors.white,
+                ),
+              ),
+            )
+          : Container(),
     );
   }
 }

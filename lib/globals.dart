@@ -54,7 +54,9 @@ class Global {
                   CupertinoDialogAction(
                     isDefaultAction: true,
                     child: Text(actionText),
-                    onPressed: actionFunction,
+                    onPressed: () {                      
+                      actionFunction();
+                    },
                   ),
                 ],
               );
@@ -72,7 +74,9 @@ class Global {
                 actions: <Widget>[
                   FlatButton(
                     child: Text(actionText),
-                    onPressed: actionFunction,
+                    onPressed: () {                      
+                      actionFunction();
+                    },
                   ),
                 ],
               );

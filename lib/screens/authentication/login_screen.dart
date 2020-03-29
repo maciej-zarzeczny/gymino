@@ -138,6 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: Image(
                               image:
                                   AssetImage('assets/images/gymino_logo.png'),
+                                  width: MediaQuery.of(context).size.width * 0.5,
                             ),
                           ),
                           Container(

@@ -16,6 +16,7 @@ import './screens/authentication/login_screen.dart';
 import './screens/authentication/auth_wrapper.dart';
 import './screens/authentication/register_screen.dart';
 import './screens/saved_workouts_screen.dart';
+import './screens/subscription_screen.dart';
 import './models/user.dart';
 
 void main() {
@@ -156,6 +157,7 @@ class MyApp extends StatelessWidget {
               ExerciseOverviewScreen(),
           TrainerInfoScreen.routeName: (context) => TrainerInfoScreen(),
           SavedWorkoutsScreen.routeName: (context) => SavedWorkoutsScreen(),
+          SubscriptionScreen.routeName: (context) => SubscriptionScreen(),          
         },
       ),
     );
