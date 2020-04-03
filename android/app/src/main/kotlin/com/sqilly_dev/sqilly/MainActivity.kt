@@ -1,4 +1,4 @@
-package com.sqilly_dev.sqilly
+package com.zarzeczny_maciej.gymino
 
 import android.os.Bundle
 

@@ -17,51 +17,63 @@ class RecommendedTrainer extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).pushNamed(TrainerWorkoutsScreen.routeName,
-            arguments: recommendedTrainer);
+        Navigator.of(context).pushNamed(TrainerWorkoutsScreen.routeName, arguments: recommendedTrainer);
       },
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.45,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15.0),
-          image: DecorationImage(
-            image: CachedNetworkImageProvider(recommendedTrainer.image),
-            fit: BoxFit.cover,
-            alignment: Alignment.topCenter,
-            colorFilter: ColorFilter.mode(Colors.black38, BlendMode.darken),
+      child: CachedNetworkImage(
+        imageUrl: recommendedTrainer.image,
+        placeholder: (context, url) => Center(
+          child: Icon(
+            Icons.image,
+            color: Global().darkGrey,
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: <Widget>[
-              Text(
-                recommendedTrainer.name,
-                style: Theme.of(context).textTheme.display1.copyWith(
-                    color: Global().canvasColor, fontWeight: FontWeight.w500),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              SizedBox(height: 5.0),
-              Row(
-                children: <Widget>[
-                  Icon(
-                    Icons.fitness_center,
-                    color: Global().canvasColor,
-                    size: SizeConfig.safeBlockHorizontal * 5,
-                  ),
-                  SizedBox(width: 5.0),
-                  Text(
-                    recommendedTrainer.numberOfWorkouts.toString(),
-                    style: Theme.of(context).textTheme.body1.copyWith(
-                        color: Global().canvasColor,
-                        fontSize: SizeConfig.safeBlockHorizontal * 4),
-                  ),
-                ],
-              ),
-            ],
+        errorWidget: (context, url, error) => Center(
+          child: Icon(
+            Icons.broken_image,
+            color: Global().darkGrey,
+          ),
+        ),
+        imageBuilder: (context, imageProvider) => Container(
+          width: MediaQuery.of(context).size.width * 0.5,
+          decoration: BoxDecoration(
+            color: Global().mediumGrey,
+            borderRadius: BorderRadius.circular(15.0),
+            image: DecorationImage(
+              image: imageProvider,
+              fit: BoxFit.cover,
+              alignment: Alignment.topCenter,
+              colorFilter: ColorFilter.mode(Colors.black38, BlendMode.darken),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                Text(
+                  recommendedTrainer.name,
+                  style: Theme.of(context).textTheme.display1.copyWith(color: Global().canvasColor, fontWeight: FontWeight.w500),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: 5.0),
+                Row(
+                  children: <Widget>[
+                    Icon(
+                      Icons.fitness_center,
+                      color: Global().canvasColor,
+                      size: SizeConfig.safeBlockHorizontal * 5,
+                    ),
+                    SizedBox(width: 5.0),
+                    Text(
+                      recommendedTrainer.numberOfWorkouts.toString(),
+                      style: Theme.of(context).textTheme.body1.copyWith(color: Global().canvasColor, fontSize: SizeConfig.safeBlockHorizontal * 4),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

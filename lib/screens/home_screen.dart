@@ -67,20 +67,20 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
                 },
                 itemBuilder: (context) => <PopupMenuEntry>[
-                  PopupMenuItem(
-                    value: 0,
-                    child: Text(
-                      'Regulamin',
-                      style: Theme.of(context).textTheme.body1.copyWith(color: Theme.of(context).iconTheme.color),
-                    ),
-                  ),
-                  PopupMenuItem(
-                    value: 1,
-                    child: Text(
-                      'Polityka prywatności',
-                      style: Theme.of(context).textTheme.body1.copyWith(color: Theme.of(context).iconTheme.color),
-                    ),
-                  ),
+                  // PopupMenuItem(
+                  //   value: 0,
+                  //   child: Text(
+                  //     'Regulamin',
+                  //     style: Theme.of(context).textTheme.body1.copyWith(color: Theme.of(context).iconTheme.color),
+                  //   ),
+                  // ),
+                  // PopupMenuItem(
+                  //   value: 1,
+                  //   child: Text(
+                  //     'Polityka prywatności',
+                  //     style: Theme.of(context).textTheme.body1.copyWith(color: Theme.of(context).iconTheme.color),
+                  //   ),
+                  // ),
                   PopupMenuItem(
                     value: 2,
                     child: Text(

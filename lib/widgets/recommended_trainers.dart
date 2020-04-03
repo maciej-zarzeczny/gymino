@@ -14,19 +14,13 @@ class RecommendedTrainers extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: recommendedTrainers.length > 1
-          ? (MediaQuery.of(context).size.height -
-                  MediaQuery.of(context).padding.top) *
-              0.35
-          : (MediaQuery.of(context).size.height -
-                  MediaQuery.of(context).padding.top) *
-              0.3,
+          ? MediaQuery.of(context).size.width * 0.7
+          : MediaQuery.of(context).size.width * 0.57,
       constraints: BoxConstraints(minHeight: 250),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          recommendedTrainers.length > 1
-              ? CustomTitle('Polecani dla ciebie')
-              : CustomTitle('Polecany dla ciebie'),
+          recommendedTrainers.length > 1 ? CustomTitle('Polecani dla ciebie') : CustomTitle('Polecany dla ciebie'),
           Expanded(
             child: recommendedTrainers.length > 1
                 ? ListView.separated(

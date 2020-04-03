@@ -78,9 +78,49 @@ class FinishedWorkout {
   }
 
   Map<String, dynamic> toJson() => {
-        'name': name,
-        'date': date,
-        'imageUrl': imageUrl,
-        'exercises': exercises,
-      };
+    'name': name,
+    'date': date,
+    'imageUrl': imageUrl,
+    'exercises': exercises,
+  };
+}
+
+class SavedWorkout {
+  final String id;
+  final String name;
+  final String imageUrl;  
+  final String trainerId;
+  final int difficulty;
+  final int duration;   
+
+  SavedWorkout({
+    this.id,
+    this.name,
+    this.imageUrl,
+    this.trainerId,
+    this.difficulty,
+    this.duration,    
+  });
+
+  factory SavedWorkout.fromSnapshot(DocumentSnapshot doc) {
+    Map data = doc.data;
+
+    return SavedWorkout(
+      id: doc.documentID ?? '',
+      name: data['name'] ?? '',
+      imageUrl: data['imageUrl'] ?? '',
+      trainerId: data['trainerId'] ?? '',
+      difficulty: data['difficulty'] ?? 0,
+      duration: data['duration'] ?? 0,      
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'name': name,
+    'imageUrl': imageUrl,
+    'trainerId': trainerId,
+    'difficulty': difficulty,
+    'duration': duration,
+    'createdAt': Timestamp.now(),
+  };
 }

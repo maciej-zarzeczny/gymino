@@ -12,6 +12,7 @@ import '../size_config.dart';
 import '../models/exercise.dart';
 import '../providers/users_provider.dart';
 import '../globals.dart';
+import '../screens/exercise_overview_screen.dart';
 
 class WorkoutScreen extends StatefulWidget {
   static const routeName = '/workout';
@@ -257,16 +258,34 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                               AnimatedOpacity(
                                 duration: Duration(milliseconds: 200),
                                 opacity: _opacity,
-                                child: Container(
-                                  height: MediaQuery.of(context).size.width * 0.8,
-                                  margin: const EdgeInsets.symmetric(horizontal: 20.0),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(15.0),
-                                    color: Global().softGrey,
-                                    image: DecorationImage(
-                                      image: CachedNetworkImageProvider(_currentExercise.image),
-                                      fit: BoxFit.cover,
-                                      colorFilter: ColorFilter.mode(Colors.black26, BlendMode.darken),
+                                child: GestureDetector(
+                                  onTap: () => Navigator.of(context).pushNamed(ExerciseOverviewScreen.routeName, arguments: _currentExercise.id),
+                                  child: CachedNetworkImage(
+                                    imageUrl: _currentExercise.image,
+                                    placeholder: (context, url) => Center(
+                                      child: Icon(
+                                        Icons.image,
+                                        color: Global().darkGrey,
+                                      ),
+                                    ),
+                                    errorWidget: (context, url, error) => Center(
+                                      child: Icon(
+                                        Icons.broken_image,
+                                        color: Global().darkGrey,
+                                      ),
+                                    ),
+                                    imageBuilder: (context, imageProvider) => Container(
+                                      height: MediaQuery.of(context).size.width * 0.8,
+                                      margin: const EdgeInsets.symmetric(horizontal: 20.0),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(15.0),
+                                        color: Global().lightGrey,
+                                        image: DecorationImage(
+                                          image: imageProvider,
+                                          fit: BoxFit.cover,
+                                          colorFilter: ColorFilter.mode(Colors.black26, BlendMode.darken),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),

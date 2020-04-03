@@ -13,7 +13,7 @@ class UserData {
   int trainingType;
   int experienceLevel;
   int finishedWorkouts;
-  final Map<dynamic, dynamic> savedWorkouts;
+  List<dynamic> savedWorkouts;  
 
   UserData({
     this.uid,
@@ -21,7 +21,7 @@ class UserData {
     this.gender,
     this.trainingType,
     this.experienceLevel,
-    this.finishedWorkouts,
+    this.finishedWorkouts,    
     this.savedWorkouts,
   });
 
@@ -34,8 +34,8 @@ class UserData {
       gender: data['gender'] ?? 0,
       trainingType: data['trainingType'] ?? 0,
       experienceLevel: data['experienceLevel'] ?? 0,
-      finishedWorkouts: data['finishedWorkouts'] ?? 0,
-      savedWorkouts: data['savedWorkouts'] ?? {},
+      finishedWorkouts: data['finishedWorkouts'] ?? 0,      
+      savedWorkouts: data['savedWorkouts'].toList() ?? [],
     );
   }
 

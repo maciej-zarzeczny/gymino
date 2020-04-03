@@ -73,7 +73,7 @@ class _WorkoutOverviewScreenState extends State<WorkoutOverviewScreen> {
       exercises = workout.getExercises();
       userData = usersProvider.userData;
 
-      if (userData.savedWorkouts != null && userData.savedWorkouts.containsKey(workoutId)) {
+      if (userData.savedWorkouts != null && userData.savedWorkouts.contains(workoutId)) {
         isSaved = true;
       }
     }
@@ -102,6 +102,7 @@ class _WorkoutOverviewScreenState extends State<WorkoutOverviewScreen> {
           content: Text("Dodano do zapisanych"),
         ));
       }).catchError((err) {
+        print(err);
         Global().showAlertDialog(
             context, 'Błąd', 'Podczas łączenia z serwerem wystąpił błąd, spróbuj ponownie później.', 'Ok', () => Navigator.of(context).pop());
       });

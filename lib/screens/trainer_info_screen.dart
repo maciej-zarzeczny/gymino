@@ -153,6 +153,7 @@ class _TrainerInfoScreenState extends State<TrainerInfoScreen> {
       padding: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15.0),
+        color: Global().mediumGrey,
         image: DecorationImage(
           image: form == 1 ? AssetImage('assets/images/supplements/powder.jpeg') : AssetImage('assets/images/supplements/pills.jpg'),
           fit: BoxFit.cover,

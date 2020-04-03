@@ -39,7 +39,7 @@ class _TrainersScreenState extends State<TrainersScreen> {
             setState(() {
               _isLoading = false;
             });
-          }).catchError((err) {
+          }).catchError((err) {            
             Global().showAlertDialog(
               context,
               'Błąd',
@@ -53,7 +53,7 @@ class _TrainersScreenState extends State<TrainersScreen> {
             _isLoading = false;
           });
         }
-      }).catchError((err) {
+      }).catchError((err) {        
         Global().showAlertDialog(
           context,
           'Błąd',

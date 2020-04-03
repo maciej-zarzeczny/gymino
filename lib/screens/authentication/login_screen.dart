@@ -17,7 +17,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _globals = Global();
+final _globals = Global();
 
   final AuthProvider _authProvider = AuthProvider();
 
@@ -72,28 +72,28 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  void signInWithGoogle() async {
-    setState(() => _isLoading = true);
+  // void signInWithGoogle() async {
+  //   setState(() => _isLoading = true);
 
-    FocusScopeNode currentFocus = FocusScope.of(context);
-    if (!currentFocus.hasPrimaryFocus) {
-      currentFocus.unfocus();
-    }
+  //   FocusScopeNode currentFocus = FocusScope.of(context);
+  //   if (!currentFocus.hasPrimaryFocus) {
+  //     currentFocus.unfocus();
+  //   }
 
-    dynamic result = await _authProvider.signInWithGoogle();
-    if (result.runtimeType == FirebaseUser) {
-      setState(() => _isLoading = false);
-    } else {
-      setState(() => _isLoading = false);
-      _globals.showAlertDialog(
-        context,
-        'Błąd logowania',
-        'Podczas logowania wystąpił błąd spróbuj jeszcze raz.',
-        'Ok',
-        () => Navigator.of(context).pop(),
-      );
-    }
-  }
+  //   dynamic result = await _authProvider.signInWithGoogle();
+  //   if (result.runtimeType == FirebaseUser) {
+  //     setState(() => _isLoading = false);
+  //   } else {
+  //     setState(() => _isLoading = false);
+  //     _globals.showAlertDialog(
+  //       context,
+  //       'Błąd logowania',
+  //       'Podczas logowania wystąpił błąd spróbuj jeszcze raz.',
+  //       'Ok',
+  //       () => Navigator.of(context).pop(),
+  //     );
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -166,17 +166,17 @@ class _LoginScreenState extends State<LoginScreen> {
                                   text: 'Zaloguj',
                                   onTapFunction: signIn,
                                 ),
-                                Text(
-                                  'Lub',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .overline
-                                      .copyWith(
-                                        color: Global().canvasColor,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                ),
-                                GoogleSignInButton(signInWithGoogle),
+                                // Text(
+                                //   'Lub',
+                                //   style: Theme.of(context)
+                                //       .textTheme
+                                //       .overline
+                                //       .copyWith(
+                                //         color: Global().canvasColor,
+                                //         fontWeight: FontWeight.bold,
+                                //       ),
+                                // ),
+                                // GoogleSignInButton(signInWithGoogle),
                               ],
                             ),
                           ),
@@ -186,12 +186,14 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: Padding(
                               padding: EdgeInsets.only(
                                 bottom:
-                                    MediaQuery.of(context).padding.bottom + 10,
+                                    MediaQuery.of(context).padding.bottom + 20,
                               ),
                               child: Text(
                                 'Nie masz konta? Zarejestruj się',
+                                textAlign: TextAlign.center,
                                 style:
                                     Theme.of(context).textTheme.body1.copyWith(
+                                          fontSize: 17,
                                           color: Global().canvasColor,
                                           fontWeight: FontWeight.bold,
                                         ),

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
-import 'package:sqilly/providers/users_provider.dart';
+
+import './providers/users_provider.dart';
 import './globals.dart';
 import './providers/trainers_provider.dart';
 import './providers/workouts_provider.dart';
