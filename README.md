@@ -1,16 +1,6 @@
-# sqilly
+# Gymino mobile application
 
-A new Flutter project.
+![Gymino app overview image](https://firebasestorage.googleapis.com/v0/b/sqilly.appspot.com/o/sqilly_promo.png?alt=media&token=60f46dd7-9c8f-4924-ba1f-bdb1d45d6ed7)
 
-## Getting Started
+Gymino app is available on iOS and Android platforms. It was created with Flutter and uses Firebase as a backend. It's a training app that allows users to choose from different trainers. Each trainer can add many workouts for the users. Both trainers and workouts are being suggested to users based on their preferences. Each workout consists of exercises with descriptions and number of sets and reps in each set. All this informations are provided by the trainer. The app acts as a virtual trainer for the user showing him what exercises he should do, what he should focus on while doing them and counting his rest periods between each sets.
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
