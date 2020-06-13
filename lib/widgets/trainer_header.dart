@@ -25,7 +25,7 @@ class TrainerHeader extends StatelessWidget {
             width: double.infinity,
             imageUrl: trainer.image,
             fit: BoxFit.cover,
-            alignment: Alignment.topCenter,
+            alignment: Alignment.center,
             errorWidget: (context, url, error) => Center(
               child: Icon(
               Icons.error_outline,

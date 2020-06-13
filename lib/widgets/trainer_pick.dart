@@ -42,7 +42,7 @@ class TrainerPick extends StatelessWidget {
             image: DecorationImage(
               image: imageProvider,
               fit: BoxFit.cover,
-              alignment: Alignment.topCenter,
+              alignment: Alignment.center,
               colorFilter: ColorFilter.mode(Colors.black38, BlendMode.darken),
             ),
           ),

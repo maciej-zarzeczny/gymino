@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../widgets/button.dart';
 import '../globals.dart';
 import '../providers/workouts_provider.dart';
 import '../models/workout.dart';
 import '../widgets/workout_header.dart';
 import '../widgets/exercise_card.dart';
 import '../screens/workout_screen.dart';
-import '../screens/subscription_screen.dart';
 import '../models/exercise.dart';
 import '../providers/users_provider.dart';
 import '../models/user.dart';
@@ -228,25 +226,13 @@ class _WorkoutOverviewScreenState extends State<WorkoutOverviewScreen> {
                     workout.isPremium
                         ? Align(
                             alignment: Alignment.bottomCenter,
-                            child: Column(
-                              children: <Widget>[
-                                Container(
-                                  width: MediaQuery.of(context).size.width * 0.8,
-                                  child: Button(
-                                    onTapFunction: () => Navigator.of(context).pushNamed(SubscriptionScreen.routeName),
-                                    text: 'Wykup subskrypcję',
-                                  ),
-                                ),
-                                Container(
-                                  width: MediaQuery.of(context).size.width * 0.7,
-                                  padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
-                                  child: Text(
-                                    'Ten trening dostępny jest tylko dla użytkowników subskrybujących tego trenera',
-                                    style: Theme.of(context).textTheme.body2,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                )
-                              ],
+                            child: Padding(                              
+                              padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 10.0, right: 20.0, left: 20.0),
+                              child: Text(
+                                'Ten trening dostępny jest tylko dla użytkowników subskrybujących tego trenera',
+                                style: Theme.of(context).textTheme.body2.copyWith(color: Theme.of(context).accentColor),
+                                textAlign: TextAlign.center,
+                              ),
                             ),
                           )
                         : Container(),
